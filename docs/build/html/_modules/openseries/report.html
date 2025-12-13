@@ -7,15 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>openseries.report &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=841abef3"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -995,6 +995,27 @@
         <span class="s2">&quot;@media (min-width: 961px) and (pointer: fine) and (hover: hover) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-desktop { display: block !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-mobile { display: none !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot { &quot;</span>
+        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; &quot;</span>
+        <span class="s2">&quot;overflow-x: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot &gt; div { &quot;</span>
+        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; &quot;</span>
+        <span class="s2">&quot;overflow-x: hidden !important; max-height: 100% !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot svg { &quot;</span>
+        <span class="s2">&quot;overflow: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop * { &quot;</span>
+        <span class="s2">&quot;overflow-y: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s1">&#39;    .plotly-desktop [style*=&quot;overflow&quot;] { &#39;</span>
+        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .scrollbar-kit { &quot;</span>
+        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
+        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .scrollbar-slider { &quot;</span>
+        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
+        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .scrollbar-glyph { &quot;</span>
+        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
+        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;/style&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;script&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1050,6 +1071,63 @@
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function adjustTableSize(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        function forceNoScroll() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var scrollbarKits = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-kit&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            scrollbarKits.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var scrollbarSliders = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-slider&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            scrollbarSliders.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var scrollbarGlyphs = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-glyph&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            scrollbarGlyphs.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var allElements = container.querySelectorAll(&#39;*&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            allElements.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var computed = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                if (computed.overflowY === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;computed.overflowY === &#39;scroll&#39; || computed.overflow === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;computed.overflow === &#39;scroll&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-y&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-x&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                if (el.scrollHeight &gt; el.clientHeight &amp;&amp; &quot;</span>
+        <span class="s2">&quot;el.clientHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;max-height&#39;, &quot;</span>
+        <span class="s2">&quot;el.clientHeight + &#39;px&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-y&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var svg = plot.querySelector(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1058,89 +1136,197 @@
         <span class="s2">&quot;            if (!tableGroup) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var plotRect = plot.getBoundingClientRect();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            if (plotRect.height === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            setTimeout(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            function adjustTable() {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                try {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    var bbox = tableGroup.getBBox();</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    if (bbox.height === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    var availableHeight = plotRect.height - 60;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    var currentHeight = bbox.height;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    if (currentHeight &gt; availableHeight &amp;&amp; &quot;</span>
-        <span class="s2">&quot;availableHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var scaleFactor = availableHeight / &quot;</span>
-        <span class="s2">&quot;currentHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var minScale = 0.4;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var maxScale = 1.0;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        scaleFactor = Math.max(minScale, &quot;</span>
-        <span class="s2">&quot;Math.min(maxScale, scaleFactor));</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var existingTransform = &quot;</span>
+        <span class="s2">&quot;                    forceNoScroll();</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var availableHeight = plotRect.height - 100;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (availableHeight &lt;= 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var rows = tableGroup.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;g[class*=</span><span class="se">\&quot;</span><span class="s2">row</span><span class="se">\&quot;</span><span class="s2">]&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (rows.length === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var rowCount = rows.length;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var calculatedRowHeight = availableHeight / rowCount;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var minRowHeight = 18;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var maxRowHeight = 35;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var rowHeight = Math.max(minRowHeight, &quot;</span>
+        <span class="s2">&quot;Math.min(maxRowHeight, calculatedRowHeight));</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var baseFontSize = 12;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var fontScale = rowHeight / 25;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var fontSize = baseFontSize * fontScale;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var minFontSize = 9;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var maxFontSize = 14;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    fontSize = Math.max(minFontSize, &quot;</span>
+        <span class="s2">&quot;Math.min(maxFontSize, fontSize));</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    rows.forEach(function(row, rowIndex) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var yPos = rowIndex * rowHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var rects = row.querySelectorAll(&#39;rect&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var texts = row.querySelectorAll(&#39;text&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        rects.forEach(function(rect) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            var currentHeight = &quot;</span>
+        <span class="s2">&quot;parseFloat(rect.getAttribute(&#39;height&#39;) || &#39;25&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            if (currentHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                rect.setAttribute(&#39;height&#39;, &quot;</span>
+        <span class="s2">&quot;rowHeight.toString());</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                var currentY = &quot;</span>
+        <span class="s2">&quot;parseFloat(rect.getAttribute(&#39;y&#39;) || &#39;0&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                var rowBaseY = Math.floor(currentY / &quot;</span>
+        <span class="s2">&quot;currentHeight) * rowHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                rect.setAttribute(&#39;y&#39;, &quot;</span>
+        <span class="s2">&quot;rowBaseY.toString());</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        texts.forEach(function(text) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            text.setAttribute(&#39;font-size&#39;, &quot;</span>
+        <span class="s2">&quot;fontSize.toString());</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var existingTransform = &quot;</span>
         <span class="s2">&quot;tableGroup.getAttribute(&#39;transform&#39;) || &#39;&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translateMatch = &quot;</span>
+        <span class="s2">&quot;                    var translateMatch = &quot;</span>
         <span class="s2">&quot;existingTransform.match(/translate</span><span class="se">\\</span><span class="s2">(([^)]+)</span><span class="se">\\</span><span class="s2">)/);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translate = translateMatch ? &quot;</span>
+        <span class="s2">&quot;                    var translate = translateMatch ? &quot;</span>
         <span class="s2">&quot;translateMatch[0] : &#39;translate(0,0)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var scaleTransform = translate + &#39; scale(&#39; + &quot;</span>
-        <span class="s2">&quot;scaleFactor + &#39;)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        tableGroup.setAttribute(&#39;transform&#39;, &quot;</span>
-        <span class="s2">&quot;scaleTransform);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    } else if (currentHeight &lt;= availableHeight) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var existingTransform = &quot;</span>
-        <span class="s2">&quot;tableGroup.getAttribute(&#39;transform&#39;) || &#39;&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translateMatch = &quot;</span>
-        <span class="s2">&quot;existingTransform.match(/translate</span><span class="se">\\</span><span class="s2">(([^)]+)</span><span class="se">\\</span><span class="s2">)/);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translate = translateMatch ? &quot;</span>
-        <span class="s2">&quot;translateMatch[0] : &#39;translate(0,0)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        tableGroup.setAttribute(&#39;transform&#39;, &quot;</span>
-        <span class="s2">&quot;translate);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    tableGroup.setAttribute(&#39;transform&#39;, translate);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    forceNoScroll();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                } catch (e) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                    console.log(&#39;Table adjustment error:&#39;, e);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            }, 300);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 200);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 600);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 1200);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 2000);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function disableTableScrolling(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var isDesktop = container.classList &amp;&amp; &quot;</span>
+        <span class="s2">&quot;container.classList.contains(&#39;plotly-desktop&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var overflowValue = isDesktop ? &#39;hidden&#39; : &#39;visible&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var allElements = plot.querySelectorAll(&#39;*&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            allElements.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                var style = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                var overflow = style.overflow;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                var overflowY = style.overflowY;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                if (overflow === &#39;auto&#39; || overflow === &#39;scroll&#39; || &quot;</span>
+        <span class="s2">&quot;                if (el.tagName === &#39;DIV&#39; || el.tagName === &#39;SVG&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var style = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var overflow = style.overflow;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var overflowY = style.overflowY;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (overflow === &#39;auto&#39; || overflow === &#39;scroll&#39; || &quot;</span>
         <span class="s2">&quot;overflowY === &#39;auto&#39; || overflowY === &#39;scroll&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
-        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-y&#39;, &#39;visible&#39;, &quot;</span>
-        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-x&#39;, &#39;visible&#39;, &quot;</span>
-        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        el.style.setProperty(&#39;overflow&#39;, &quot;</span>
+        <span class="s2">&quot;overflowValue, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        el.style.setProperty(&#39;overflow-y&#39;, &quot;</span>
+        <span class="s2">&quot;overflowValue, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        el.style.setProperty(&#39;overflow-x&#39;, &quot;</span>
+        <span class="s2">&quot;overflowValue, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow-y&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow&#39;, overflowValue, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow-y&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var plotDivs = plot.querySelectorAll(&#39;div&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            plotDivs.forEach(function(div) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                div.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;                div.style.setProperty(&#39;overflow&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                div.style.setProperty(&#39;overflow-y&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;                div.style.setProperty(&#39;overflow-y&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var svgs = plot.querySelectorAll(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            svgs.forEach(function(svg) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                svg.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;                svg.style.setProperty(&#39;overflow&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                svg.setAttribute(&#39;overflow&#39;, &#39;visible&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                svg.setAttribute(&#39;overflow&#39;, overflowValue);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function setupScrollObserver(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var isDesktop = container.classList &amp;&amp; &quot;</span>
+        <span class="s2">&quot;container.classList.contains(&#39;plotly-desktop&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        function preventScrollbars() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (isDesktop) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var scrollbarKits = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-kit&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                scrollbarKits.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var scrollbarSliders = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-slider&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                scrollbarSliders.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var scrollbarGlyphs = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-glyph&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                scrollbarGlyphs.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var allElements = plot.querySelectorAll(&#39;*&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    allElements.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        if (el.tagName === &#39;DIV&#39; || &quot;</span>
+        <span class="s2">&quot;el.tagName === &#39;SVG&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            var style = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            if (style.overflow === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;style.overflow === &#39;scroll&#39; || style.overflowY === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;style.overflowY === &#39;scroll&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                el.style.setProperty(&#39;overflow&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;hidden&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                el.style.setProperty(&#39;overflow-y&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;hidden&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                el.style.setProperty(&#39;overflow-x&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;hidden&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    plot.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var svg = plot.querySelector(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (svg) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        svg.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        svg.setAttribute(&#39;overflow&#39;, &#39;hidden&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                adjustTableSize(container);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            } else {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                disableTableScrolling(container);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        var observer = new MutationObserver(function(mutations) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            disableTableScrolling(container);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            preventScrollbars();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        observer.observe(container, {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            childList: true,</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1148,6 +1334,7 @@
         <span class="s2">&quot;            attributes: true,</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            attributeFilter: [&#39;style&#39;, &#39;class&#39;]</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        preventScrollbars();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        return observer;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1176,7 +1363,6 @@
         <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (desktopContainer &amp;&amp; &quot;</span>
         <span class="s1">&#39;desktopContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s2">&quot;            disableTableScrolling(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            adjustTableSize(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            adjustLogoPosition(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            if (!desktopContainer._scrollObserver) {</span><span class="se">\n</span><span class="s2">&quot;</span>

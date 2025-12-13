@@ -54,7 +54,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.githubpages",
-    "myst_parser",
     "sphinx_rtd_theme",
 ]
 
@@ -152,21 +151,7 @@ intersphinx_mapping = {
 # Source file suffixes
 source_suffix = {
     ".rst": None,
-    ".md": "myst_parser",
 }
-
-# MyST parser configuration
-myst_enable_extensions = [
-    "colon_fence",
-    "deflist",
-    "html_admonition",
-    "html_image",
-    "linkify",
-    "replacements",
-    "smartquotes",
-    "substitution",
-    "tasklist",
-]
 
 # Custom substitutions for dynamic content
 # Using GitHub API approach instead of Sphinx substitutions

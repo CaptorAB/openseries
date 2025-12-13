@@ -8,15 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Types and Enums &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=841abef3"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -122,62 +122,62 @@
 <p>Declaring types used throughout the project.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Enum types of OpenTimeSeries to identify the output.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">EWMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EWMA'</span></em></dt>
+<span class="sig-name descname"><span class="pre">EWMA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EWMA'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">PRICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Price(Close)'</span></em></dt>
+<span class="sig-name descname"><span class="pre">PRICE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Price(Close)'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">RTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Return(Total)'</span></em></dt>
+<span class="sig-name descname"><span class="pre">RTRN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Return(Total)'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">RELRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Relative</span> <span class="pre">return'</span></em></dt>
+<span class="sig-name descname"><span class="pre">RELRTRN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Relative</span> <span class="pre">return'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLBETA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Beta'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLBETA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Beta'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLCORR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">correlation'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLCORR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">correlation'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLCVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">CVaR'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLCVAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">CVaR'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLINFORATIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Information</span> <span class="pre">Ratio'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLINFORATIO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Information</span> <span class="pre">Ratio'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">returns'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLRTRN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">returns'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">VaR'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLVAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">VaR'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLVOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">volatility'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLVOL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">volatility'</span></span></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -186,62 +186,62 @@
 <h2>Value Types<a class="headerlink" href="#value-types" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#ValueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Enum types of OpenTimeSeries to identify the output.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">EWMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EWMA'</span></em></dt>
+<span class="sig-name descname"><span class="pre">EWMA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EWMA'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">PRICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Price(Close)'</span></em></dt>
+<span class="sig-name descname"><span class="pre">PRICE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Price(Close)'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">RTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Return(Total)'</span></em></dt>
+<span class="sig-name descname"><span class="pre">RTRN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Return(Total)'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">RELRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Relative</span> <span class="pre">return'</span></em></dt>
+<span class="sig-name descname"><span class="pre">RELRTRN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Relative</span> <span class="pre">return'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLBETA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Beta'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLBETA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Beta'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLCORR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">correlation'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLCORR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">correlation'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLCVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">CVaR'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLCVAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">CVaR'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLINFORATIO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Information</span> <span class="pre">Ratio'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLINFORATIO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Information</span> <span class="pre">Ratio'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLRTRN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">returns'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLRTRN</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">returns'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLVAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">VaR'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLVAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">VaR'</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ROLLVOL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">volatility'</span></em></dt>
+<span class="sig-name descname"><span class="pre">ROLLVOL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Rolling</span> <span class="pre">volatility'</span></span></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -252,7 +252,7 @@
 <h2>Type Aliases<a class="headerlink" href="#type-aliases" title="Link to this heading"></a></h2>
 <dl class="py data">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">SeriesOrFloat_co</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">+SeriesOrFloat_co</span></em></dt>
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">SeriesOrFloat_co</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">+SeriesOrFloat_co</span></span></dt>
 <dd><p>Type variable.</p>
 <p>The preferred way to construct a type variable is via the dedicated
 syntax for generic functions, classes, and type aliases:</p>
@@ -390,7 +390,7 @@ it to types is also the same.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateType</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">datetime.date</span> <span class="pre">|</span> <span class="pre">datetime.datetime</span> <span class="pre">|</span> <span class="pre">numpy.datetime64</span> <span class="pre">|</span> <span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></em></dt>
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateType</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">datetime.date</span> <span class="pre">|</span> <span class="pre">datetime.datetime</span> <span class="pre">|</span> <span class="pre">numpy.datetime64</span> <span class="pre">|</span> <span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></dt>
 <dd><p>Represent a PEP 604 union type</p>
 <p>E.g. for int | str</p>
 </dd></dl>
@@ -523,7 +523,7 @@ it to types is also the same.</p>
 <h2>Validation Classes<a class="headerlink" href="#validation-classes" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Countries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">countryinput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Countries"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Countries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">countryinput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Countries"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Declare Countries.</p>
 <dl class="field-list simple">
@@ -533,12 +533,12 @@ it to types is also the same.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">countryinput</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CountriesType</span></em></dt>
+<span class="sig-name descname"><span class="pre">countryinput</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CountriesType</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span></dt>
 <dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 
@@ -546,7 +546,7 @@ it to types is also the same.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Currency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Currency"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">Currency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#Currency"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Declare Currency.</p>
 <dl class="field-list simple">
@@ -556,12 +556,12 @@ it to types is also the same.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ccy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CurrencyStringType</span></em></dt>
+<span class="sig-name descname"><span class="pre">ccy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CurrencyStringType</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span></dt>
 <dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 
@@ -569,19 +569,19 @@ it to types is also the same.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
 <p>Base class for allowed property arguments definition.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></em></dt>
+<span class="sig-name descname"><span class="pre">allowed_strings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></span></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenTimeSeriesPropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenTimeSeriesPropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenTimeSeriesPropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenTimeSeriesPropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PropertiesList</span></code></p>
 <p>Allowed property arguments for the OpenTimeSeries class.</p>
 <dl class="field-list simple">
@@ -591,7 +591,7 @@ it to types is also the same.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_idx',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_idx',</span> <span class="pre">'length',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'periods_in_a_year',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'yearfrac',</span> <span class="pre">'z_score'}</span></em></dt>
+<span class="sig-name descname"><span class="pre">allowed_strings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_idx',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_idx',</span> <span class="pre">'length',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'periods_in_a_year',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'yearfrac',</span> <span class="pre">'z_score'}</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -615,7 +615,7 @@ it to types is also the same.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenFramePropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenFramePropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">OpenFramePropertiesList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/owntypes.html#OpenFramePropertiesList"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PropertiesList</span></code></p>
 <p>Allowed property arguments for the OpenFrame class.</p>
 <dl class="field-list simple">
@@ -625,7 +625,7 @@ it to types is also the same.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">allowed_strings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_indices',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_indices',</span> <span class="pre">'lengths_of_items',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days_all',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></em></dt>
+<span class="sig-name descname"><span class="pre">allowed_strings</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><span class="pre">ClassVar</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arithmetic_ret',</span> <span class="pre">'cvar_down',</span> <span class="pre">'downside_deviation',</span> <span class="pre">'first_indices',</span> <span class="pre">'geo_ret',</span> <span class="pre">'kappa3_ratio',</span> <span class="pre">'kurtosis',</span> <span class="pre">'last_indices',</span> <span class="pre">'lengths_of_items',</span> <span class="pre">'max_drawdown',</span> <span class="pre">'max_drawdown_cal_year',</span> <span class="pre">'max_drawdown_date',</span> <span class="pre">'omega_ratio',</span> <span class="pre">'positive_share',</span> <span class="pre">'ret_vol_ratio',</span> <span class="pre">'skew',</span> <span class="pre">'sortino_ratio',</span> <span class="pre">'span_of_days_all',</span> <span class="pre">'value_ret',</span> <span class="pre">'var_down',</span> <span class="pre">'vol',</span> <span class="pre">'vol_from_var',</span> <span class="pre">'worst',</span> <span class="pre">'worst_month',</span> <span class="pre">'z_score'}</span></span></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -652,112 +652,112 @@ it to types is also the same.</p>
 <h2>Custom Exceptions<a class="headerlink" href="#custom-exceptions" title="Link to this heading"></a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MixedValuetypesError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MixedValuetypesError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MixedValuetypesError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MixedValuetypesError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when provided timeseries valuetypes are not the same.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">AtLeastOneFrameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#AtLeastOneFrameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">AtLeastOneFrameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#AtLeastOneFrameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when none of the possible frame inputs is provided.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateAlignmentError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#DateAlignmentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateAlignmentError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#DateAlignmentError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when date input is not aligned with existing range.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NumberOfItemsAndLabelsNotSameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NumberOfItemsAndLabelsNotSameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NumberOfItemsAndLabelsNotSameError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NumberOfItemsAndLabelsNotSameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when number of labels is not matching the number of timeseries.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">InitialValueZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#InitialValueZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">InitialValueZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#InitialValueZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when a calculation cannot be performed due to initial value(s) zero.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#CountriesNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#CountriesNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when countries argument is not provided in correct format.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MarketsNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MarketsNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MarketsNotStringNorListStrError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MarketsNotStringNorListStrError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when markets argument is not provided in correct format.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">TradingDaysNotAboveZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#TradingDaysNotAboveZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">TradingDaysNotAboveZeroError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#TradingDaysNotAboveZeroError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when trading days argument is not above zero.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">BothStartAndEndError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#BothStartAndEndError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">BothStartAndEndError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#BothStartAndEndError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when both start and end dates are provided.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NoWeightsError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NoWeightsError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">NoWeightsError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#NoWeightsError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when no weights are provided to function where necessary.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LabelsNotUniqueError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#LabelsNotUniqueError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LabelsNotUniqueError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#LabelsNotUniqueError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when provided label names are not unique.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">RatioInputError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#RatioInputError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">RatioInputError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#RatioInputError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when ratio keyword not provided correctly.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MergingResultedInEmptyError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MergingResultedInEmptyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">MergingResultedInEmptyError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#MergingResultedInEmptyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when a merge resulted in an empty DataFrame.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">IncorrectArgumentComboError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#IncorrectArgumentComboError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">IncorrectArgumentComboError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#IncorrectArgumentComboError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when correct combination of arguments is not provided.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesInputValidationError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesInputValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">PropertiesInputValidationError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#PropertiesInputValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when duplicate strings are provided.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ResampleDataLossError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#ResampleDataLossError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ResampleDataLossError</span></span><a class="reference internal" href="../_modules/openseries/owntypes.html#ResampleDataLossError"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when user attempts to run resample_to_business_period_ends on returns.</p>
 </dd></dl>
