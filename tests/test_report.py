@@ -11,12 +11,10 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 from pandas import Series
-from plotly.subplots import make_subplots  # type: ignore[import-untyped]
 
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
 from openseries.report import (
-    _configure_figure_layout,
     calendar_period_returns,
     report_html,
 )
@@ -424,53 +422,16 @@ class TestReport:
                 msg = "Capture ratio with NaN values test not working as intended."
                 raise ReportTestError(msg)
 
-    def test_configure_figure_layout_with_table_min_height(self: TestReport) -> None:
-        """Test _configure_figure_layout with table_min_height and total_min_height."""
-        frame = self.randomframe.from_deepcopy()
-        frame.to_cumret()
-
-        figure = make_subplots(
-            rows=2,
-            cols=1,
-            specs=[
-                [{"type": "xy"}],
-                [{"type": "xy"}],
-            ],
-        )
-
-        _configure_figure_layout(
-            figure=figure,
-            copied=frame,
-            add_logo=False,
-            vertical_legend=False,
-            title=None,
-            mobile=True,
-            total_min_height=950,
-            table_min_height=200,
-        )
-
-        fig_json = loads(cast("str", figure.to_json()))
-        layout = fig_json["layout"]
-
-        if "yaxis" not in layout or "domain" not in layout["yaxis"]:
-            msg = (
-                "_configure_figure_layout with table_min_height "
-                "not working as intended."
-            )
-            raise ReportTestError(msg)
-
     def test_report_html_auto_open_file(self: TestReport) -> None:
         """Test report_html with auto_open=True and output_type='file'."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        directory = Path(__file__).parent
         with patch("webbrowser.open") as mock_open:
             _, figfile = report_html(
                 data=frame,
                 auto_open=True,
                 output_type="file",
-                directory=directory,
             )
             plotfile = Path(figfile).resolve()
 

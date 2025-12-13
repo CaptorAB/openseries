@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "2.1.1"
+version = "2.1.2"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -67,18 +67,17 @@ pre-commit = ">=4.5.0"
 pytest = ">=9.0.2"
 pytest-cov = ">=7.0.0"
 pytest-xdist = ">=3.8.0"
-ruff = "0.14.8"
+ruff = "0.14.9"
 types-openpyxl = ">=3.1.2"
 scipy-stubs = ">=1.14.1.0"
 types-python-dateutil = ">=2.8.2"
 types-requests = ">=2.20.0"
 
 [tool.poetry.group.docs.dependencies]
-myst-parser = ">=4.0.1"
-sphinx = ">=8.2.3"
+sphinx = ">=9.0.4"
 sphinx-autobuild = ">=2025.8.25"
-sphinx-autodoc-typehints = ">=3.5.2"
-sphinx-rtd-theme = ">=3.0.2"
+sphinx-autodoc-typehints = ">=3.6.0"
+sphinx-rtd-theme = ">=3.1.0rc1"
 
 [build-system]
 requires = ["poetry-core>=2.2.1"]

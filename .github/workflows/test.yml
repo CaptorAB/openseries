@@ -35,7 +35,7 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Manage Poetry cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         id: poetry-cache
         with:
           path: |
@@ -67,7 +67,7 @@ jobs:
           poetry run ruff format
 
       - name: Manage Mypy cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         id: mypy-cache
         with:
           path: .mypy_cache
@@ -120,7 +120,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ github.ref_name == 'master' }}
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CaptorAB/openseries

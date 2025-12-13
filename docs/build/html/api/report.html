@@ -8,15 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Report Generation &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=841abef3"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -149,7 +149,20 @@ labels. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-<p>The report_html function creates comprehensive HTML reports for financial analysis, comparing multiple assets and providing detailed performance metrics, charts, and risk analysis.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">report_html</span></code> function creates comprehensive HTML reports for financial analysis, comparing multiple assets and providing detailed performance metrics, charts, and risk analysis.</p>
+<p>The generated report includes:</p>
+<ul class="simple">
+<li><p><strong>Interactive line charts</strong> showing cumulative returns over time for all assets</p></li>
+<li><p><strong>Bar charts</strong> displaying period returns (annual, quarterly, or monthly depending on data length)</p></li>
+<li><p><strong>Performance metrics table</strong> including:
+- Return metrics (CAGR or simple return, Year-to-Date, Month-to-Date)
+- Risk metrics (Volatility, Sharpe Ratio, Sortino Ratio)
+- Relative performance metrics (Jensen’s Alpha, Information Ratio, Tracking Error, Index Beta)
+- Capture Ratio (for periods longer than one year)
+- Worst period returns
+- Comparison period dates</p></li>
+</ul>
+<p>The report features <strong>responsive design</strong> with separate layouts optimized for desktop and mobile devices. On desktop, charts and tables are displayed side-by-side, while mobile layouts stack content vertically for better viewing on smaller screens. The HTML output automatically adapts to screen size and device capabilities.</p>
 </section>
 </section>
 

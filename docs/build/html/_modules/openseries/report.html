@@ -7,15 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>openseries.report &mdash; openseries 2.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=841abef3"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -534,9 +534,6 @@
     <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">mobile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">total_min_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">table_min_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure figure layout with logo, legend, and title.</span>
 
@@ -546,14 +543,12 @@
 <span class="sd">        add_logo: Whether to add logo.</span>
 <span class="sd">        vertical_legend: Whether to use vertical legend.</span>
 <span class="sd">        title: Optional title for the figure.</span>
-<span class="sd">        mobile: Whether this is a mobile layout. Defaults to False.</span>
-<span class="sd">        total_min_height: Minimum total height for mobile layout in pixels.</span>
-<span class="sd">        table_min_height: Minimum height for table subplot in pixels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">add_logo</span><span class="p">:</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">add_layout_image</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span>
+        <span class="n">logo_copy</span> <span class="o">=</span> <span class="n">logo</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">add_layout_image</span><span class="p">(</span><span class="n">logo_copy</span><span class="p">)</span>
 
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">))</span>
     <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, list[str]]&quot;</span><span class="p">,</span> <span class="n">fig</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -578,24 +573,6 @@
             <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">mobile</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">vertical_legend</span><span class="p">:</span>
-            <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">1.02</span><span class="p">,</span>
-                <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
-            <span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">1.02</span><span class="p">,</span>
-                <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
-            <span class="p">}</span>
-
     <span class="n">layout_updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;legend&quot;</span><span class="p">:</span> <span class="n">legend</span><span class="p">,</span>
         <span class="s2">&quot;colorway&quot;</span><span class="p">:</span> <span class="n">colorway</span><span class="p">[:</span> <span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">],</span>
@@ -603,59 +580,11 @@
         <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">mobile</span> <span class="ow">and</span> <span class="n">total_min_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">layout_updates</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_min_height</span>
-        <span class="n">layout_updates</span><span class="p">[</span><span class="s2">&quot;autosize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="o">**</span><span class="n">layout_updates</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mobile</span><span class="p">:</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
-            <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
-            <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
-            <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
-            <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
-            <span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
-            <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
-            <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
-            <span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
-            <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
-            <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-            <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">table_min_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">total_min_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">400</span>
-            <span class="n">bar_height</span> <span class="o">=</span> <span class="mi">350</span>
-            <span class="n">spacing</span> <span class="o">=</span> <span class="mf">0.08</span>
-            <span class="n">plot_domain_top</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="n">plot_domain_bottom</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">plot_height</span> <span class="o">/</span> <span class="n">total_min_height</span><span class="p">)</span>
-            <span class="n">bar_domain_top</span> <span class="o">=</span> <span class="n">plot_domain_bottom</span> <span class="o">-</span> <span class="n">spacing</span>
-            <span class="n">bar_domain_bottom</span> <span class="o">=</span> <span class="n">bar_domain_top</span> <span class="o">-</span> <span class="p">(</span><span class="n">bar_height</span> <span class="o">/</span> <span class="n">total_min_height</span><span class="p">)</span>
-
-            <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-                <span class="n">yaxis_domain</span><span class="o">=</span><span class="p">[</span><span class="n">plot_domain_bottom</span><span class="p">,</span> <span class="n">plot_domain_top</span><span class="p">],</span>
-                <span class="n">yaxis2_domain</span><span class="o">=</span><span class="p">[</span><span class="n">bar_domain_bottom</span><span class="p">,</span> <span class="n">bar_domain_top</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="n">title_size</span> <span class="o">=</span> <span class="mi">24</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">)</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">title_size</span> <span class="o">=</span> <span class="mi">36</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">title_size</span> <span class="o">=</span> <span class="mi">36</span>
 
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
         <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
@@ -823,15 +752,94 @@
             <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">_configure_figure_layout</span><span class="p">(</span>
-        <span class="n">figure_mobile</span><span class="p">,</span>
-        <span class="n">copied</span><span class="p">,</span>
-        <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">,</span>
-        <span class="n">vertical_legend</span><span class="o">=</span><span class="n">vertical_legend</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">mobile</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">total_min_height</span><span class="o">=</span><span class="n">total_min_height</span><span class="p">,</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">add_logo</span><span class="p">:</span>
+        <span class="n">logo_copy</span> <span class="o">=</span> <span class="n">logo</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">logo_copy</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.99</span>
+        <span class="n">logo_copy</span><span class="p">[</span><span class="s2">&quot;xanchor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;right&quot;</span>
+        <span class="n">figure_mobile</span><span class="o">.</span><span class="n">add_layout_image</span><span class="p">(</span><span class="n">logo_copy</span><span class="p">)</span>
+
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">))</span>
+    <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, list[str]]&quot;</span><span class="p">,</span> <span class="n">fig</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;colorway&quot;</span><span class="p">,</span>
+        <span class="p">[],</span>
     <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">vertical_legend</span><span class="p">:</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.04</span><span class="p">,</span>
+            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;yanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;xanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+            <span class="s2">&quot;orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="n">layout_updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;legend&quot;</span><span class="p">:</span> <span class="n">legend</span><span class="p">,</span>
+        <span class="s2">&quot;colorway&quot;</span><span class="p">:</span> <span class="n">colorway</span><span class="p">[:</span> <span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">],</span>
+        <span class="s2">&quot;autosize&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">total_min_height</span><span class="p">,</span>
+        <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="o">**</span><span class="n">layout_updates</span><span class="p">)</span>
+
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
+        <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
+        <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
+        <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
+        <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">tickangle</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
+        <span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
+        <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
+        <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
+        <span class="n">tickformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
+        <span class="n">gridcolor</span><span class="o">=</span><span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span>
+        <span class="n">automargin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plot_height</span> <span class="o">=</span> <span class="mi">400</span>
+    <span class="n">bar_height</span> <span class="o">=</span> <span class="mi">350</span>
+    <span class="n">spacing</span> <span class="o">=</span> <span class="mf">0.08</span>
+    <span class="n">plot_domain_top</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">plot_domain_bottom</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">plot_height</span> <span class="o">/</span> <span class="n">total_min_height</span><span class="p">)</span>
+    <span class="n">bar_domain_top</span> <span class="o">=</span> <span class="n">plot_domain_bottom</span> <span class="o">-</span> <span class="n">spacing</span>
+    <span class="n">bar_domain_bottom</span> <span class="o">=</span> <span class="n">bar_domain_top</span> <span class="o">-</span> <span class="p">(</span><span class="n">bar_height</span> <span class="o">/</span> <span class="n">total_min_height</span><span class="p">)</span>
+
+    <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">yaxis_domain</span><span class="o">=</span><span class="p">[</span><span class="n">plot_domain_bottom</span><span class="p">,</span> <span class="n">plot_domain_top</span><span class="p">],</span>
+        <span class="n">yaxis2_domain</span><span class="o">=</span><span class="p">[</span><span class="n">bar_domain_bottom</span><span class="p">,</span> <span class="n">bar_domain_top</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">title_size</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">figure_mobile</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;br&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">title_size</span><span class="p">}}},</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">figure_mobile</span>
 
@@ -940,7 +948,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">desktop_style</span> <span class="o">=</span> <span class="s2">&quot;width:100%;&quot;</span>
     <span class="n">mobile_style</span> <span class="o">=</span> <span class="s2">&quot;width:100%; display:none;&quot;</span>
-    <span class="n">match_media</span> <span class="o">=</span> <span class="s1">&#39;window.matchMedia(&quot;(max-width: 960px)&quot;).matches&#39;</span>
+    <span class="n">match_media</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;(window.matchMedia(&quot;(max-width: 960px)&quot;).matches || &#39;</span>
+        <span class="s1">&#39;&quot;ontouchstart&quot; in window || navigator.maxTouchPoints &gt; 0)&#39;</span>
+    <span class="p">)</span>
     <span class="n">desktop_get</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;document.getElementById(&quot;</span><span class="si">{</span><span class="n">div_id_desktop</span><span class="si">}</span><span class="s1">_container&quot;)&#39;</span>
     <span class="n">mobile_get</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;document.getElementById(&quot;</span><span class="si">{</span><span class="n">div_id_mobile</span><span class="si">}</span><span class="s1">_container&quot;)&#39;</span>
 
@@ -957,7 +968,7 @@
         <span class="sa">f</span><span class="s2">&quot;&lt;/div&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;style&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;body { overflow-y: auto; }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;@media (max-width: 960px) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;@media (max-width: 960px), (pointer: coarse), (hover: none) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-desktop { display: none !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-mobile { display: block !important; &quot;</span>
         <span class="s2">&quot;overflow: visible !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -981,13 +992,55 @@
         <span class="s2">&quot;    .plotly-mobile [style*=&#39;overflow&#39;] { &quot;</span>
         <span class="s2">&quot;overflow: visible !important; overflow-y: visible !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;}</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;@media (min-width: 961px) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;@media (min-width: 961px) and (pointer: fine) and (hover: hover) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-desktop { display: block !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-mobile { display: none !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot { &quot;</span>
+        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; &quot;</span>
+        <span class="s2">&quot;overflow-x: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot &gt; div { &quot;</span>
+        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; &quot;</span>
+        <span class="s2">&quot;overflow-x: hidden !important; max-height: 100% !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot svg { &quot;</span>
+        <span class="s2">&quot;overflow: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop * { &quot;</span>
+        <span class="s2">&quot;overflow-y: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s1">&#39;    .plotly-desktop [style*=&quot;overflow&quot;] { &#39;</span>
+        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .scrollbar-kit { &quot;</span>
+        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
+        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .scrollbar-slider { &quot;</span>
+        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
+        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    .plotly-desktop .scrollbar-glyph { &quot;</span>
+        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
+        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;/style&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;script&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    function adjustLogoPosition(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var svg = plot.querySelector(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (!svg) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var images = svg.querySelectorAll(&#39;image[xref=</span><span class="se">\&quot;</span><span class="s2">paper</span><span class="se">\&quot;</span><span class="s2">]&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            images.forEach(function(img) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var isNarrow = window.matchMedia(&quot;</span>
+        <span class="s2">&quot;&#39;(max-width: 960px)&#39;).matches;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                if (isNarrow) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    img.setAttribute(&#39;x&#39;, &#39;0.99&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    img.setAttribute(&#39;xanchor&#39;, &#39;right&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                } else {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    img.setAttribute(&#39;x&#39;, &#39;0.01&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    img.removeAttribute(&#39;xanchor&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function updateLayout() {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;        var isMobile = </span><span class="si">{</span><span class="n">match_media</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;        var desktopContainer = </span><span class="si">{</span><span class="n">desktop_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1010,12 +1063,71 @@
         <span class="s1">&#39;mobileContainer.style.display = &quot;none&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="s2">&quot;            disableTableScrolling(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            setTimeout(function() { &quot;</span>
-        <span class="s2">&quot;adjustTableSize(desktopContainer); }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;adjustTableSize(desktopContainer); &quot;</span>
+        <span class="s2">&quot;adjustLogoPosition(desktopContainer); }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        adjustLogoPosition(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function adjustTableSize(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        function forceNoScroll() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var scrollbarKits = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-kit&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            scrollbarKits.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var scrollbarSliders = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-slider&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            scrollbarSliders.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var scrollbarGlyphs = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-glyph&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            scrollbarGlyphs.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var allElements = container.querySelectorAll(&#39;*&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            allElements.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var computed = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                if (computed.overflowY === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;computed.overflowY === &#39;scroll&#39; || computed.overflow === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;computed.overflow === &#39;scroll&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-y&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-x&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                if (el.scrollHeight &gt; el.clientHeight &amp;&amp; &quot;</span>
+        <span class="s2">&quot;el.clientHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;max-height&#39;, &quot;</span>
+        <span class="s2">&quot;el.clientHeight + &#39;px&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-y&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var svg = plot.querySelector(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1024,89 +1136,197 @@
         <span class="s2">&quot;            if (!tableGroup) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var plotRect = plot.getBoundingClientRect();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            if (plotRect.height === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            setTimeout(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            function adjustTable() {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                try {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    var bbox = tableGroup.getBBox();</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    if (bbox.height === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    var availableHeight = plotRect.height - 60;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    var currentHeight = bbox.height;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    if (currentHeight &gt; availableHeight &amp;&amp; &quot;</span>
-        <span class="s2">&quot;availableHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var scaleFactor = availableHeight / &quot;</span>
-        <span class="s2">&quot;currentHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var minScale = 0.4;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var maxScale = 1.0;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        scaleFactor = Math.max(minScale, &quot;</span>
-        <span class="s2">&quot;Math.min(maxScale, scaleFactor));</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var existingTransform = &quot;</span>
+        <span class="s2">&quot;                    forceNoScroll();</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var availableHeight = plotRect.height - 100;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (availableHeight &lt;= 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var rows = tableGroup.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;g[class*=</span><span class="se">\&quot;</span><span class="s2">row</span><span class="se">\&quot;</span><span class="s2">]&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (rows.length === 0) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var rowCount = rows.length;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var calculatedRowHeight = availableHeight / rowCount;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var minRowHeight = 18;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var maxRowHeight = 35;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var rowHeight = Math.max(minRowHeight, &quot;</span>
+        <span class="s2">&quot;Math.min(maxRowHeight, calculatedRowHeight));</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var baseFontSize = 12;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var fontScale = rowHeight / 25;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var fontSize = baseFontSize * fontScale;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var minFontSize = 9;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var maxFontSize = 14;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    fontSize = Math.max(minFontSize, &quot;</span>
+        <span class="s2">&quot;Math.min(maxFontSize, fontSize));</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    rows.forEach(function(row, rowIndex) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var yPos = rowIndex * rowHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var rects = row.querySelectorAll(&#39;rect&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        var texts = row.querySelectorAll(&#39;text&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        rects.forEach(function(rect) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            var currentHeight = &quot;</span>
+        <span class="s2">&quot;parseFloat(rect.getAttribute(&#39;height&#39;) || &#39;25&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            if (currentHeight &gt; 0) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                rect.setAttribute(&#39;height&#39;, &quot;</span>
+        <span class="s2">&quot;rowHeight.toString());</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                var currentY = &quot;</span>
+        <span class="s2">&quot;parseFloat(rect.getAttribute(&#39;y&#39;) || &#39;0&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                var rowBaseY = Math.floor(currentY / &quot;</span>
+        <span class="s2">&quot;currentHeight) * rowHeight;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                rect.setAttribute(&#39;y&#39;, &quot;</span>
+        <span class="s2">&quot;rowBaseY.toString());</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        texts.forEach(function(text) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            text.setAttribute(&#39;font-size&#39;, &quot;</span>
+        <span class="s2">&quot;fontSize.toString());</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var existingTransform = &quot;</span>
         <span class="s2">&quot;tableGroup.getAttribute(&#39;transform&#39;) || &#39;&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translateMatch = &quot;</span>
+        <span class="s2">&quot;                    var translateMatch = &quot;</span>
         <span class="s2">&quot;existingTransform.match(/translate</span><span class="se">\\</span><span class="s2">(([^)]+)</span><span class="se">\\</span><span class="s2">)/);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translate = translateMatch ? &quot;</span>
+        <span class="s2">&quot;                    var translate = translateMatch ? &quot;</span>
         <span class="s2">&quot;translateMatch[0] : &#39;translate(0,0)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var scaleTransform = translate + &#39; scale(&#39; + &quot;</span>
-        <span class="s2">&quot;scaleFactor + &#39;)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        tableGroup.setAttribute(&#39;transform&#39;, &quot;</span>
-        <span class="s2">&quot;scaleTransform);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    } else if (currentHeight &lt;= availableHeight) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var existingTransform = &quot;</span>
-        <span class="s2">&quot;tableGroup.getAttribute(&#39;transform&#39;) || &#39;&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translateMatch = &quot;</span>
-        <span class="s2">&quot;existingTransform.match(/translate</span><span class="se">\\</span><span class="s2">(([^)]+)</span><span class="se">\\</span><span class="s2">)/);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        var translate = translateMatch ? &quot;</span>
-        <span class="s2">&quot;translateMatch[0] : &#39;translate(0,0)&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                        tableGroup.setAttribute(&#39;transform&#39;, &quot;</span>
-        <span class="s2">&quot;translate);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    tableGroup.setAttribute(&#39;transform&#39;, translate);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    forceNoScroll();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                } catch (e) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                    console.log(&#39;Table adjustment error:&#39;, e);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            }, 300);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 200);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 600);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 1200);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            setTimeout(adjustTable, 2000);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function disableTableScrolling(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var isDesktop = container.classList &amp;&amp; &quot;</span>
+        <span class="s2">&quot;container.classList.contains(&#39;plotly-desktop&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var overflowValue = isDesktop ? &#39;hidden&#39; : &#39;visible&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var allElements = plot.querySelectorAll(&#39;*&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            allElements.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                var style = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                var overflow = style.overflow;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                var overflowY = style.overflowY;</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                if (overflow === &#39;auto&#39; || overflow === &#39;scroll&#39; || &quot;</span>
+        <span class="s2">&quot;                if (el.tagName === &#39;DIV&#39; || el.tagName === &#39;SVG&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var style = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var overflow = style.overflow;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var overflowY = style.overflowY;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (overflow === &#39;auto&#39; || overflow === &#39;scroll&#39; || &quot;</span>
         <span class="s2">&quot;overflowY === &#39;auto&#39; || overflowY === &#39;scroll&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
-        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-y&#39;, &#39;visible&#39;, &quot;</span>
-        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                    el.style.setProperty(&#39;overflow-x&#39;, &#39;visible&#39;, &quot;</span>
-        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        el.style.setProperty(&#39;overflow&#39;, &quot;</span>
+        <span class="s2">&quot;overflowValue, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        el.style.setProperty(&#39;overflow-y&#39;, &quot;</span>
+        <span class="s2">&quot;overflowValue, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        el.style.setProperty(&#39;overflow-x&#39;, &quot;</span>
+        <span class="s2">&quot;overflowValue, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow-y&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow&#39;, overflowValue, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            plot.style.setProperty(&#39;overflow-y&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var plotDivs = plot.querySelectorAll(&#39;div&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            plotDivs.forEach(function(div) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                div.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;                div.style.setProperty(&#39;overflow&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                div.style.setProperty(&#39;overflow-y&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;                div.style.setProperty(&#39;overflow-y&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            var svgs = plot.querySelectorAll(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            svgs.forEach(function(svg) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                svg.style.setProperty(&#39;overflow&#39;, &#39;visible&#39;, &quot;</span>
+        <span class="s2">&quot;                svg.style.setProperty(&#39;overflow&#39;, overflowValue, &quot;</span>
         <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;                svg.setAttribute(&#39;overflow&#39;, &#39;visible&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                svg.setAttribute(&#39;overflow&#39;, overflowValue);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    function setupScrollObserver(container) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (!container) return;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        var isDesktop = container.classList &amp;&amp; &quot;</span>
+        <span class="s2">&quot;container.classList.contains(&#39;plotly-desktop&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        function preventScrollbars() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (isDesktop) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var scrollbarKits = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-kit&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                scrollbarKits.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var scrollbarSliders = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-slider&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                scrollbarSliders.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var scrollbarGlyphs = container.querySelectorAll(&quot;</span>
+        <span class="s2">&quot;&#39;.scrollbar-glyph&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                scrollbarGlyphs.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;display&#39;, &#39;none&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;visibility&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    el.style.setProperty(&#39;opacity&#39;, &#39;0&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var plots = container.querySelectorAll(&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                plots.forEach(function(plot) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var allElements = plot.querySelectorAll(&#39;*&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    allElements.forEach(function(el) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        if (el.tagName === &#39;DIV&#39; || &quot;</span>
+        <span class="s2">&quot;el.tagName === &#39;SVG&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            var style = window.getComputedStyle(el);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            if (style.overflow === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;style.overflow === &#39;scroll&#39; || style.overflowY === &#39;auto&#39; || &quot;</span>
+        <span class="s2">&quot;style.overflowY === &#39;scroll&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                el.style.setProperty(&#39;overflow&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;hidden&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                el.style.setProperty(&#39;overflow-y&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;hidden&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                                el.style.setProperty(&#39;overflow-x&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;hidden&#39;, &#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    plot.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    var svg = plot.querySelector(&#39;svg&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    if (svg) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        svg.style.setProperty(&#39;overflow&#39;, &#39;hidden&#39;, &quot;</span>
+        <span class="s2">&quot;&#39;important&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                        svg.setAttribute(&#39;overflow&#39;, &#39;hidden&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                adjustTableSize(container);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            } else {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                disableTableScrolling(container);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        var observer = new MutationObserver(function(mutations) {</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;            disableTableScrolling(container);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            preventScrollbars();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        observer.observe(container, {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            childList: true,</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1114,6 +1334,7 @@
         <span class="s2">&quot;            attributes: true,</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            attributeFilter: [&#39;style&#39;, &#39;class&#39;]</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        });</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        preventScrollbars();</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        return observer;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1124,6 +1345,7 @@
         <span class="s2">&quot;            if (desktopContainer &amp;&amp; &quot;</span>
         <span class="s1">&#39;desktopContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="s2">&quot;                adjustTableSize(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                adjustLogoPosition(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    });</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1141,8 +1363,8 @@
         <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        if (desktopContainer &amp;&amp; &quot;</span>
         <span class="s1">&#39;desktopContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s2">&quot;            disableTableScrolling(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            adjustTableSize(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            adjustLogoPosition(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            if (!desktopContainer._scrollObserver) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                desktopContainer._scrollObserver = &quot;</span>
         <span class="s2">&quot;setupScrollObserver(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1251,12 +1473,11 @@
     <span class="n">plotfile</span> <span class="o">=</span> <span class="n">dirpath</span> <span class="o">/</span> <span class="n">filename</span>
 
     <span class="n">_configure_figure_layout</span><span class="p">(</span>
-        <span class="n">figure</span><span class="p">,</span>
-        <span class="n">copied</span><span class="p">,</span>
+        <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
+        <span class="n">copied</span><span class="o">=</span><span class="n">copied</span><span class="p">,</span>
         <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">,</span>
         <span class="n">vertical_legend</span><span class="o">=</span><span class="n">vertical_legend</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">mobile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">figure_mobile</span> <span class="o">=</span> <span class="n">_build_mobile_figure</span><span class="p">(</span>
