@@ -424,9 +424,6 @@ def _configure_figure_layout(
     add_logo: bool,
     vertical_legend: bool,
     title: str | None,
-    mobile: bool = False,
-    total_min_height: int | None = None,
-    table_min_height: int | None = None,
 ) -> None:
     """Configure figure layout with logo, legend, and title.
 
@@ -436,14 +433,12 @@ def _configure_figure_layout(
         add_logo: Whether to add logo.
         vertical_legend: Whether to use vertical legend.
         title: Optional title for the figure.
-        mobile: Whether this is a mobile layout. Defaults to False.
-        total_min_height: Minimum total height for mobile layout in pixels.
-        table_min_height: Minimum height for table subplot in pixels.
     """
     fig, logo = load_plotly_dict()
 
     if add_logo:
-        figure.add_layout_image(logo)
+        logo_copy = logo.copy()
+        figure.add_layout_image(logo_copy)
 
     figure.update_layout(fig.get("layout"))
     colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
@@ -468,24 +463,6 @@ def _configure_figure_layout(
             "orientation": "h",
         }
 
-    if mobile:
-        if vertical_legend:
-            legend = {
-                "yanchor": "top",
-                "y": 1.02,
-                "xanchor": "left",
-                "x": 0,
-                "orientation": "h",
-            }
-        else:
-            legend = {
-                "yanchor": "top",
-                "y": 1.02,
-                "xanchor": "left",
-                "x": 0,
-                "orientation": "h",
-            }
-
     layout_updates: dict[str, object] = {
         "legend": legend,
         "colorway": colorway[: copied.item_count],
@@ -493,59 +470,11 @@ def _configure_figure_layout(
         "margin": {"l": 50, "r": 50, "t": 80, "b": 50, "pad": 10},
     }
 
-    if mobile and total_min_height is not None:
-        layout_updates["height"] = total_min_height
-        layout_updates["autosize"] = False
-
     figure.update_layout(**layout_updates)
 
-    if mobile:
-        figure.update_xaxes(
-            gridcolor="#EEEEEE",
-            automargin=True,
-            tickangle=-45,
-            row=1,
-            col=1,
-        )
-        figure.update_xaxes(
-            gridcolor="#EEEEEE",
-            automargin=True,
-            tickangle=-45,
-            row=2,
-            col=1,
-        )
-        figure.update_yaxes(
-            tickformat=".2%",
-            gridcolor="#EEEEEE",
-            automargin=True,
-            row=1,
-            col=1,
-        )
-        figure.update_yaxes(
-            tickformat=".2%",
-            gridcolor="#EEEEEE",
-            automargin=True,
-            row=2,
-            col=1,
-        )
-        if table_min_height is not None and total_min_height is not None:
-            plot_height = 400
-            bar_height = 350
-            spacing = 0.08
-            plot_domain_top = 1.0
-            plot_domain_bottom = 1.0 - (plot_height / total_min_height)
-            bar_domain_top = plot_domain_bottom - spacing
-            bar_domain_bottom = bar_domain_top - (bar_height / total_min_height)
-
-            figure.update_layout(
-                yaxis_domain=[plot_domain_bottom, plot_domain_top],
-                yaxis2_domain=[bar_domain_bottom, bar_domain_top],
-            )
-        title_size = 24
-    else:
-        figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
-        figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
-        title_size = 36
+    figure.update_xaxes(gridcolor="#EEEEEE", automargin=True, tickangle=-45)
+    figure.update_yaxes(tickformat=".2%", gridcolor="#EEEEEE", automargin=True)
+    title_size = 36
 
     if title:
         figure.update_layout(
@@ -713,15 +642,94 @@ def _build_mobile_figure(
             col=1,
         )
 
-    _configure_figure_layout(
-        figure_mobile,
-        copied,
-        add_logo=add_logo,
-        vertical_legend=vertical_legend,
-        title=title,
-        mobile=True,
-        total_min_height=total_min_height,
+    fig, logo = load_plotly_dict()
+
+    if add_logo:
+        logo_copy = logo.copy()
+        logo_copy["x"] = 0.99
+        logo_copy["xanchor"] = "right"
+        figure_mobile.add_layout_image(logo_copy)
+
+    figure_mobile.update_layout(fig.get("layout"))
+    colorway: list[str] = cast("dict[str, list[str]]", fig["layout"]).get(
+        "colorway",
+        [],
     )
+
+    if vertical_legend:
+        legend = {
+            "yanchor": "bottom",
+            "y": -0.04,
+            "xanchor": "right",
+            "x": 0.98,
+            "orientation": "v",
+        }
+    else:
+        legend = {
+            "yanchor": "bottom",
+            "y": -0.2,
+            "xanchor": "right",
+            "x": 0.98,
+            "orientation": "h",
+        }
+
+    layout_updates: dict[str, object] = {
+        "legend": legend,
+        "colorway": colorway[: copied.item_count],
+        "autosize": False,
+        "height": total_min_height,
+        "margin": {"l": 50, "r": 50, "t": 80, "b": 50, "pad": 10},
+    }
+
+    figure_mobile.update_layout(**layout_updates)
+
+    figure_mobile.update_xaxes(
+        gridcolor="#EEEEEE",
+        automargin=True,
+        tickangle=-45,
+        row=1,
+        col=1,
+    )
+    figure_mobile.update_xaxes(
+        gridcolor="#EEEEEE",
+        automargin=True,
+        tickangle=-45,
+        row=2,
+        col=1,
+    )
+    figure_mobile.update_yaxes(
+        tickformat=".2%",
+        gridcolor="#EEEEEE",
+        automargin=True,
+        row=1,
+        col=1,
+    )
+    figure_mobile.update_yaxes(
+        tickformat=".2%",
+        gridcolor="#EEEEEE",
+        automargin=True,
+        row=2,
+        col=1,
+    )
+
+    plot_height = 400
+    bar_height = 350
+    spacing = 0.08
+    plot_domain_top = 1.0
+    plot_domain_bottom = 1.0 - (plot_height / total_min_height)
+    bar_domain_top = plot_domain_bottom - spacing
+    bar_domain_bottom = bar_domain_top - (bar_height / total_min_height)
+
+    figure_mobile.update_layout(
+        yaxis_domain=[plot_domain_bottom, plot_domain_top],
+        yaxis2_domain=[bar_domain_bottom, bar_domain_top],
+    )
+
+    title_size = 24
+    if title:
+        figure_mobile.update_layout(
+            {"title": {"text": f"<b>{title}</b><br>", "font": {"size": title_size}}},
+        )
 
     return figure_mobile
 
@@ -830,7 +838,10 @@ def _generate_responsive_html_string(
     """
     desktop_style = "width:100%;"
     mobile_style = "width:100%; display:none;"
-    match_media = 'window.matchMedia("(max-width: 960px)").matches'
+    match_media = (
+        '(window.matchMedia("(max-width: 960px)").matches || '
+        '"ontouchstart" in window || navigator.maxTouchPoints > 0)'
+    )
     desktop_get = f'document.getElementById("{div_id_desktop}_container")'
     mobile_get = f'document.getElementById("{div_id_mobile}_container")'
 
@@ -847,7 +858,7 @@ def _generate_responsive_html_string(
         f"</div>\n"
         "<style>\n"
         "body { overflow-y: auto; }\n"
-        "@media (max-width: 960px) {\n"
+        "@media (max-width: 960px), (pointer: coarse), (hover: none) {\n"
         "    .plotly-desktop { display: none !important; }\n"
         "    .plotly-mobile { display: block !important; "
         "overflow: visible !important; }\n"
@@ -871,13 +882,34 @@ def _generate_responsive_html_string(
         "    .plotly-mobile [style*='overflow'] { "
         "overflow: visible !important; overflow-y: visible !important; }\n"
         "}\n"
-        "@media (min-width: 961px) {\n"
+        "@media (min-width: 961px) and (pointer: fine) and (hover: hover) {\n"
         "    .plotly-desktop { display: block !important; }\n"
         "    .plotly-mobile { display: none !important; }\n"
         "}\n"
         "</style>\n"
         "<script>\n"
         "(function() {\n"
+        "    function adjustLogoPosition(container) {\n"
+        "        if (!container) return;\n"
+        "        var plots = container.querySelectorAll('.js-plotly-plot');\n"
+        "        plots.forEach(function(plot) {\n"
+        "            var svg = plot.querySelector('svg');\n"
+        "            if (!svg) return;\n"
+        "            var images = svg.querySelectorAll('image[xref=\"paper\"]');\n"
+        "            images.forEach(function(img) {\n"
+        "                var isNarrow = window.matchMedia("
+        "'(max-width: 960px)').matches;\n"
+        "                if (isNarrow) {\n"
+        "                    img.setAttribute('x', '0.99');\n"
+        "                    img.setAttribute('xanchor', 'right');\n"
+        "                } else {\n"
+        "                    img.setAttribute('x', '0.01');\n"
+        "                    img.removeAttribute('xanchor');\n"
+        "                }\n"
+        "            });\n"
+        "        });\n"
+        "    }\n"
+        "\n"
         "    function updateLayout() {\n"
         f"        var isMobile = {match_media};\n"
         f"        var desktopContainer = {desktop_get};\n"
@@ -900,8 +932,10 @@ def _generate_responsive_html_string(
         'mobileContainer.style.display = "none";\n'
         "            disableTableScrolling(desktopContainer);\n"
         "            setTimeout(function() { "
-        "adjustTableSize(desktopContainer); }, 100);\n"
+        "adjustTableSize(desktopContainer); "
+        "adjustLogoPosition(desktopContainer); }, 100);\n"
         "        }\n"
+        "        adjustLogoPosition(desktopContainer);\n"
         "    }\n"
         "\n"
         "    function adjustTableSize(container) {\n"
@@ -1014,6 +1048,7 @@ def _generate_responsive_html_string(
         "            if (desktopContainer && "
         'desktopContainer.style.display !== "none") {\n'
         "                adjustTableSize(desktopContainer);\n"
+        "                adjustLogoPosition(desktopContainer);\n"
         "            }\n"
         "        }, 100);\n"
         "    });\n"
@@ -1033,6 +1068,7 @@ def _generate_responsive_html_string(
         'desktopContainer.style.display !== "none") {\n'
         "            disableTableScrolling(desktopContainer);\n"
         "            adjustTableSize(desktopContainer);\n"
+        "            adjustLogoPosition(desktopContainer);\n"
         "            if (!desktopContainer._scrollObserver) {\n"
         "                desktopContainer._scrollObserver = "
         "setupScrollObserver(desktopContainer);\n"
@@ -1139,12 +1175,11 @@ def report_html(
     plotfile = dirpath / filename
 
     _configure_figure_layout(
-        figure,
-        copied,
+        figure=figure,
+        copied=copied,
         add_logo=add_logo,
         vertical_legend=vertical_legend,
         title=title,
-        mobile=False,
     )
 
     figure_mobile = _build_mobile_figure(
