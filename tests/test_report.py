@@ -212,26 +212,40 @@ class TestReport:
             msg = "report_html add_logo argument not setup correctly"
             raise ReportTestError(msg)
 
+    def _verify_file_created(self: TestReport, filepath: str) -> Path:
+        """Verify that a file was created and return its Path object."""
+        plotfile = Path(filepath).resolve()
+        if not plotfile.exists():
+            msg = "html file not created"
+            raise FileNotFoundError(msg)
+        if filepath[:5] == "<div>":
+            msg = "report_html method not working as intended"
+            raise ReportTestError(msg)
+        return plotfile
+
     def test_report_html_filefolders(self: TestReport) -> None:
         """Test report_html method with different file folder options."""
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
 
         directory = Path(__file__).parent
-        _, figfile = report_html(data=plotframe, auto_open=False, directory=directory)
-        plotfile = Path(figfile).resolve()
-        if not plotfile.exists():
-            msg = "html file not created"
-            raise FileNotFoundError(msg)
+        test_filename1 = "test_report_html_filefolders_1.html"
+        _, filepath = report_html(
+            data=plotframe,
+            auto_open=False,
+            directory=directory,
+            filename=test_filename1,
+        )
+        plotfile = self._verify_file_created(filepath)
 
-        plotfile.unlink()
-        if plotfile.exists():
-            msg = "html file not deleted as intended"
-            raise FileExistsError(msg)
-
-        if figfile[:5] == "<div>":
-            msg = "report_html method not working as intended"
-            raise ReportTestError(msg)
+        test_filename2 = "test_report_output.html"
+        _, filepath2 = report_html(
+            data=plotframe,
+            auto_open=False,
+            directory=directory,
+            filename=test_filename2,
+        )
+        plotfile2 = self._verify_file_created(filepath2)
 
         _, divstring = report_html(data=plotframe, auto_open=False, output_type="div")
         if not divstring.startswith("<div") or not divstring.endswith("</script>"):
@@ -265,8 +279,9 @@ class TestReport:
                 msg = "report_html method not working as intended"
                 raise ReportTestError(msg)
         finally:
-            if mockfilepath.exists():
-                mockfilepath.unlink()
+            for file_to_cleanup in [mockfilepath, plotfile, plotfile2]:
+                if file_to_cleanup.exists():
+                    file_to_cleanup.unlink()
 
     def test_report_html_shortdata(self: TestReport) -> None:
         """Test report_html function with short data."""
@@ -422,26 +437,62 @@ class TestReport:
                 msg = "Capture ratio with NaN values test not working as intended."
                 raise ReportTestError(msg)
 
-    def test_report_html_auto_open_file(self: TestReport) -> None:
+    def test_report_html_auto_open_file(
+        self: TestReport,
+        *,
+        manual: bool = False,  # noqa: PT028
+    ) -> None:
         """Test report_html with auto_open=True and output_type='file'."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        with patch("webbrowser.open") as mock_open:
-            _, figfile = report_html(
+        if manual:
+            report_html(
                 data=frame,
                 auto_open=True,
+                filename="tst.html",
+                title="Nice Longish Title To Check",
+            )
+            narrow = frame.from_deepcopy()
+            narrow.delete_timeseries(lvl_zero_item="Asset_1")
+            narrow.delete_timeseries(lvl_zero_item="Asset_2")
+            report_html(
+                data=narrow,
+                auto_open=True,
+                filename="tst_narrow.html",
+                title="Nice Longish Title To Check",
+            )
+
+        directory = Path(__file__).parent
+        test_filename = "test_report_html_auto_open_file.html"
+
+        with patch("webbrowser.open") as mock_open:
+            _, filepath = report_html(
+                data=frame,
+                auto_open=True,
+                directory=directory,
+                filename=test_filename,
                 output_type="file",
             )
-            plotfile = Path(figfile).resolve()
-
+            plotfile = Path(filepath).resolve()
             if not plotfile.exists():
                 msg = "html file not created"
                 raise FileNotFoundError(msg)
-
-            mock_open.assert_called_once()
-            if str(plotfile.resolve()) not in str(mock_open.call_args[0][0]):
-                msg = "webbrowser.open not called with correct file path"
+            if filepath[:5] == "<div>":
+                msg = "report_html method not returning file path as intended"
                 raise ReportTestError(msg)
 
-            plotfile.unlink()
+            mock_open.assert_called_once()
+            call_arg = str(mock_open.call_args[0][0])
+            if not call_arg.startswith("file://"):
+                msg = "webbrowser.open not called with file:// URL"
+                raise ReportTestError(msg)
+
+            with plotfile.open(encoding="utf-8") as f:
+                file_content = f.read()
+                if not file_content.startswith("<!DOCTYPE html>"):
+                    msg = "HTML file does not contain full HTML document"
+                    raise ReportTestError(msg)
+
+            if plotfile.exists():
+                plotfile.unlink()

@@ -28,8 +28,48 @@ Using the Built-in HTML Report
 
     # Generate HTML report
     # The last asset in the frame is used as the benchmark
-    report_html(
+    figure, filepath = report_html(
          data=comparison_frame,
          output_type="file",
          filename="stock_comparison_report.html"
     )
+
+    # filepath contains the path to the saved HTML file
+    print(f"Report saved to: {filepath}")
+
+    # The figure object can be used for further customization if needed
+    # figure.show()  # Display the figure interactively
+
+Embedding Reports in Existing HTML Pages
+-----------------------------------------
+
+When you need to embed a report in an existing HTML page, use ``output_type="div"``:
+
+.. code-block:: python
+
+    # Generate HTML div section for embedding
+    figure, html_div = report_html(
+         data=comparison_frame,
+         output_type="div"
+    )
+
+    # html_div contains the responsive HTML div section
+    # that can be embedded in your existing HTML page
+    # It includes both desktop and mobile layouts with CSS and JavaScript
+
+    # Example: Save to a custom HTML template
+    html_template = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>My Custom Report</title>
+    </head>
+    <body>
+        <h1>Portfolio Analysis Report</h1>
+        {html_div}
+    </body>
+    </html>
+    """
+
+    with open("custom_report.html", "w", encoding="utf-8") as f:
+        f.write(html_template)
