@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Report Generation &mdash; openseries 2.1.1 documentation</title>
+  <title>Report Generation &mdash; openseries 2.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=841abef3"></script>
+      <script src="../_static/documentation_options.js?v=b3e23499"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -78,6 +78,8 @@
 <li class="toctree-l1"><a class="reference internal" href="simulation.html">Simulation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Report Generation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#html-report-function">HTML Report Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#responsive-design">Responsive Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#return-values">Return Values</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="datefixer.html">Date Utilities</a></li>
@@ -119,7 +121,7 @@
 <h2>HTML Report Function<a class="headerlink" href="#html-report-function" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.report.</span></span><span class="sig-name descname"><span class="pre">report_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bar_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BYE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_plotlyjs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cdn'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/report.html#report_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<span class="sig-prename descclassname"><span class="pre">openseries.report.</span></span><span class="sig-name descname"><span class="pre">report_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bar_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BYE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'file'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_logo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/report.html#report_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Generate a HTML report page with line and bar plots and a table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -130,9 +132,6 @@
 <li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – The report page title.</p></li>
 <li><p><strong>directory</strong> (<em>Path</em><em> | </em><em>None</em>) – Directory where Plotly HTML file is saved.</p></li>
 <li><p><strong>output_type</strong> (<em>LiteralPlotlyOutput</em>) – Determines output type. Defaults to “file”.</p></li>
-<li><p><strong>include_plotlyjs</strong> (<em>LiteralPlotlyJSlib</em>) – Determines how the plotly.js library is included in
-the output.
-Defaults to “cdn”.</p></li>
 <li><p><strong>auto_open</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Determines whether to open a browser window with the plot.
 Defaults to False.</p></li>
 <li><p><strong>add_logo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True a Captor logo is added to the plot. Defaults to True.</p></li>
@@ -141,10 +140,24 @@ labels. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Plotly Figure and a div section or a HTML filename with location.</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Plotly Figure object (the desktop version of the figure)</p></li>
+<li><dl class="simple">
+<dt>When <code class="docutils literal notranslate"><span class="pre">output_type=&quot;file&quot;</span></code>: A string containing the file path to the</dt><dd><p>saved HTML file</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>When <code class="docutils literal notranslate"><span class="pre">output_type=&quot;div&quot;</span></code>: A string containing the responsive HTML div</dt><dd><p>section (includes both desktop and mobile layouts with CSS and
+JavaScript)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[Figure, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+<dd class="field-odd"><p>A tuple containing</p>
 </dd>
 </dl>
 </dd></dl>
@@ -162,7 +175,47 @@ labels. Defaults to False.</p></li>
 - Worst period returns
 - Comparison period dates</p></li>
 </ul>
-<p>The report features <strong>responsive design</strong> with separate layouts optimized for desktop and mobile devices. On desktop, charts and tables are displayed side-by-side, while mobile layouts stack content vertically for better viewing on smaller screens. The HTML output automatically adapts to screen size and device capabilities.</p>
+<p><strong>Important Notes:</strong></p>
+<ul class="simple">
+<li><p>The last asset in the <code class="docutils literal notranslate"><span class="pre">OpenFrame</span></code> is used as the benchmark for relative performance metrics
+(Jensen’s Alpha, Information Ratio, Tracking Error, Index Beta, and Capture Ratio)</p></li>
+<li><p>For periods shorter than one year, the report uses simple returns instead of CAGR</p></li>
+<li><p>For periods shorter than a quarter, bar charts show daily returns instead of period returns</p></li>
+<li><p>Capture Ratio is only included for periods longer than one year</p></li>
+</ul>
+</section>
+<section id="responsive-design">
+<h2>Responsive Design<a class="headerlink" href="#responsive-design" title="Link to this heading"></a></h2>
+<p>The report features <strong>responsive design</strong> with separate layouts optimized for desktop and mobile devices:</p>
+<ul class="simple">
+<li><p><strong>Desktop layout</strong>: Charts and tables are displayed side-by-side in a 2x2 grid layout. The table
+is rendered as an interactive Plotly table integrated with the charts.</p></li>
+<li><p><strong>Mobile layout</strong>: Content is stacked vertically for better viewing on smaller screens. The table
+is rendered as a standard HTML table below the charts for better mobile compatibility.</p></li>
+</ul>
+<p>The HTML output automatically adapts to screen size and device capabilities using CSS media queries
+and JavaScript detection. The layout switches at a breakpoint of 960px width or when touch capabilities
+are detected.</p>
+</section>
+<section id="return-values">
+<h2>Return Values<a class="headerlink" href="#return-values" title="Link to this heading"></a></h2>
+<p>The function returns a tuple containing:</p>
+<ul class="simple">
+<li><p><strong>Plotly Figure</strong>: The desktop version of the figure object (can be used for further customization
+or interactive display)</p></li>
+<li><p><strong>String output</strong>: The type depends on the <code class="docutils literal notranslate"><span class="pre">output_type</span></code> parameter:</p>
+<ul>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">output_type=&quot;file&quot;</span></code> (default): Returns the file path string to the saved HTML file.
+The file contains a complete HTML document (with DOCTYPE, html, head, and body tags)
+that can be opened directly in a web browser. If <code class="docutils literal notranslate"><span class="pre">auto_open=True</span></code>, the file will
+automatically open in the default web browser.</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">output_type=&quot;div&quot;</span></code>: Returns a string containing the responsive HTML div section
+(includes both desktop and mobile layouts with CSS and JavaScript) that can be embedded
+in an existing HTML page. The <code class="docutils literal notranslate"><span class="pre">filename</span></code> parameter is optional when using this mode and
+is only used to generate unique div IDs for the embedded content.</p></li>
+</ul>
+</li>
+</ul>
 </section>
 </section>
 

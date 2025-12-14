@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>openseries.report &mdash; openseries 2.1.1 documentation</title>
+  <title>openseries.report &mdash; openseries 2.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=841abef3"></script>
+      <script src="../../_static/documentation_options.js?v=b3e23499"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -112,6 +112,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">webbrowser</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">stack</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
@@ -126,7 +127,7 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">plotly.graph_objs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Figure</span>  <span class="c1"># type: ignore[import-untyped]</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">.frame</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenFrame</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">LiteralPlotlyJSlib</span><span class="p">,</span> <span class="n">LiteralPlotlyOutput</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">LiteralPlotlyOutput</span>
 
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">concat</span>
@@ -967,7 +968,9 @@
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mobile_content</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;&lt;/div&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;&lt;style&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;html, body { height: 100%; margin: 0; padding: 0; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;body { overflow-y: auto; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;.plotly-desktop { min-height: 100vh; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;@media (max-width: 960px), (pointer: coarse), (hover: none) {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-desktop { display: none !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-mobile { display: block !important; &quot;</span>
@@ -1000,16 +1003,7 @@
         <span class="s2">&quot;overflow-x: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-desktop .js-plotly-plot &gt; div { &quot;</span>
         <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; &quot;</span>
-        <span class="s2">&quot;overflow-x: hidden !important; max-height: 100% !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    .plotly-desktop .js-plotly-plot svg { &quot;</span>
-        <span class="s2">&quot;overflow: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    .plotly-desktop * { &quot;</span>
-        <span class="s2">&quot;overflow-y: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s1">&#39;    .plotly-desktop [style*=&quot;overflow&quot;] { &#39;</span>
-        <span class="s2">&quot;overflow: hidden !important; overflow-y: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    .plotly-desktop .scrollbar-kit { &quot;</span>
-        <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
-        <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;overflow-x: hidden !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    .plotly-desktop .scrollbar-slider { &quot;</span>
         <span class="s2">&quot;display: none !important; visibility: hidden !important; &quot;</span>
         <span class="s2">&quot;opacity: 0 !important; }</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1346,10 +1340,27 @@
         <span class="s1">&#39;desktopContainer.style.display !== &quot;none&quot;) {</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="s2">&quot;                adjustTableSize(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;                adjustLogoPosition(desktopContainer);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                var plotDiv = desktopContainer.querySelector(&quot;</span>
+        <span class="s2">&quot;&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                if (plotDiv &amp;&amp; typeof Plotly !== &#39;undefined&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                    Plotly.Plots.resize(plotDiv);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;        }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    });</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    updateLayout();</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    // Set desktop plot container to full viewport height on load</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    setTimeout(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;        var desktopContainer = </span><span class="si">{</span><span class="n">desktop_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        if (desktopContainer &amp;&amp; typeof Plotly !== &#39;undefined&#39;) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            var plotDiv = desktopContainer.querySelector(&quot;</span>
+        <span class="s2">&quot;&#39;.js-plotly-plot&#39;);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            if (plotDiv) {</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                plotDiv.style.height = window.innerHeight + &#39;px&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;                Plotly.Plots.resize(plotDiv);</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;            }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;        }</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    }, 100);</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;    var checkInterval = setInterval(function() {</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;        var mobileContainer = </span><span class="si">{</span><span class="n">mobile_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;        var desktopContainer = </span><span class="si">{</span><span class="n">desktop_get</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -1377,6 +1388,36 @@
     <span class="p">)</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_wrap_in_full_html</span><span class="p">(</span>
+    <span class="n">responsive_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap responsive HTML content in a full HTML document.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        responsive_content: The responsive HTML content (divs, CSS, JS).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Full HTML document string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plotly_js_script</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;&lt;script src=&quot;https://cdn.plot.ly/plotly-latest.min.js&quot;&gt;&lt;/script&gt;&#39;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s2">&quot;&lt;!DOCTYPE html&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s1">&#39;&lt;html lang=&quot;en&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s2">&quot;&lt;head&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s1">&#39;    &lt;meta charset=&quot;utf-8&quot; /&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s2">&quot;    &lt;title&gt;Plotly Report&lt;/title&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">plotly_js_script</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;&lt;/head&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;&lt;body&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">responsive_content</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;&lt;/body&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;&lt;/html&gt;&quot;</span>
+    <span class="p">)</span>
+
+
 <div class="viewcode-block" id="report_html">
 <a class="viewcode-back" href="../../api/report.html#openseries.report_html">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">report_html</span><span class="p">(</span>
@@ -1386,7 +1427,6 @@
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
-    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -1401,9 +1441,6 @@
 <span class="sd">        title: The report page title.</span>
 <span class="sd">        directory: Directory where Plotly HTML file is saved.</span>
 <span class="sd">        output_type: Determines output type. Defaults to &quot;file&quot;.</span>
-<span class="sd">        include_plotlyjs: Determines how the plotly.js library is included in</span>
-<span class="sd">            the output.</span>
-<span class="sd">            Defaults to &quot;cdn&quot;.</span>
 <span class="sd">        auto_open: Determines whether to open a browser window with the plot.</span>
 <span class="sd">            Defaults to False.</span>
 <span class="sd">        add_logo: If True a Captor logo is added to the plot. Defaults to True.</span>
@@ -1411,7 +1448,13 @@
 <span class="sd">            labels. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Plotly Figure and a div section or a HTML filename with location.</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - Plotly Figure object (the desktop version of the figure)</span>
+<span class="sd">        - When ``output_type=&quot;file&quot;``: A string containing the file path to the</span>
+<span class="sd">            saved HTML file</span>
+<span class="sd">        - When ``output_type=&quot;div&quot;``: A string containing the responsive HTML div</span>
+<span class="sd">            section (includes both desktop and mobile layouts with CSS and</span>
+<span class="sd">            JavaScript)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
@@ -1501,12 +1544,14 @@
         <span class="n">div_id_desktop</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_desktop&quot;</span>
         <span class="n">div_id_mobile</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_mobile&quot;</span>
 
-        <span class="n">html_desktop</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">html_desktop_raw</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
             <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
             <span class="n">div_id</span><span class="o">=</span><span class="n">div_id_desktop</span><span class="p">,</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
@@ -1519,16 +1564,23 @@
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
+        <span class="n">script_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&lt;script src=&quot;https://cdn\.plot\.ly/plotly[^&quot;]*&quot;&gt;&lt;/script&gt;&#39;</span>
+        <span class="n">html_desktop_content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">script_pattern</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">html_desktop_raw</span><span class="p">)</span>
+
         <span class="n">responsive_html</span> <span class="o">=</span> <span class="n">_generate_responsive_html_string</span><span class="p">(</span>
-            <span class="n">html_desktop</span><span class="o">=</span><span class="n">html_desktop</span><span class="p">,</span>
+            <span class="n">html_desktop</span><span class="o">=</span><span class="n">html_desktop_content</span><span class="p">,</span>
             <span class="n">html_mobile</span><span class="o">=</span><span class="n">html_mobile</span><span class="p">,</span>
             <span class="n">div_id_desktop</span><span class="o">=</span><span class="n">div_id_desktop</span><span class="p">,</span>
             <span class="n">div_id_mobile</span><span class="o">=</span><span class="n">div_id_mobile</span><span class="p">,</span>
             <span class="n">table_html</span><span class="o">=</span><span class="n">table_html</span><span class="p">,</span>
         <span class="p">)</span>
 
+        <span class="n">full_html</span> <span class="o">=</span> <span class="n">_wrap_in_full_html</span><span class="p">(</span>
+            <span class="n">responsive_content</span><span class="o">=</span><span class="n">responsive_html</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="k">with</span> <span class="n">plotfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">responsive_html</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">full_html</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">auto_open</span><span class="p">:</span>
             <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file://</span><span class="si">{</span><span class="n">plotfile</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1537,12 +1589,15 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">div_id_mobile</span> <span class="o">=</span> <span class="n">div_id</span> <span class="o">+</span> <span class="s2">&quot;_mobile&quot;</span>
+
+        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
         <span class="n">html_desktop</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
             <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
             <span class="n">div_id</span><span class="o">=</span><span class="n">div_id</span><span class="p">,</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
+            <span class="n">include_plotlyjs</span><span class="o">=</span><span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
             <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="n">html_mobile</span> <span class="o">=</span> <span class="n">to_html</span><span class="p">(</span>
