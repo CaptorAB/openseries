@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import webbrowser
 from inspect import stack
 from logging import getLogger
@@ -16,7 +17,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 
     from .frame import OpenFrame
-    from .owntypes import LiteralPlotlyJSlib, LiteralPlotlyOutput
+    from .owntypes import LiteralPlotlyOutput
 
 
 from pandas import DataFrame, Index, Series, Timestamp, concat
@@ -857,7 +858,9 @@ def _generate_responsive_html_string(
         f"{mobile_content}\n"
         f"</div>\n"
         "<style>\n"
+        "html, body { height: 100%; margin: 0; padding: 0; }\n"
         "body { overflow-y: auto; }\n"
+        ".plotly-desktop { min-height: 100vh; }\n"
         "@media (max-width: 960px), (pointer: coarse), (hover: none) {\n"
         "    .plotly-desktop { display: none !important; }\n"
         "    .plotly-mobile { display: block !important; "
@@ -890,16 +893,7 @@ def _generate_responsive_html_string(
         "overflow-x: hidden !important; }\n"
         "    .plotly-desktop .js-plotly-plot > div { "
         "overflow: hidden !important; overflow-y: hidden !important; "
-        "overflow-x: hidden !important; max-height: 100% !important; }\n"
-        "    .plotly-desktop .js-plotly-plot svg { "
-        "overflow: hidden !important; }\n"
-        "    .plotly-desktop * { "
-        "overflow-y: hidden !important; }\n"
-        '    .plotly-desktop [style*="overflow"] { '
-        "overflow: hidden !important; overflow-y: hidden !important; }\n"
-        "    .plotly-desktop .scrollbar-kit { "
-        "display: none !important; visibility: hidden !important; "
-        "opacity: 0 !important; }\n"
+        "overflow-x: hidden !important; }\n"
         "    .plotly-desktop .scrollbar-slider { "
         "display: none !important; visibility: hidden !important; "
         "opacity: 0 !important; }\n"
@@ -1236,10 +1230,27 @@ def _generate_responsive_html_string(
         'desktopContainer.style.display !== "none") {\n'
         "                adjustTableSize(desktopContainer);\n"
         "                adjustLogoPosition(desktopContainer);\n"
+        "                var plotDiv = desktopContainer.querySelector("
+        "'.js-plotly-plot');\n"
+        "                if (plotDiv && typeof Plotly !== 'undefined') {\n"
+        "                    Plotly.Plots.resize(plotDiv);\n"
+        "                }\n"
         "            }\n"
         "        }, 100);\n"
         "    });\n"
         "    updateLayout();\n"
+        "    // Set desktop plot container to full viewport height on load\n"
+        "    setTimeout(function() {\n"
+        f"        var desktopContainer = {desktop_get};\n"
+        "        if (desktopContainer && typeof Plotly !== 'undefined') {\n"
+        "            var plotDiv = desktopContainer.querySelector("
+        "'.js-plotly-plot');\n"
+        "            if (plotDiv) {\n"
+        "                plotDiv.style.height = window.innerHeight + 'px';\n"
+        "                Plotly.Plots.resize(plotDiv);\n"
+        "            }\n"
+        "        }\n"
+        "    }, 100);\n"
         "    var checkInterval = setInterval(function() {\n"
         f"        var mobileContainer = {mobile_get};\n"
         f"        var desktopContainer = {desktop_get};\n"
@@ -1267,6 +1278,36 @@ def _generate_responsive_html_string(
     )
 
 
+def _wrap_in_full_html(
+    responsive_content: str,
+) -> str:
+    """Wrap responsive HTML content in a full HTML document.
+
+    Args:
+        responsive_content: The responsive HTML content (divs, CSS, JS).
+
+    Returns:
+        Full HTML document string.
+    """
+    plotly_js_script = (
+        '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>'
+    )
+
+    return (
+        "<!DOCTYPE html>\n"
+        '<html lang="en">\n'
+        "<head>\n"
+        '    <meta charset="utf-8" />\n'
+        "    <title>Plotly Report</title>\n"
+        f"    {plotly_js_script}\n"
+        "</head>\n"
+        "<body>\n"
+        f"{responsive_content}\n"
+        "</body>\n"
+        "</html>"
+    )
+
+
 def report_html(
     data: OpenFrame,
     bar_freq: LiteralBizDayFreq = "BYE",
@@ -1274,7 +1315,6 @@ def report_html(
     title: str | None = None,
     directory: Path | None = None,
     output_type: LiteralPlotlyOutput = "file",
-    include_plotlyjs: LiteralPlotlyJSlib = "cdn",
     *,
     auto_open: bool = False,
     add_logo: bool = True,
@@ -1289,9 +1329,6 @@ def report_html(
         title: The report page title.
         directory: Directory where Plotly HTML file is saved.
         output_type: Determines output type. Defaults to "file".
-        include_plotlyjs: Determines how the plotly.js library is included in
-            the output.
-            Defaults to "cdn".
         auto_open: Determines whether to open a browser window with the plot.
             Defaults to False.
         add_logo: If True a Captor logo is added to the plot. Defaults to True.
@@ -1299,7 +1336,13 @@ def report_html(
             labels. Defaults to False.
 
     Returns:
-        Plotly Figure and a div section or a HTML filename with location.
+        A tuple containing:
+        - Plotly Figure object (the desktop version of the figure)
+        - When ``output_type="file"``: A string containing the file path to the
+            saved HTML file
+        - When ``output_type="div"``: A string containing the responsive HTML div
+            section (includes both desktop and mobile layouts with CSS and
+            JavaScript)
 
     """
     copied = data.from_deepcopy()
@@ -1389,12 +1432,14 @@ def report_html(
         div_id_desktop = filename.split(sep=".")[0] + "_desktop"
         div_id_mobile = filename.split(sep=".")[0] + "_mobile"
 
-        html_desktop = to_html(
+        figure.update_layout(height=None)
+
+        html_desktop_raw = to_html(
             fig=figure,
             div_id=div_id_desktop,
             auto_play=False,
             full_html=False,
-            include_plotlyjs=include_plotlyjs,
+            include_plotlyjs="cdn",
             config=fig["config"],
         )
 
@@ -1407,16 +1452,23 @@ def report_html(
             config=fig["config"],
         )
 
+        script_pattern = r'<script src="https://cdn\.plot\.ly/plotly[^"]*"></script>'
+        html_desktop_content = re.sub(script_pattern, "", html_desktop_raw)
+
         responsive_html = _generate_responsive_html_string(
-            html_desktop=html_desktop,
+            html_desktop=html_desktop_content,
             html_mobile=html_mobile,
             div_id_desktop=div_id_desktop,
             div_id_mobile=div_id_mobile,
             table_html=table_html,
         )
 
+        full_html = _wrap_in_full_html(
+            responsive_content=responsive_html,
+        )
+
         with plotfile.open(mode="w", encoding="utf-8") as f:
-            f.write(responsive_html)
+            f.write(full_html)
 
         if auto_open:
             webbrowser.open(f"file://{plotfile.resolve()}")
@@ -1425,12 +1477,15 @@ def report_html(
     else:
         div_id = filename.split(sep=".")[0]
         div_id_mobile = div_id + "_mobile"
+
+        figure.update_layout(height=None)
+
         html_desktop = to_html(
             fig=figure,
             div_id=div_id,
             auto_play=False,
             full_html=False,
-            include_plotlyjs=include_plotlyjs,
+            include_plotlyjs="cdn",
             config=fig["config"],
         )
         html_mobile = to_html(
