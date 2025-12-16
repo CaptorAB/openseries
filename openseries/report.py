@@ -12,7 +12,7 @@ from string import ascii_letters
 from typing import TYPE_CHECKING, Any, cast
 from warnings import catch_warnings, simplefilter
 
-from pandas import DataFrame, Index, Series, Timestamp, concat
+from pandas import DataFrame, Index, Series, Timestamp, concat, isna
 from plotly.graph_objs import Bar, Figure, Scatter  # type: ignore[import-untyped]
 from plotly.utils import PlotlyJSONEncoder  # type: ignore[import-untyped]
 
@@ -289,7 +289,6 @@ def _add_capture_ratio(
         cru.iloc[-1] = None
         cru.name = "Capture Ratio (monthly)"
     cru_df = cru.to_frame().T
-    formats.append("{:.2f}")
     return concat([rpt_df, cru_df]), formats
 
 
@@ -348,37 +347,16 @@ def _get_plotly_layouts(
     layout_theme: dict[str, Any],
     colorway: list[str],
     item_count: int,
-    *,
-    vertical_legend: bool,
-    title: str | None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Get line and bar layouts for plotly."""
-    if vertical_legend:
-        legend = {
-            "yanchor": "bottom",
-            "y": -0.04,
-            "xanchor": "right",
-            "x": 0.98,
-            "orientation": "v",
-        }
-    else:
-        legend = {
-            "yanchor": "bottom",
-            "y": -0.2,
-            "xanchor": "right",
-            "x": 0.98,
-            "orientation": "h",
-        }
-
     line_layout = dict(layout_theme)
     line_layout.update(
         {
-            "legend": legend,
             "colorway": colorway[:item_count] if colorway else None,
             "margin": {"l": 50, "r": 20, "t": 20, "b": 40},
             "xaxis": {"gridcolor": "#EEEEEE", "automargin": True, "tickangle": -45},
             "yaxis": {"tickformat": ".2%", "gridcolor": "#EEEEEE", "automargin": True},
-            "showlegend": True,
+            "showlegend": False,
         },
     )
 
@@ -386,15 +364,12 @@ def _get_plotly_layouts(
     bar_layout.update(
         {
             "barmode": "group",
-            "margin": {"l": 50, "r": 20, "t": 10, "b": 60},
+            "margin": {"l": 50, "r": 20, "t": 10, "b": 80},
             "xaxis": {"gridcolor": "#EEEEEE", "automargin": True, "tickangle": -45},
             "yaxis": {"tickformat": ".2%", "gridcolor": "#EEEEEE", "automargin": True},
             "showlegend": False,
         },
     )
-
-    if title:
-        line_layout["title"] = {"text": f"<b>{title}</b><br>", "font": {"size": 36}}
 
     return line_layout, bar_layout
 
@@ -408,8 +383,29 @@ def _get_logo_html(logo: CaptorLogoType, *, add_logo: bool) -> str:
     except (KeyError, AttributeError, TypeError):
         src = ""
     if src:
-        return f'<img src="{src}" alt="Captor" style="height:34px;" />'
+        return f'<img src="{src}" alt="Captor" style="height:68px;" />'
     return "CAPTOR"
+
+
+def _get_legend_html(line_traces: list[Scatter], colorway: list[str]) -> str:
+    """Generate HTML for the legend at the bottom of the page."""
+    legend_items = []
+    for idx, trace in enumerate(line_traces):
+        name = trace.name or ""
+        color = "#000000"
+        if idx < len(colorway):
+            color = colorway[idx]
+        elif hasattr(trace, "line") and trace.line and hasattr(trace.line, "color"):
+            color = str(trace.line.color) if trace.line.color else "#000000"
+        legend_items.append(
+            f'<div class="legend-item">'
+            f'<div class="legend-color" style="background-color:{color};"></div>'
+            f"<span>{name}</span>"
+            f"</div>",
+        )
+    if legend_items:
+        return f'<div class="legend-container">{"".join(legend_items)}</div>'
+    return ""
 
 
 def _get_css() -> str:
@@ -418,20 +414,21 @@ def _get_css() -> str:
     :root{--ink:#1f2a44;--muted:#6b778c;--header:#4a4a4a;--header2:#6a6a6a;--cell:#f3f3f3;--cell2:#e6e6e6;--paper:#ffffff;}
     html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
-    .page{max-width:1200px;margin:0 auto;padding:24px 24px 32px;}
+    .page{max-width:calc(100% - 64px);margin:0 auto;padding:32px;
+    padding-bottom:48px;}
     .header{display:grid;grid-template-columns:140px 1fr 140px;gap:12px;
     align-items:start;}
-    h1{margin:0;text-align:center;font-size:28px;font-weight:800;}
+    h1{margin:0;text-align:center;font-size:45px;font-weight:800;}
     .layout{display:grid;grid-template-columns:1.2fr .9fr;
     grid-template-areas:"charts table";gap:22px;align-items:start;margin-top:12px;}
     .charts{grid-area:charts;display:grid;grid-template-rows:auto auto;gap:18px;}
     .table{grid-area:table;}
-    .plot{width:100%;height:420px;}
-    .plot.bar{height:320px;}
+    .plot{width:100%;height:380px;}
+    .plot.bar{height:300px;}
     @media (max-width:980px){
-      .page{padding:16px 14px 22px;}
+      .page{padding:24px;padding-bottom:24px;}
       .header{grid-template-columns:120px 1fr;}
-      h1{font-size:24px;}
+      h1{font-size:36px;}
       .layout{grid-template-columns:1fr;grid-template-areas:"table" "charts";gap:16px;}
       .plot{height:380px;}
       .plot.bar{height:300px;}
@@ -442,11 +439,17 @@ def _get_css() -> str:
     font-weight:700;text-align:center;white-space:nowrap;}
     table.metrics thead th:first-child{background:var(--header2);text-align:left;}
     table.metrics tbody td{padding:7px 10px;border-bottom:1px solid white;
-    border-right:1px solid white;text-align:center;background:var(--cell);}
+    border-right:1px solid white;text-align:center;background:var(--paper);}
     table.metrics tbody td:first-child{text-align:left;font-weight:600;color:white;
     background:var(--header);width:42%;}
-    table.metrics tbody tr:nth-child(even) td:not(:first-child){
-    background:var(--cell2);}
+    table.metrics tbody td:last-child{background:var(--cell2);}
+    .legend-container{margin-top:24px;padding-top:20px;padding-bottom:16px;
+    display:flex;justify-content:center;flex-wrap:wrap;gap:24px;flex-shrink:0;}
+    .legend-item{display:flex;align-items:center;gap:8px;font-size:14px;}
+    .legend-color{width:20px;height:3px;border-radius:2px;}
+    @media (min-width:981px){
+      html,body{overflow-y:auto;}
+    }
     """
 
 
@@ -482,6 +485,7 @@ def _generate_html(
     table_html: str,
     line_payload: dict[str, Any],
     bar_payload: dict[str, Any],
+    legend_html: str,
 ) -> str:
     """Generate the HTML string."""
     return f"""<!doctype html>
@@ -507,6 +511,7 @@ def _generate_html(
     </div>
     <div class="table">{table_html}</div>
   </div>
+  {legend_html}
 </div>
 <script>
 const line = {_dumps_plotly(line_payload)};
@@ -534,7 +539,7 @@ def report_html(
     *,
     auto_open: bool = False,
     add_logo: bool = True,
-    vertical_legend: bool = True,
+    vertical_legend: bool = True,  # noqa: ARG001
 ) -> tuple[Figure, str]:
     """Generate a responsive HTML report page with line and bar plots and a table."""
     copied = data.from_deepcopy()
@@ -547,20 +552,6 @@ def report_html(
     line_traces = _create_line_traces(copied)
     bar_traces = _create_bar_traces(copied, bar_freq)
 
-    formats = [
-        "{:.2%}",
-        "{:.2%}",
-        "{:.2f}",
-        "{:.2f}",
-        "{:.2%}",
-        "{:%Y-%m-%d}",
-        "{:%Y-%m-%d}",
-        "{:.2%}",
-        "{:.2f}",
-        "{:.2%}",
-        "{:.2f}",
-    ]
-
     rpt_df = copied.all_properties(
         properties=cast("list[LiteralFrameProps]", properties),
     )
@@ -569,21 +560,49 @@ def report_html(
     rpt_df = _add_tracking_error(rpt_df, copied)
 
     if copied.yearfrac > 1.0:
-        rpt_df, formats = _add_capture_ratio(rpt_df, copied, formats)
+        rpt_df, _ = _add_capture_ratio(rpt_df, copied, [])
 
     rpt_df = _add_beta(rpt_df, copied)
     rpt_df.index = Index(labels_init)
     rpt_df = _add_ytd_mtd(rpt_df, copied)
     rpt_df = rpt_df.reindex(labels_final)
 
+    format_map = {
+        "Return (CAGR)": "{:.2%}",
+        "Return (simple)": "{:.2%}",
+        "Year-to-Date": "{:.2%}",
+        "Month-to-Date": "{:.2%}",
+        "Volatility": "{:.2%}",
+        "Sharpe Ratio": "{:.2f}",
+        "Sortino Ratio": "{:.2f}",
+        "Jensen's Alpha": "{:.2%}",
+        "Information Ratio": "{:.2f}",
+        "Tracking Error (weekly)": "{:.2%}",
+        "Index Beta (weekly)": "{:.2f}",
+        "Capture Ratio (monthly)": "{:.2f}",
+        "Worst Month": "{:.2%}",
+        "Worst Day": "{:.2%}",
+        "Comparison Start": "{:%Y-%m-%d}",
+        "Comparison End": "{:%Y-%m-%d}",
+    }
+    formats = [format_map.get(label, "{:.2f}") for label in labels_final]
+
     for item, f in zip(rpt_df.index, formats, strict=False):
         rpt_df.loc[item] = rpt_df.loc[item].apply(
-            lambda x, fmt=f: str(x)
-            if (isinstance(x, str) or x is None)
+            lambda x, fmt=f: ""
+            if (
+                x is None
+                or (not isinstance(x, str) and isna(x))
+                or (isinstance(x, str) and x.lower() in ("nan", "nan%", ""))
+            )
             else (
-                Timestamp(x).strftime("%Y-%m-%d")
-                if "%Y-%m-%d" in fmt and not isinstance(x, str)
-                else fmt.format(x)
+                str(x)
+                if isinstance(x, str)
+                else (
+                    Timestamp(x).strftime("%Y-%m-%d")
+                    if "%Y-%m-%d" in fmt and not isinstance(x, str)
+                    else fmt.format(x)
+                )
             ),
         )
 
@@ -611,8 +630,6 @@ def report_html(
         layout_theme,
         colorway,
         copied.item_count,
-        vertical_legend=vertical_legend,
-        title=title,
     )
 
     config = cast("dict[str, Any]", fig_theme.get("config", {})) or {}
@@ -633,6 +650,8 @@ def report_html(
         "config": config,
     }
 
+    legend_html = _get_legend_html(line_traces, colorway)
+
     html = _generate_html(
         title,
         css,
@@ -641,6 +660,7 @@ def report_html(
         table_html,
         line_payload,
         bar_payload,
+        legend_html,
     )
 
     if output_type == "file":
