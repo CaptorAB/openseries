@@ -468,7 +468,7 @@ class TestReport:
     def test_report_html_auto_open_file(
         self: TestReport,
         *,
-        manual: bool = True,  # noqa: PT028
+        manual: bool = False,  # noqa: PT028
     ) -> None:
         """Test report_html with auto_open=True and output_type='file'."""
         frame = self.randomframe.from_deepcopy()
@@ -494,7 +494,7 @@ class TestReport:
         directory = Path(__file__).parent
         test_filename = "test_report_html_auto_open_file.html"
 
-        with patch("webbrowser.open") as mock_open:
+        with patch("openseries.report.webbrowser_open") as mock_open:
             _, filepath = report_html(
                 data=frame,
                 auto_open=True,
@@ -513,7 +513,7 @@ class TestReport:
             mock_open.assert_called_once()
             call_arg = str(mock_open.call_args[0][0])
             if not call_arg.startswith("file://"):
-                msg = "webbrowser.open not called with file:// URL"
+                msg = "webbrowser_open not called with file:// URL"
                 raise ReportTestError(msg)
 
             with plotfile.open(encoding="utf-8") as f:
@@ -579,8 +579,11 @@ class TestReport:
         directory = Path(__file__).parent
         test_filename = "test_report_html_browser_error.html"
 
-        # Mock webbrowser.open to raise OSError
-        with patch("webbrowser.open", side_effect=OSError("Browser error")):
+        # Mock webbrowser_open to raise OSError
+        with patch(
+            "openseries.report.webbrowser_open",
+            side_effect=OSError("Browser error"),
+        ):
             _, filepath = report_html(
                 data=frame,
                 auto_open=True,
@@ -597,36 +600,40 @@ class TestReport:
                 plotfile.unlink()
 
     def test_report_html_legend_colorway_fallback(self: TestReport) -> None:
-        """Test report_html legend with colorway fallback to trace line color."""
+        """Test report_html legend with colorway cycling and empty fallback."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        # Create a trace with explicit line color to test the fallback path
-        trace_with_color = Scatter(
+        # Create traces for testing
+        trace1 = Scatter(
             x=[1, 2, 3],
             y=[1, 2, 3],
-            name="TestTrace",
-            line={"width": 2.5, "color": "#FF0000"},
+            name="TestTrace1",
+            line={"width": 2.5},
         )
-
-        # Create a trace with falsy line color to test the else branch
-        trace_with_falsy_color = Scatter(
+        trace2 = Scatter(
             x=[1, 2, 3],
             y=[1, 2, 3],
             name="TestTrace2",
-            line={"width": 2.5, "color": None},
+            line={"width": 2.5},
+        )
+        trace3 = Scatter(
+            x=[1, 2, 3],
+            y=[1, 2, 3],
+            name="TestTrace3",
+            line={"width": 2.5},
         )
 
-        # Mock load_plotly_dict to return empty colorway to trigger fallback
+        # Mock load_plotly_dict to return empty colorway
         with patch("openseries.report.load_plotly_dict") as mock_load:
             mock_load.return_value = (
                 {"layout": {}},  # Empty layout, no colorway
                 None,
             )
-            # Test with trace that has valid line.color
+            # Test with empty colorway - should use default colorway color
             with patch(
                 "openseries.report._create_line_traces",
-                return_value=[trace_with_color],
+                return_value=[trace1],
             ):
                 _, html = report_html(
                     data=frame,
@@ -634,61 +641,48 @@ class TestReport:
                     output_type="div",
                 )
                 # Should still generate legend HTML even with empty colorway
-                # The fallback should use trace line color
                 if 'class="legend-container"' not in html:
-                    msg = (
-                        "report_html legend not generated with "
-                        "empty colorway fallback."
-                    )
+                    msg = "report_html legend not generated with empty colorway."
                     raise ReportTestError(msg)
-                # Verify the color from trace line.color is used
-                if "background-color:#FF0000" not in html:
+                # Should use default colorway color when colorway is empty
+                if "background-color:#66725B" not in html:
                     msg = (
-                        "report_html legend should use trace line.color "
+                        "report_html legend should use default colorway color "
                         "when colorway is empty."
                     )
                     raise ReportTestError(msg)
 
-            # Test with trace that has falsy line.color (None)
+        # Test colorway cycling when there are more traces than colors
+        with patch("openseries.report.load_plotly_dict") as mock_load:
+            mock_load.return_value = (
+                {"layout": {"colorway": ["#FF0000", "#00FF00"]}},  # 2 colors
+                None,
+            )
+            # Test with 3 traces but only 2 colors - should cycle
             with patch(
                 "openseries.report._create_line_traces",
-                return_value=[trace_with_falsy_color],
+                return_value=[trace1, trace2, trace3],
             ):
                 _, html2 = report_html(
                     data=frame,
                     auto_open=False,
                     output_type="div",
                 )
-                # Should use default black color when line.color is falsy
-                if "background-color:#000000" not in html2:
-                    msg = (
-                        "report_html legend should use default color "
-                        "when line.color is falsy."
-                    )
+                # Should cycle: trace1=#FF0000, trace2=#00FF00, trace3=#FF0000
+                if "background-color:#FF0000" not in html2:
+                    msg = "report_html legend should use first colorway color."
                     raise ReportTestError(msg)
-
-            # Test with trace that has line but no color attribute
-            # This tests the elif condition when hasattr(trace.line, "color") is False
-            trace_line_no_color_attr = Scatter(
-                x=[1, 2, 3],
-                y=[1, 2, 3],
-                name="TestTrace3",
-                line={"width": 2.5},  # No color in line dict
-            )
-            with patch(
-                "openseries.report._create_line_traces",
-                return_value=[trace_line_no_color_attr],
-            ):
-                _, html3 = report_html(
-                    data=frame,
-                    auto_open=False,
-                    output_type="div",
-                )
-                # Should use default black color when line has no color attribute
-                if "background-color:#000000" not in html3:
+                if "background-color:#00FF00" not in html2:
+                    msg = "report_html legend should use second colorway color."
+                    raise ReportTestError(msg)
+                # Count occurrences of #FF0000 - should appear twice
+                expected_red_count = 2
+                count_red = html2.count("background-color:#FF0000")
+                if count_red != expected_red_count:
                     msg = (
-                        "report_html legend should use default color "
-                        "when line has no color attribute."
+                        f"report_html legend should cycle colors. "
+                        f"Expected #FF0000 to appear {expected_red_count} times, "
+                        f"got {count_red}."
                     )
                     raise ReportTestError(msg)
 

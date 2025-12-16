@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-import json
-import webbrowser
 from inspect import stack
+from itertools import cycle
+from json import dumps as json_dumps
 from logging import getLogger
 from pathlib import Path
 from secrets import choice
 from string import ascii_letters
 from typing import TYPE_CHECKING, Any, cast
 from warnings import catch_warnings, simplefilter
+from webbrowser import open as webbrowser_open
 
 from pandas import DataFrame, Index, Series, Timestamp, concat, isna
 from plotly.graph_objs import Bar, Figure, Scatter  # type: ignore[import-untyped]
@@ -58,7 +59,7 @@ def calendar_period_returns(
 
 
 def _dumps_plotly(obj: object) -> str:
-    return json.dumps(obj, cls=PlotlyJSONEncoder)
+    return json_dumps(obj, cls=PlotlyJSONEncoder)
 
 
 def _fmt_dates(idx: Index) -> list[str]:
@@ -163,7 +164,7 @@ def _create_line_traces(data: OpenFrame) -> list[Scatter]:
             Scatter(
                 x=x_line,
                 y=data.tsdf.iloc[:, item].tolist(),
-                hovertemplate="%{y:.2%}<br>%{x}<extra></extra>",
+                hovertemplate=f"{lbl}<br>%{{y:.2%}}<br>%{{x}}<extra></extra>",
                 line={"width": 2.5, "dash": "solid"},
                 mode="lines",
                 name=lbl,
@@ -193,7 +194,7 @@ def _create_bar_traces(
             Bar(
                 x=x_bar,
                 y=bdf.iloc[:, item].tolist(),
-                hovertemplate="%{y:.2%}<br>%{x}<extra></extra>",
+                hovertemplate=f"{col_name[0]}<br>%{{y:.2%}}<br>%{{x}}<extra></extra>",
                 name=col_name[0],
                 showlegend=False,
             ),
@@ -390,13 +391,10 @@ def _get_logo_html(logo: CaptorLogoType, *, add_logo: bool) -> str:
 def _get_legend_html(line_traces: list[Scatter], colorway: list[str]) -> str:
     """Generate HTML for the legend at the bottom of the page."""
     legend_items = []
-    for idx, trace in enumerate(line_traces):
+    color_cycle = cycle(colorway or ["#66725B"])
+    for trace in line_traces:
         name = trace.name or ""
-        color = "#000000"
-        if idx < len(colorway):
-            color = colorway[idx]
-        elif hasattr(trace, "line") and trace.line and hasattr(trace.line, "color"):
-            color = str(trace.line.color) if trace.line.color else "#000000"
+        color = next(color_cycle)
         legend_items.append(
             f'<div class="legend-item">'
             f'<div class="legend-color" style="background-color:{color};"></div>'
@@ -471,7 +469,7 @@ def _write_html_file(
     plotfile.write_text(html, encoding="utf-8")
     if auto_open:
         try:
-            webbrowser.open(plotfile.as_uri())
+            webbrowser_open(plotfile.as_uri())
         except OSError as exc:
             logger.warning("Failed to open browser: %s", exc)
     return str(plotfile)
