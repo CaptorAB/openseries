@@ -284,8 +284,6 @@ class TestReport:
             mockfilepath = Path(mockfile).resolve()
 
         try:
-            # When Documents doesn't exist, it should use the calling script's
-            # directory. The file should be created somewhere (not in Documents)
             if mockfilepath.name != "seriesfile.html":
                 msg = "report_html method not working as intended"
                 raise ReportTestError(msg)
@@ -327,12 +325,9 @@ class TestReport:
             msg = f"report_html shortdata test not working:{frame.length}"
             raise ReportTestError(msg)
 
-        # Ensure yearfrac is <= 1.0 for short data by truncating to a very short period
-        # Truncate to just a few days to ensure yearfrac <= 1.0
         if frame.yearfrac > 1.0:
             frame.trunc_frame(start_cut=dt.date(2019, 6, 1))
 
-        # Verify yearfrac is now <= 1.0
         if frame.yearfrac > 1.0:
             msg = (
                 f"report_html shortdata test: yearfrac still > 1.0 "
@@ -354,8 +349,6 @@ class TestReport:
         )
         labels = "".join(table_data) if table_data else ""
 
-        # Check both the figure JSON and HTML output for "Return (simple)"
-        # Labels are formatted with HTML tags, so check for the text content
         in_labels = "Return (simple)" in labels or "<b>Return (simple)</b>" in labels
         in_html = "Return (simple)" in html_output
         if not in_labels and not in_html:
@@ -530,16 +523,14 @@ class TestReport:
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        # Test with invalid logo type to trigger exception handling
         with patch("openseries.report.load_plotly_dict") as mock_load:
-            mock_load.return_value = ({}, None)  # Invalid logo type
+            mock_load.return_value = ({}, None)
             _, html = report_html(
                 data=frame,
                 auto_open=False,
                 output_type="div",
                 add_logo=True,
             )
-            # Should return "CAPTOR" when logo has no source
             if "CAPTOR" not in html:
                 msg = "report_html logo exception handling not working correctly."
                 raise ReportTestError(msg)
@@ -549,7 +540,6 @@ class TestReport:
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        # Test with include_plotlyjs=False (should return empty string)
         _, html_false = report_html(
             data=frame,
             auto_open=False,
@@ -560,7 +550,6 @@ class TestReport:
             msg = "report_html include_plotlyjs=False not working correctly."
             raise ReportTestError(msg)
 
-        # Test with include_plotlyjs=True (should return empty string)
         _, html_true = report_html(
             data=frame,
             auto_open=False,
@@ -579,7 +568,6 @@ class TestReport:
         directory = Path(__file__).parent
         test_filename = "test_report_html_browser_error.html"
 
-        # Mock webbrowser_open to raise OSError
         with patch(
             "openseries.report.webbrowser_open",
             side_effect=OSError("Browser error"),
@@ -595,7 +583,6 @@ class TestReport:
                 msg = "html file not created when browser open fails"
                 raise FileNotFoundError(msg)
 
-            # Clean up
             if plotfile.exists():
                 plotfile.unlink()
 
@@ -604,7 +591,6 @@ class TestReport:
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        # Create traces for testing
         trace1 = Scatter(
             x=[1, 2, 3],
             y=[1, 2, 3],
@@ -624,13 +610,11 @@ class TestReport:
             line={"width": 2.5},
         )
 
-        # Mock load_plotly_dict to return empty colorway
         with patch("openseries.report.load_plotly_dict") as mock_load:
             mock_load.return_value = (
-                {"layout": {}},  # Empty layout, no colorway
+                {"layout": {}},
                 None,
             )
-            # Test with empty colorway - should use default colorway color
             with patch(
                 "openseries.report._create_line_traces",
                 return_value=[trace1],
@@ -640,11 +624,9 @@ class TestReport:
                     auto_open=False,
                     output_type="div",
                 )
-                # Should still generate legend HTML even with empty colorway
                 if 'class="legend-container"' not in html:
                     msg = "report_html legend not generated with empty colorway."
                     raise ReportTestError(msg)
-                # Should use default colorway color when colorway is empty
                 if "background-color:#66725B" not in html:
                     msg = (
                         "report_html legend should use default colorway color "
@@ -652,13 +634,11 @@ class TestReport:
                     )
                     raise ReportTestError(msg)
 
-        # Test colorway cycling when there are more traces than colors
         with patch("openseries.report.load_plotly_dict") as mock_load:
             mock_load.return_value = (
-                {"layout": {"colorway": ["#FF0000", "#00FF00"]}},  # 2 colors
+                {"layout": {"colorway": ["#FF0000", "#00FF00"]}},
                 None,
             )
-            # Test with 3 traces but only 2 colors - should cycle
             with patch(
                 "openseries.report._create_line_traces",
                 return_value=[trace1, trace2, trace3],
@@ -668,14 +648,12 @@ class TestReport:
                     auto_open=False,
                     output_type="div",
                 )
-                # Should cycle: trace1=#FF0000, trace2=#00FF00, trace3=#FF0000
                 if "background-color:#FF0000" not in html2:
                     msg = "report_html legend should use first colorway color."
                     raise ReportTestError(msg)
                 if "background-color:#00FF00" not in html2:
                     msg = "report_html legend should use second colorway color."
                     raise ReportTestError(msg)
-                # Count occurrences of #FF0000 - should appear twice
                 expected_red_count = 2
                 count_red = html2.count("background-color:#FF0000")
                 if count_red != expected_red_count:
@@ -691,7 +669,6 @@ class TestReport:
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
 
-        # Mock _create_line_traces to return empty list
         with patch(
             "openseries.report._create_line_traces",
             return_value=[],
@@ -701,8 +678,6 @@ class TestReport:
                 auto_open=False,
                 output_type="div",
             )
-            # With empty traces, legend should not be in HTML (returns empty string)
-            # The legend-container div should not be present
             if 'class="legend-container"' in html:
                 msg = "report_html legend should be empty with no traces."
                 raise ReportTestError(msg)
