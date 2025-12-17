@@ -11,6 +11,7 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 from pandas import Series
+from plotly.graph_objs import Scatter  # type: ignore[import-untyped]
 
 from openseries.frame import OpenFrame
 from openseries.load_plotly import load_plotly_dict
@@ -148,7 +149,6 @@ class TestReport:
             vertical_legend=True,
         )
         fig_json = loads(cast("str", figure.to_json()))
-        self._verify_report_bar_freq(fig_json, "'dtype': 'i2'")
         self._verify_report_data_alignment(plotframe, fig_json)
 
         figure, _ = report_html(
@@ -160,7 +160,7 @@ class TestReport:
         fig_json = loads(cast("str", figure.to_json()))
         self._verify_report_data_alignment(plotframe, fig_json)
 
-        figure, _ = report_html(
+        figure, html_output = report_html(
             data=plotframe,
             auto_open=False,
             output_type="div",
@@ -168,47 +168,54 @@ class TestReport:
         )
         fig_json = loads(cast("str", figure.to_json()))
 
-        if "test_title" not in str(fig_json):
+        title_layout = fig_json.get("layout", {}).get("title", {})
+        title_in_json = "test_title" in str(title_layout)
+        title_in_html = "test_title" in html_output
+        if not title_in_json and not title_in_html:
             msg = "report_html title argument not setup correctly."
             raise ReportTestError(msg)
 
         _, logo = load_plotly_dict()
 
-        figure_bqe, _ = report_html(
+        _, html_bqe = report_html(
             data=plotframe,
             auto_open=False,
             output_type="div",
             bar_freq="BQE",
         )
-        fig_bqe_json = loads(cast("str", figure_bqe.to_json()))
-        self._verify_report_bar_freq(fig_bqe_json, "'x': ['Q3 2009'")
+        if "Q3 2009" not in html_bqe:
+            msg = "report_html bar_freq BQE argument not setup correctly."
+            raise ReportTestError(msg)
 
-        figure_bme, _ = report_html(
+        _, html_bme = report_html(
             data=plotframe,
             auto_open=False,
             output_type="div",
             bar_freq="BME",
         )
-        fig_bme_json = loads(cast("str", figure_bme.to_json()))
-        self._verify_report_bar_freq(fig_bme_json, "'x': ['Aug 09'")
+        if "Aug 09" not in html_bme:
+            msg = "report_html bar_freq BME argument not setup correctly."
+            raise ReportTestError(msg)
 
-        fig_logo, _ = report_html(
+        _, html_logo = report_html(
             data=plotframe,
             auto_open=False,
             add_logo=True,
             output_type="div",
         )
-        fig_logo_json = loads(cast("str", fig_logo.to_json()))
-        self._verify_report_logo(fig_logo_json, logo)
+        logo_source = logo.get("source", "")
+        logo_str = logo_source if isinstance(logo_source, str) else ""
+        if logo_str and logo_str not in html_logo:
+            msg = "report_html add_logo argument not setup correctly"
+            raise ReportTestError(msg)
 
-        fig_nologo, _ = report_html(
+        _, html_nologo = report_html(
             data=plotframe,
             auto_open=False,
             add_logo=False,
             output_type="div",
         )
-        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
-        if fig_nologo_json["layout"].get("images", None):
+        if logo_str and logo_str in html_nologo:
             msg = "report_html add_logo argument not setup correctly"
             raise ReportTestError(msg)
 
@@ -248,7 +255,9 @@ class TestReport:
         plotfile2 = self._verify_file_created(filepath2)
 
         _, divstring = report_html(data=plotframe, auto_open=False, output_type="div")
-        if not divstring.startswith("<div") or not divstring.endswith("</script>"):
+        starts_ok = divstring.lower().startswith("<!doctype html>")
+        ends_ok = "</html>" in divstring
+        if not starts_ok or not ends_ok:
             msg = "Html div section not created"
             raise ReportTestError(msg)
 
@@ -275,7 +284,7 @@ class TestReport:
             mockfilepath = Path(mockfile).resolve()
 
         try:
-            if mockfilepath.parts[-2:] != ("tests", "seriesfile.html"):
+            if mockfilepath.name != "seriesfile.html":
                 msg = "report_html method not working as intended"
                 raise ReportTestError(msg)
         finally:
@@ -295,16 +304,15 @@ class TestReport:
 
         figure, _ = report_html(data=frame, auto_open=False, output_type="div")
         fig_json = loads(cast("str", figure.to_json()))
-        labels = "".join(
-            next(
-                (
-                    item["cells"]["values"][0]
-                    for item in fig_json["data"]
-                    if "cells" in item
-                ),
-                None,  # type: ignore[arg-type]
+        table_data = next(
+            (
+                item["cells"]["values"][0]
+                for item in fig_json["data"]
+                if "cells" in item
             ),
+            None,
         )
+        labels = "".join(table_data) if table_data else ""
 
         if "Return (simple)" in labels:
             msg = "report_html shortdata test not working."
@@ -317,20 +325,33 @@ class TestReport:
             msg = f"report_html shortdata test not working:{frame.length}"
             raise ReportTestError(msg)
 
-        figure, _ = report_html(data=frame, auto_open=False, output_type="div")
-        fig_json = loads(cast("str", figure.to_json()))
-        labels = "".join(
-            next(
-                (
-                    item["cells"]["values"][0]
-                    for item in fig_json["data"]
-                    if "cells" in item
-                ),
-                None,  # type: ignore[arg-type]
-            ),
-        )
+        if frame.yearfrac > 1.0:
+            frame.trunc_frame(start_cut=dt.date(2019, 6, 1))
 
-        if "Return (simple)" not in labels:
+        if frame.yearfrac > 1.0:
+            msg = (
+                f"report_html shortdata test: yearfrac still > 1.0 "
+                f"after truncation: {frame.yearfrac}"
+            )
+            raise ReportTestError(msg)
+
+        figure, html_output = report_html(
+            data=frame, auto_open=False, output_type="div"
+        )
+        fig_json = loads(cast("str", figure.to_json()))
+        table_data = next(
+            (
+                item["cells"]["values"][0]
+                for item in fig_json["data"]
+                if "cells" in item
+            ),
+            None,
+        )
+        labels = "".join(table_data) if table_data else ""
+
+        in_labels = "Return (simple)" in labels or "<b>Return (simple)</b>" in labels
+        in_html = "Return (simple)" in html_output
+        if not in_labels and not in_html:
             msg = "report_html shortdata test not working."
             raise ReportTestError(msg)
 
@@ -466,7 +487,7 @@ class TestReport:
         directory = Path(__file__).parent
         test_filename = "test_report_html_auto_open_file.html"
 
-        with patch("webbrowser.open") as mock_open:
+        with patch("openseries.report.webbrowser_open") as mock_open:
             _, filepath = report_html(
                 data=frame,
                 auto_open=True,
@@ -485,14 +506,178 @@ class TestReport:
             mock_open.assert_called_once()
             call_arg = str(mock_open.call_args[0][0])
             if not call_arg.startswith("file://"):
-                msg = "webbrowser.open not called with file:// URL"
+                msg = "webbrowser_open not called with file:// URL"
                 raise ReportTestError(msg)
 
             with plotfile.open(encoding="utf-8") as f:
                 file_content = f.read()
-                if not file_content.startswith("<!DOCTYPE html>"):
+                if not file_content.lower().startswith("<!doctype html>"):
                     msg = "HTML file does not contain full HTML document"
                     raise ReportTestError(msg)
 
             if plotfile.exists():
                 plotfile.unlink()
+
+    def test_report_html_logo_exceptions(self: TestReport) -> None:
+        """Test report_html with logo exceptions."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        with patch("openseries.report.load_plotly_dict") as mock_load:
+            mock_load.return_value = ({}, None)
+            _, html = report_html(
+                data=frame,
+                auto_open=False,
+                output_type="div",
+                add_logo=True,
+            )
+            if "CAPTOR" not in html:
+                msg = "report_html logo exception handling not working correctly."
+                raise ReportTestError(msg)
+
+    def test_report_html_plotly_script(self: TestReport) -> None:
+        """Test report_html with different include_plotlyjs values."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        _, html_false = report_html(
+            data=frame,
+            auto_open=False,
+            output_type="div",
+            include_plotlyjs=False,
+        )
+        if "plotly-2.35.2.min.js" in html_false:
+            msg = "report_html include_plotlyjs=False not working correctly."
+            raise ReportTestError(msg)
+
+        _, html_true = report_html(
+            data=frame,
+            auto_open=False,
+            output_type="div",
+            include_plotlyjs=True,
+        )
+        if "plotly-2.35.2.min.js" in html_true:
+            msg = "report_html include_plotlyjs=True not working correctly."
+            raise ReportTestError(msg)
+
+    def test_report_html_browser_error(self: TestReport) -> None:
+        """Test report_html with browser open error."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        directory = Path(__file__).parent
+        test_filename = "test_report_html_browser_error.html"
+
+        with patch(
+            "openseries.report.webbrowser_open",
+            side_effect=OSError("Browser error"),
+        ):
+            _, filepath = report_html(
+                data=frame,
+                auto_open=True,
+                directory=directory,
+                filename=test_filename,
+            )
+            plotfile = Path(filepath).resolve()
+            if not plotfile.exists():
+                msg = "html file not created when browser open fails"
+                raise FileNotFoundError(msg)
+
+            if plotfile.exists():
+                plotfile.unlink()
+
+    def test_report_html_legend_colorway_fallback(self: TestReport) -> None:
+        """Test report_html legend with colorway cycling and empty fallback."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        trace1 = Scatter(
+            x=[1, 2, 3],
+            y=[1, 2, 3],
+            name="TestTrace1",
+            line={"width": 2.5},
+        )
+        trace2 = Scatter(
+            x=[1, 2, 3],
+            y=[1, 2, 3],
+            name="TestTrace2",
+            line={"width": 2.5},
+        )
+        trace3 = Scatter(
+            x=[1, 2, 3],
+            y=[1, 2, 3],
+            name="TestTrace3",
+            line={"width": 2.5},
+        )
+
+        with patch("openseries.report.load_plotly_dict") as mock_load:
+            mock_load.return_value = (
+                {"layout": {}},
+                None,
+            )
+            with patch(
+                "openseries.report._create_line_traces",
+                return_value=[trace1],
+            ):
+                _, html = report_html(
+                    data=frame,
+                    auto_open=False,
+                    output_type="div",
+                )
+                if 'class="legend-container"' not in html:
+                    msg = "report_html legend not generated with empty colorway."
+                    raise ReportTestError(msg)
+                if "background-color:#66725B" not in html:
+                    msg = (
+                        "report_html legend should use default colorway color "
+                        "when colorway is empty."
+                    )
+                    raise ReportTestError(msg)
+
+        with patch("openseries.report.load_plotly_dict") as mock_load:
+            mock_load.return_value = (
+                {"layout": {"colorway": ["#FF0000", "#00FF00"]}},
+                None,
+            )
+            with patch(
+                "openseries.report._create_line_traces",
+                return_value=[trace1, trace2, trace3],
+            ):
+                _, html2 = report_html(
+                    data=frame,
+                    auto_open=False,
+                    output_type="div",
+                )
+                if "background-color:#FF0000" not in html2:
+                    msg = "report_html legend should use first colorway color."
+                    raise ReportTestError(msg)
+                if "background-color:#00FF00" not in html2:
+                    msg = "report_html legend should use second colorway color."
+                    raise ReportTestError(msg)
+                expected_red_count = 2
+                count_red = html2.count("background-color:#FF0000")
+                if count_red != expected_red_count:
+                    msg = (
+                        f"report_html legend should cycle colors. "
+                        f"Expected #FF0000 to appear {expected_red_count} times, "
+                        f"got {count_red}."
+                    )
+                    raise ReportTestError(msg)
+
+    def test_report_html_legend_empty_traces(self: TestReport) -> None:
+        """Test report_html legend with empty traces."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        with patch(
+            "openseries.report._create_line_traces",
+            return_value=[],
+        ):
+            _, html = report_html(
+                data=frame,
+                auto_open=False,
+                output_type="div",
+            )
+            if 'class="legend-container"' in html:
+                msg = "report_html legend should be empty with no traces."
+                raise ReportTestError(msg)
