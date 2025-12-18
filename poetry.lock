@@ -1571,14 +1571,14 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "roman-numerals"
-version = "4.0.0"
+version = "4.1.0"
 description = "Manipulate well-formed Roman numerals"
 optional = false
 python-versions = ">=3.10"
 groups = ["docs"]
 files = [
-    {file = "roman_numerals-4.0.0-py3-none-any.whl", hash = "sha256:4131feb23ba1a542494873e4cee7844ec8d226a750134efc65ceb20939ed33c9"},
-    {file = "roman_numerals-4.0.0.tar.gz", hash = "sha256:231287018a8788bf8c0718482a08c15b90458523ea1d840a18a791a86d4583b3"},
+    {file = "roman_numerals-4.1.0-py3-none-any.whl", hash = "sha256:647ba99caddc2cc1e55a51e4360689115551bf4476d90e8162cf8c345fe233c7"},
+    {file = "roman_numerals-4.1.0.tar.gz", hash = "sha256:1af8b147eb1405d5839e78aeb93131690495fe9da5c91856cb33ad55a7f1e5b2"},
 ]
 
 [[package]]

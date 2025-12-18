@@ -432,14 +432,15 @@ def _get_css() -> str:
       .plot.bar{height:300px;}
     }
     table.metrics{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;
-    border-radius:4px;overflow:hidden;}
+    border-radius:4px;overflow:hidden;table-layout:fixed;}
     table.metrics thead th{background:var(--header);color:white;padding:8px 10px;
-    font-weight:700;text-align:center;white-space:nowrap;}
-    table.metrics thead th:first-child{background:var(--header2);text-align:left;}
+    font-weight:700;text-align:center;word-wrap:break-word;word-break:break-word;}
+    table.metrics thead th:first-child{background:var(--header2);text-align:left;
+    width:180px;}
     table.metrics tbody td{padding:7px 10px;border-bottom:1px solid white;
     border-right:1px solid white;text-align:center;background:var(--paper);}
     table.metrics tbody td:first-child{text-align:left;font-weight:600;color:white;
-    background:var(--header);width:42%;}
+    background:var(--header);width:180px;}
     table.metrics tbody td:last-child{background:var(--cell2);}
     .legend-container{margin-top:24px;padding-top:20px;padding-bottom:16px;
     display:flex;justify-content:center;flex-wrap:wrap;gap:24px;flex-shrink:0;}
@@ -611,7 +612,7 @@ def report_html(
     rpt_df.columns = colmns
     table_html = _metrics_table_html(rpt_df)
 
-    dirpath = _get_output_directory(directory)
+    dirpath = _get_output_directory(directory=directory)
 
     if not filename:
         filename = "".join(choice(ascii_letters) for _ in range(6)) + ".html"
@@ -625,16 +626,16 @@ def report_html(
     )
 
     line_layout, bar_layout = _get_plotly_layouts(
-        layout_theme,
-        colorway,
-        copied.item_count,
+        layout_theme=layout_theme,
+        colorway=colorway,
+        item_count=copied.item_count,
     )
 
     config = cast("dict[str, Any]", fig_theme.get("config", {})) or {}
     config = {**config, "responsive": True, "displayModeBar": False}
 
-    plotly_script = _get_plotly_script(include_plotlyjs)
-    logo_html = _get_logo_html(logo, add_logo=add_logo)
+    plotly_script = _get_plotly_script(include_plotlyjs=include_plotlyjs)
+    logo_html = _get_logo_html(logo=logo, add_logo=add_logo)
     css = _get_css()
 
     line_payload = {
@@ -648,21 +649,21 @@ def report_html(
         "config": config,
     }
 
-    legend_html = _get_legend_html(line_traces, colorway)
+    legend_html = _get_legend_html(line_traces=line_traces, colorway=colorway)
 
     html = _generate_html(
-        title,
-        css,
-        plotly_script,
-        logo_html,
-        table_html,
-        line_payload,
-        bar_payload,
-        legend_html,
+        title=title,
+        css=css,
+        plotly_script=plotly_script,
+        logo_html=logo_html,
+        table_html=table_html,
+        line_payload=line_payload,
+        bar_payload=bar_payload,
+        legend_html=legend_html,
     )
 
     if output_type == "file":
-        output = _write_html_file(plotfile, html, auto_open=auto_open)
+        output = _write_html_file(plotfile=plotfile, html=html, auto_open=auto_open)
     else:
         output = html
 
