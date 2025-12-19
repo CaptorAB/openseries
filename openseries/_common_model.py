@@ -506,17 +506,16 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         mdddf = self.tsdf.copy()
         mdddf.index = DatetimeIndex(mdddf.index)
-        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date  # type: ignore[attr-defined,arg-type]
+        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date  # type: ignore[arg-type]
 
         if self.tsdf.shape[1] == 1:
-            return cast("dt.date", result.iloc[0])
-        date_series = Series(
+            return result.iloc[0]
+        return Series(  # type: ignore[arg-type]
             data=result,
             index=self.tsdf.columns,
             name="Max drawdown date",
             dtype="datetime64[ns]",
-        ).dt.date  # type: ignore[attr-defined]
-        return cast("Series[dt.date]", date_series)
+        ).dt.date
 
     @property
     def worst(self: Self) -> SeriesOrFloat_co:

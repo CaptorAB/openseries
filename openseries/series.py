@@ -625,7 +625,7 @@ class OpenTimeSeries(_CommonModel[float]):
             cast("Timestamp", earlier) : cast("Timestamp", later)
         ].copy()
 
-        data.loc[:, (self.label, ValueType.RTRN)] = log(  # type: ignore[index]
+        data.loc[:, (self.label, ValueType.RTRN)] = log(
             data.loc[:, self.tsdf.columns.to_numpy()[0]],
         ).diff()
 

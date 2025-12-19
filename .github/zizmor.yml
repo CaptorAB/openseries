@@ -4,24 +4,28 @@ rules:
     config:
       policies:
         actions/*: hash-pin
-        github/*: hash-pin
-        softprops/*: hash-pin
         astral-sh/*: hash-pin
         codecov/*: hash-pin
+        github/*: hash-pin
+        pypa/*: hash-pin
+        softprops/*: hash-pin
 
   forbidden-uses:
     config:
       allow:
-        - actions/checkout
         - actions/cache
+        - actions/checkout
+        - actions/configure-pages
+        - actions/deploy-pages
+        - actions/download-artifact
         - actions/github-script
         - actions/setup-python
+        - actions/upload-artifact
+        - actions/upload-pages-artifact
         - github/codeql-action/upload-sarif
+        - pypa/gh-action-pypi-publish
         - softprops/action-gh-release
         - astral-sh/setup-uv
         - codecov/codecov-action
         - codecov/test-results-action
-        - actions/configure-pages
-        - actions/upload-pages-artifact
-        - actions/deploy-pages
         - webfactory/ssh-agent
