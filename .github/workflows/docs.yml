@@ -3,6 +3,10 @@ name: docs.yml
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 on:
   # Only run on pushes to master for documentation-related changes
   # This prevents running on every commit, only when docs actually change
