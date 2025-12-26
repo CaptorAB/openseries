@@ -1735,6 +1735,25 @@ class TestOpenFrame:
             if mockfilepath.exists():
                 mockfilepath.unlink()
 
+    @patch("openseries._common_model.webbrowser_open")
+    def test_plot_series_auto_open(
+        self: TestOpenFrame, mock_webbrowser: MagicMock
+    ) -> None:
+        """Test plot_series method with auto_open=True."""
+        plotframe = self.randomframe.from_deepcopy()
+        plotframe.to_cumret()
+
+        _, output = plotframe.plot_series(auto_open=True, output_type="file")
+        plotfile = Path(output).resolve()
+        if not plotfile.exists():
+            msg = "html file not created"
+            raise FileNotFoundError(msg)
+
+        try:
+            mock_webbrowser.assert_called_once_with(plotfile.as_uri())
+        finally:
+            plotfile.unlink()
+
     def test_plot_bars(self: TestOpenFrame) -> None:
         """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()

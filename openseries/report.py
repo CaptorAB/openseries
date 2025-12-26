@@ -17,6 +17,7 @@ from pandas import DataFrame, Index, Series, Timestamp, concat, isna
 from plotly.graph_objs import Bar, Figure, Scatter  # type: ignore[import-untyped]
 from plotly.utils import PlotlyJSONEncoder  # type: ignore[import-untyped]
 
+from .html_utils import _get_base_css, _get_plotly_script
 from .load_plotly import load_plotly_dict
 from .owntypes import (
     CaptorLogoType,
@@ -408,12 +409,10 @@ def _get_legend_html(line_traces: list[Scatter], colorway: list[str]) -> str:
 
 def _get_css() -> str:
     """Get CSS styles for the HTML report."""
-    return """
-    :root{--ink:#1f2a44;--muted:#6b778c;--header:#4a4a4a;--header2:#6a6a6a;--cell:#f3f3f3;--cell2:#e6e6e6;--paper:#ffffff;}
-    html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
-    .page{max-width:calc(100% - 64px);margin:0 auto;padding:32px;
-    padding-bottom:48px;}
+    base_css = _get_base_css()
+    return (
+        base_css
+        + """
     .header{display:grid;grid-template-columns:140px 1fr 140px;gap:12px;
     align-items:start;}
     h1{margin:0;text-align:center;font-size:45px;font-weight:800;}
@@ -430,6 +429,11 @@ def _get_css() -> str:
       .layout{grid-template-columns:1fr;grid-template-areas:"table" "charts";gap:16px;}
       .plot{height:380px;}
       .plot.bar{height:300px;}
+      table.metrics{table-layout:fixed;width:auto;}
+      table.metrics thead th{min-width:120px;width:120px;white-space:nowrap;}
+      table.metrics thead th:first-child{width:180px;}
+      table.metrics tbody td{min-width:120px;width:120px;}
+      table.metrics tbody td:first-child{width:180px;}
     }
     table.metrics{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;
     border-radius:4px;overflow:hidden;table-layout:fixed;}
@@ -450,13 +454,7 @@ def _get_css() -> str:
       html,body{overflow-y:auto;}
     }
     """
-
-
-def _get_plotly_script(include_plotlyjs: LiteralPlotlyJSlib) -> str:
-    """Get plotly script tag."""
-    if include_plotlyjs == "cdn":
-        return '<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>'
-    return ""
+    )
 
 
 def _write_html_file(

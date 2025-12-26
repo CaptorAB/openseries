@@ -13,6 +13,7 @@ from pathlib import Path
 from secrets import choice
 from string import ascii_letters
 from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
+from webbrowser import open as webbrowser_open
 
 from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
@@ -62,7 +63,6 @@ from pandas.tseries.offsets import CustomBusinessDay
 from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
-from plotly.offline import plot  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath, ValidationError
 from scipy.stats import (
     kurtosis,
@@ -79,6 +79,7 @@ from .datefixer import (
     date_offset_foll,
     holiday_calendar,
 )
+from .html_utils import _generate_responsive_plot_html
 from .load_plotly import load_plotly_dict
 
 
@@ -1074,6 +1075,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         *,
         include_plotlyjs_bool: LiteralPlotlyJSlib,
         auto_open: bool,
+        title: str | None = None,
     ) -> str:
         """Write a file or return inline HTML string from a Plotly Figure.
 
@@ -1085,22 +1087,34 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             filename: Output filename used for the ``div_id`` when inline.
             include_plotlyjs_bool: How plotly.js is included.
             auto_open: Whether to auto-open the file in a browser.
+            title: Title for the HTML page (used for file output).
 
         Returns:
             If ``output_type`` is ``"file"``, the path to the file; otherwise an
             inline HTML string (div).
         """
         if output_type == "file":
-            plot(
-                figure_or_data=figure,
-                filename=str(plotfile),
-                auto_open=auto_open,
-                auto_play=False,
-                link_text="",
-                include_plotlyjs=include_plotlyjs_bool,
-                config=fig_config,
-                output_type=output_type,
+            div_id = filename.rsplit(".", 1)[0]
+            plot_div = cast(
+                "str",
+                to_html(
+                    fig=figure,
+                    config=fig_config,
+                    auto_play=False,
+                    include_plotlyjs=False,
+                    full_html=False,
+                    div_id=div_id,
+                ),
             )
+            html_content = _generate_responsive_plot_html(
+                title=title,
+                plot_div=plot_div,
+                include_plotlyjs=include_plotlyjs_bool,
+                plot_id=div_id,
+            )
+            plotfile.write_text(html_content, encoding="utf-8")
+            if auto_open:
+                webbrowser_open(plotfile.as_uri())
             return str(plotfile)
 
         div_id = filename.rsplit(".", 1)[0]
@@ -1190,6 +1204,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             auto_open=auto_open,
             plotfile=plotfile,
             filename=filename,
+            title=title,
         )
 
         return figure, string_output
@@ -1285,6 +1300,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             auto_open=auto_open,
             plotfile=plotfile,
             filename=filename,
+            title=title,
         )
 
         return figure, string_output
@@ -1407,6 +1423,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             auto_open=auto_open,
             plotfile=plotfile,
             filename=filename,
+            title=title,
         )
 
         return figure, string_output
