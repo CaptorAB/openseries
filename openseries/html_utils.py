@@ -64,20 +64,39 @@ def _get_base_css() -> str:
 
 
 def _get_plot_css() -> str:
-    """Get CSS styles for full-screen responsive plots."""
+    """Get CSS styles for full-screen responsive plots.
+
+    Returns:
+        CSS string for responsive plots.
+    """
     return """
-    :root{--ink:#1f2a44;--paper:#ffffff;}
-    html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;width:100%;height:100%;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-    height:100%;}
-    .page{height:100%;width:100%;padding:0;position:relative;}
-    .plot-container{display:flex;height:100%;}
-    .plot{position:absolute;top:0;left:0;width:100vw;height:100vh;}
+    overflow-x:hidden;}
+    .page{width:100%;height:100vh;display:flex;flex-direction:column;}
+    .title-container{width:100%;flex-shrink:0;padding:15px 20px 10px 20px;
+    display:flex;align-items:center;justify-content:center;background:white;z-index:10;
+    gap:15px;}
+    .title-logo{height:60px;width:auto;flex-shrink:0;}
+    .title-container h1{margin:0;padding:0;font-size:36px;font-weight:bold;
+    color:#253551;word-wrap:break-word;word-break:break-word;
+    white-space:normal;line-height:1.2;flex:1;text-align:center;}
+    .plot-container{width:100%;flex:1;position:relative;overflow:hidden;
+    min-height:0;}
+    .plot{width:100%;height:100%;display:block;position:absolute;top:0;left:0;}
+    .plot > div{width:100% !important;height:100% !important;}
+    .plot .js-plotly-plot{width:100% !important;height:100% !important;}
+    .plot .js-plotly-plot .plotly{width:100% !important;height:100% !important;}
     @media (max-width: 980px) {
-      .page{height:auto;min-height:100vh;}
-      .plot-container{height:auto;}
-      .plot{position:relative;top:auto;left:auto;width:100%;height:auto;overflow-x:hidden;}
-      html,body{overflow-x:hidden;}
+      .title-container{padding:12px 15px 8px 15px;gap:12px;}
+      .title-container h1{font-size:24px;line-height:1.3;}
+      .title-logo{height:32px;}
+    }
+    @media (max-width: 480px) {
+      .title-container{padding:10px 12px 6px 12px;gap:10px;}
+      .title-container h1{font-size:18px;line-height:1.2;}
+      .title-logo{height:24px;}
     }
     """
 
@@ -94,35 +113,94 @@ def _generate_responsive_plot_html(
     plot_div: str,
     include_plotlyjs: LiteralPlotlyJSlib,
     plot_id: str,
+    logo_url: str | None = None,
 ) -> str:
     """Generate responsive HTML for a single Plotly plot."""
     css = _get_plot_css()
     plotly_script = _get_plotly_script(include_plotlyjs)
 
-    # Add class="plot" to the plot div for styling
     plot_div = plot_div.replace(
         f'<div id="{plot_id}"', f'<div id="{plot_id}" class="plot"'
     )
+
+    title_html = ""
+    if (title is not None and title) or logo_url:
+        logo_html = ""
+        if logo_url:
+            logo_html = f'<img src="{logo_url}" alt="Logo" class="title-logo" />'
+        title_text = f"<h1><b>{title}</b></h1>" if title else ""
+        title_html = f'<div class="title-container">{logo_html}{title_text}</div>'
 
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,
+maximum-scale=5,user-scalable=yes" />
 <title>{title or ""}</title>
 <style>{css}</style>
 {plotly_script}
 </head>
 <body>
 <div class="page">
+  {title_html}
   <div class="plot-container">
     {plot_div}
   </div>
 </div>
 <script>
-window.addEventListener("resize", () => {{
-  Plotly.Plots.resize("{plot_id}");
-}});
+(function() {{
+  var plotDiv = document.getElementById("{plot_id}");
+  var container = plotDiv ? plotDiv.closest('.plot-container') : null;
+
+  function getContainerSize() {{
+    if (!container) return {{width: window.innerWidth, height: window.innerHeight}};
+    var rect = container.getBoundingClientRect();
+    return {{width: rect.width, height: rect.height}};
+  }}
+
+  function resizePlot() {{
+    if (typeof Plotly === 'undefined' || !Plotly.Plots || !plotDiv) return;
+
+    var size = getContainerSize();
+    if (size.width > 0 && size.height > 0) {{
+      Plotly.Plots.resize(plotDiv);
+    }}
+  }}
+
+  function debounceResize() {{
+    clearTimeout(window._resizeTimeout);
+    window._resizeTimeout = setTimeout(resizePlot, 150);
+  }}
+
+  window.addEventListener("resize", debounceResize);
+
+  window.addEventListener("orientationchange", function() {{
+    setTimeout(function() {{
+      resizePlot();
+    }}, 300);
+  }});
+
+  function initResize() {{
+    if (typeof Plotly !== 'undefined' && plotDiv) {{
+      setTimeout(resizePlot, 100);
+      setTimeout(resizePlot, 500);
+      setTimeout(resizePlot, 1000);
+    }} else {{
+      setTimeout(initResize, 100);
+    }}
+  }}
+
+  if (document.readyState === 'loading') {{
+    document.addEventListener('DOMContentLoaded', initResize);
+  }} else {{
+    initResize();
+  }}
+
+  window.addEventListener('load', function() {{
+    setTimeout(resizePlot, 200);
+  }});
+}})();
 </script>
 </body>
 </html>

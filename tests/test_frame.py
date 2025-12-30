@@ -1573,14 +1573,14 @@ class TestOpenFrame:
 
     def _verify_plot_title(
         self: TestOpenFrame,
-        fig_json: dict[str, Any],
+        html_output: str,
         title: str | None,
         method_name: str,
     ) -> None:
-        """Verify plot title.
+        """Verify plot title in HTML output.
 
         Args:
-            fig_json: Figure JSON data.
+            html_output: HTML output string.
             title: Expected title or None.
             method_name: Method name for error messages.
 
@@ -1588,14 +1588,24 @@ class TestOpenFrame:
             OpenFrameTestError: If title is not correct.
         """
         if title is None:
-            if fig_json["layout"]["title"].get("text", None):
-                msg = f"{method_name} title argument not setup correctly"
+            if '<div class="title-container">' in html_output:
+                msg = (
+                    f"{method_name} title container should not exist "
+                    "when title is None"
+                )
                 raise OpenFrameTestError(msg)
-        elif title not in fig_json["layout"]["title"]["text"]:
-            msg = f"{method_name} title argument not setup correctly"
-            raise OpenFrameTestError(msg)
+        else:
+            if title not in html_output:
+                msg = f"{method_name} title argument not setup correctly in HTML"
+                raise OpenFrameTestError(msg)
+            # Verify title is bold in HTML
+            bold_title = f"<b>{title}</b>"
+            h1_bold_title = f"<h1><b>{title}</b></h1>"
+            if bold_title not in html_output and h1_bold_title not in html_output:
+                msg = f"{method_name} title not bold in HTML"
+                raise OpenFrameTestError(msg)
 
-    def test_plot_series(self: TestOpenFrame) -> None:
+    def test_plot_series(self: TestOpenFrame) -> None:  # noqa: PLR0915
         """Test plot_series method."""
         plotframe = self.randomframe.from_deepcopy()
         plotframe.to_cumret()
@@ -1646,13 +1656,16 @@ class TestOpenFrame:
 
         _, logo = load_plotly_dict()
 
-        fig_logo, _ = plotframe.plot_series(
+        _, file_path_logo = plotframe.plot_series(
             auto_open=False,
             add_logo=True,
-            output_type="div",
+            output_type="file",
         )
-        fig_logo_json = loads(cast("str", fig_logo.to_json()))
-        self._verify_plot_logo(fig_logo_json, logo, "plot_series")
+        html_logo = Path(file_path_logo).read_text(encoding="utf-8")
+        if logo and logo.get("source") and f'src="{logo["source"]}"' not in html_logo:
+            msg = "plot_series logo not found in HTML"
+            raise OpenFrameTestError(msg)
+        Path(file_path_logo).unlink()
 
         fig_nologo, _ = plotframe.plot_series(
             auto_open=False,
@@ -1665,21 +1678,46 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
 
         title = "My Plot"
-        fig_title, _ = plotframe.plot_series(
+        fig_title, file_path = plotframe.plot_series(
             auto_open=False,
             title=title,
-            output_type="div",
+            output_type="file",
         )
+        html_content = Path(file_path).read_text(encoding="utf-8")
+        self._verify_plot_title(html_content, title, "plot_series")
+        # Verify no title in Plotly layout
         fig_title_json = loads(cast("str", fig_title.to_json()))
-        self._verify_plot_title(fig_title_json, title, "plot_series")
+        if fig_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_series title should not be in Plotly layout"
+            raise OpenFrameTestError(msg)
+        Path(file_path).unlink()
 
-        fig_no_title, _ = plotframe.plot_series(
+        fig_no_title, file_path_no_title = plotframe.plot_series(
             auto_open=False,
             title=None,
-            output_type="div",
+            add_logo=False,
+            output_type="file",
         )
+        html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
+        self._verify_plot_title(html_no_title, None, "plot_series")
+        # Verify no title in Plotly layout
         fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
-        self._verify_plot_title(fig_no_title_json, None, "plot_series")
+        if fig_no_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_series title should not be in Plotly layout when title is None"
+            raise OpenFrameTestError(msg)
+        Path(file_path_no_title).unlink()
+
+        # Test include_plotlyjs=False to cover html_utils._get_plotly_script branch
+        _, file_path_inline = plotframe.plot_series(
+            auto_open=False,
+            output_type="file",
+            include_plotlyjs=False,
+        )
+        html_inline = Path(file_path_inline).read_text(encoding="utf-8")
+        if "plotly-2.35.2.min.js" in html_inline:
+            msg = "plot_series include_plotlyjs=False not working correctly"
+            raise OpenFrameTestError(msg)
+        Path(file_path_inline).unlink()
 
     def test_plot_series_filefolders(self: TestOpenFrame) -> None:
         """Test plot_series method with different file folder options."""
@@ -1754,7 +1792,7 @@ class TestOpenFrame:
         finally:
             plotfile.unlink()
 
-    def test_plot_bars(self: TestOpenFrame) -> None:
+    def test_plot_bars(self: TestOpenFrame) -> None:  # noqa: PLR0915
         """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()
 
@@ -1798,13 +1836,16 @@ class TestOpenFrame:
 
         _, logo = load_plotly_dict()
 
-        fig_logo, _ = plotframe.plot_bars(
+        _, file_path_logo = plotframe.plot_bars(
             auto_open=False,
             add_logo=True,
-            output_type="div",
+            output_type="file",
         )
-        fig_logo_json = loads(cast("str", fig_logo.to_json()))
-        self._verify_plot_logo(fig_logo_json, logo, "plot_bars")
+        html_logo = Path(file_path_logo).read_text(encoding="utf-8")
+        if logo and logo.get("source") and f'src="{logo["source"]}"' not in html_logo:
+            msg = "plot_bars logo not found in HTML"
+            raise OpenFrameTestError(msg)
+        Path(file_path_logo).unlink()
 
         fig_nologo, _ = plotframe.plot_bars(
             auto_open=False,
@@ -1817,21 +1858,46 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
 
         title = "My Plot"
-        fig_title, _ = plotframe.plot_bars(
+        fig_title, file_path = plotframe.plot_bars(
             auto_open=False,
             title=title,
-            output_type="div",
+            output_type="file",
         )
+        html_content = Path(file_path).read_text(encoding="utf-8")
+        self._verify_plot_title(html_content, title, "plot_bars")
+        # Verify no title in Plotly layout
         fig_title_json = loads(cast("str", fig_title.to_json()))
-        self._verify_plot_title(fig_title_json, title, "plot_bars")
+        if fig_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_bars title should not be in Plotly layout"
+            raise OpenFrameTestError(msg)
+        Path(file_path).unlink()
 
-        fig_no_title, _ = plotframe.plot_bars(
+        fig_no_title, file_path_no_title = plotframe.plot_bars(
             auto_open=False,
             title=None,
-            output_type="div",
+            add_logo=False,
+            output_type="file",
         )
+        html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
+        self._verify_plot_title(html_no_title, None, "plot_bars")
+        # Verify no title in Plotly layout
         fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
-        self._verify_plot_title(fig_no_title_json, None, "plot_bars")
+        if fig_no_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_bars title should not be in Plotly layout when title is None"
+            raise OpenFrameTestError(msg)
+        Path(file_path_no_title).unlink()
+
+        # Test include_plotlyjs=False to cover html_utils._get_plotly_script branch
+        _, file_path_inline = plotframe.plot_bars(
+            auto_open=False,
+            output_type="file",
+            include_plotlyjs=False,
+        )
+        html_inline = Path(file_path_inline).read_text(encoding="utf-8")
+        if "plotly-2.35.2.min.js" in html_inline:
+            msg = "plot_bars include_plotlyjs=False not working correctly"
+            raise OpenFrameTestError(msg)
+        Path(file_path_inline).unlink()
 
     def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
         """Test plot_bars method with different file folder options."""
@@ -1943,61 +2009,147 @@ class TestOpenFrame:
         ):
             _, _ = plotframe.plot_histogram(auto_open=False, labels=["a", "b"])
 
-    def test_plot_histogram_bars_logo(self: TestOpenFrame) -> None:
+    def test_plot_histogram_bars_logo(self: TestOpenFrame) -> None:  # noqa: C901
         """Test plot_histogram method logo."""
         plotframe = self.randomframe.from_deepcopy()
         _, logo = load_plotly_dict()
 
-        fig_logo, _ = plotframe.plot_histogram(
-            auto_open=False,
-            add_logo=True,
-            output_type="div",
-        )
-        fig_logo_json = loads(cast("str", fig_logo.to_json()))
-        if logo == {}:
-            if fig_logo_json["layout"]["images"][0] != logo:
-                msg = "plot_histogram add_logo argument not setup correctly"
+        file_path_logo: str | None = None
+        file_path_nologo: str | None = None
+        file_path_logo_no_title: str | None = None
+        file_path_title_no_logo: str | None = None
+        try:
+            _, file_path_logo = plotframe.plot_histogram(
+                auto_open=False,
+                add_logo=True,
+                output_type="file",
+            )
+            html_logo = Path(file_path_logo).read_text(encoding="utf-8")
+            logo_src = f'src="{logo["source"]}"' if logo and logo.get("source") else ""
+            if logo_src and logo_src not in html_logo:
+                msg = "plot_histogram logo not found in HTML"
                 raise OpenFrameTestError(msg)
-        elif fig_logo_json["layout"]["images"][0]["source"] != logo["source"]:
-            msg = "plot_histogram add_logo argument not setup correctly"
-            raise OpenFrameTestError(msg)
 
-        fig_nologo, _ = plotframe.plot_histogram(
-            auto_open=False,
-            add_logo=False,
-            output_type="div",
-        )
-        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
-        if fig_nologo_json["layout"].get("images", None):
-            msg = "plot_histogram add_logo argument not setup correctly"
-            raise OpenFrameTestError(msg)
+            _, file_path_nologo = plotframe.plot_histogram(
+                auto_open=False,
+                add_logo=False,
+                output_type="file",
+            )
+            html_nologo = Path(file_path_nologo).read_text(encoding="utf-8")
+            if logo_src and logo_src in html_nologo:
+                msg = "plot_histogram logo should not be in HTML when add_logo=False"
+                raise OpenFrameTestError(msg)
+
+            # Test logo with no title to cover html_utils lines 126-128
+            _, file_path_logo_no_title = plotframe.plot_histogram(
+                auto_open=False,
+                add_logo=True,
+                title=None,
+                output_type="file",
+            )
+            html_logo_no_title = Path(file_path_logo_no_title).read_text(
+                encoding="utf-8"
+            )
+            if logo_src and logo_src not in html_logo_no_title:
+                msg = "plot_histogram logo not found in HTML when title is None"
+                raise OpenFrameTestError(msg)
+            # Verify title-container exists with logo but no title text
+            if '<div class="title-container">' not in html_logo_no_title:
+                msg = "plot_histogram title-container missing when logo present"
+                raise OpenFrameTestError(msg)
+            if "<h1>" in html_logo_no_title:
+                msg = "plot_histogram title should not be in HTML when title is None"
+                raise OpenFrameTestError(msg)
+
+            # Test title with no logo to cover html_utils branch 126->128
+            _, file_path_title_no_logo = plotframe.plot_histogram(
+                auto_open=False,
+                add_logo=False,
+                title="Test Title",
+                output_type="file",
+            )
+            html_title_no_logo = Path(file_path_title_no_logo).read_text(
+                encoding="utf-8"
+            )
+            if "Test Title" not in html_title_no_logo:
+                msg = "plot_histogram title not found in HTML when logo is False"
+                raise OpenFrameTestError(msg)
+            if logo_src and logo_src in html_title_no_logo:
+                msg = "plot_histogram logo should not be in HTML when add_logo=False"
+                raise OpenFrameTestError(msg)
+        finally:
+            if file_path_logo:
+                Path(file_path_logo).unlink(missing_ok=True)
+            if file_path_nologo:
+                Path(file_path_nologo).unlink(missing_ok=True)
+            if file_path_logo_no_title:
+                Path(file_path_logo_no_title).unlink(missing_ok=True)
+            if file_path_title_no_logo:
+                Path(file_path_title_no_logo).unlink(missing_ok=True)
 
     def test_plot_histogram_bars_title(self: TestOpenFrame) -> None:
         """Test plot_histogram method title."""
         plotframe = self.randomframe.from_deepcopy()
 
         title = "My Plot"
-        fig_title, _ = plotframe.plot_histogram(
+        fig_title, file_path = plotframe.plot_histogram(
             auto_open=False,
             title=title,
-            output_type="div",
+            output_type="file",
         )
-        fig_title_json = loads(cast("str", fig_title.to_json()))
-
-        if title not in fig_title_json["layout"]["title"]["text"]:
-            msg = "plot_histogram title argument not setup correctly"
+        html_content = Path(file_path).read_text(encoding="utf-8")
+        # Title is rendered in HTML, not in Plotly layout
+        if title not in html_content:
+            msg = "plot_histogram title argument not setup correctly in HTML"
             raise OpenFrameTestError(msg)
+        # Verify title is bold in HTML
+        bold_title = f"<b>{title}</b>"
+        h1_bold_title = f"<h1><b>{title}</b></h1>"
+        if bold_title not in html_content and h1_bold_title not in html_content:
+            msg = "plot_histogram title not bold in HTML"
+            raise OpenFrameTestError(msg)
+        # Verify no title in Plotly layout
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+        if fig_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_histogram title should not be in Plotly layout"
+            raise OpenFrameTestError(msg)
+        Path(file_path).unlink()
 
-        fig_no_title, _ = plotframe.plot_histogram(
+        fig_no_title, file_path_no_title = plotframe.plot_histogram(
             auto_open=False,
             title=None,
-            output_type="div",
+            add_logo=False,
+            output_type="file",
         )
-        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
-
-        if fig_no_title_json["layout"]["title"].get("text", None):
-            msg = "plot_histogram title argument not setup correctly"
+        html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
+        # Verify no title in HTML when title is None and logo is False
+        if '<div class="title-container">' in html_no_title:
+            msg = (
+                "plot_histogram title container should not exist "
+                "when title is None and logo is False"
+            )
             raise OpenFrameTestError(msg)
+        # Verify no title in Plotly layout
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+        if fig_no_title_json["layout"].get("title", {}).get("text", None):
+            msg = (
+                "plot_histogram title should not be in Plotly layout "
+                "when title is None"
+            )
+            raise OpenFrameTestError(msg)
+        Path(file_path_no_title).unlink()
+
+        # Test include_plotlyjs=False to cover html_utils._get_plotly_script branch
+        _, file_path_inline = plotframe.plot_histogram(
+            auto_open=False,
+            output_type="file",
+            include_plotlyjs=False,
+        )
+        html_inline = Path(file_path_inline).read_text(encoding="utf-8")
+        if "plotly-2.35.2.min.js" in html_inline:
+            msg = "plot_histogram include_plotlyjs=False not working correctly"
+            raise OpenFrameTestError(msg)
+        Path(file_path_inline).unlink()
 
     def test_plot_histogram_lines(self: TestOpenFrame) -> None:
         """Test plot_histogram method with plot_type lines."""

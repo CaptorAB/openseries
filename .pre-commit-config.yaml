@@ -45,6 +45,8 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
         exclude: ^docs/build/|^docs/_build/|docs/source/api/generated/
+      - id: name-tests-test
+        args: [ --pytest-test-first ]
       - id: no-commit-to-branch
         args: [ '--branch', 'master' ]
       - id: pretty-format-json
