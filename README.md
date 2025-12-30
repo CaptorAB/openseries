@@ -20,7 +20,7 @@ Tools for analyzing financial timeseries of a single asset or a group of assets.
 
 ## Documentation
 
-Complete documentation is available at: [https://openseries.readthedocs.io](https://openseries.readthedocs.io/)
+Complete documentation is available at: [https://captorab.github.io/openseries/](https://captorab.github.io/openseries/)
 
 The documentation includes:
 
