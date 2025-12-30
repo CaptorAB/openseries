@@ -63,7 +63,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from plotly.io import to_html  # type: ignore[import-untyped]
-from pydantic import BaseModel, ConfigDict, DirectoryPath, ValidationError
+from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import (
     kurtosis,
     norm,
@@ -507,16 +507,19 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         mdddf = self.tsdf.copy()
         mdddf.index = DatetimeIndex(mdddf.index)
-        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date  # type: ignore[arg-type]
+        idxmin_result = cast(
+            "Series[Timestamp]",
+            (mdddf / mdddf.expanding(min_periods=1).max()).idxmin(),
+        )
+        result = idxmin_result.dt.date
 
         if self.tsdf.shape[1] == 1:
             return result.iloc[0]
-        return Series(  # type: ignore[arg-type]
+        return Series(
             data=result,
             index=self.tsdf.columns,
             name="Max drawdown date",
-            dtype="datetime64[ns]",
-        ).dt.date
+        )
 
     @property
     def worst(self: Self) -> SeriesOrFloat_co:
@@ -547,12 +550,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         method: LiteralPandasReindexMethod = "nearest"
 
-        try:
+        if hasattr(self, "constituents"):
+            countries = self.constituents[0].countries
+            markets = self.constituents[0].markets
+        else:
             countries = self.countries
             markets = self.markets
-        except AttributeError:
-            countries = self.constituents[0].countries  # type: ignore[attr-defined]
-            markets = self.constituents[0].markets  # type: ignore[attr-defined]
 
         wmdf = self.tsdf.copy()
 
@@ -733,6 +736,54 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         return earlier, later
 
+    def _get_or_set_countries(
+        self: Self, countries: CountriesType | None
+    ) -> CountriesType | None:
+        """Get or set countries attribute, handling both OpenTimeSeries and OpenFrame.
+
+        Args:
+            countries: Country code(s) to set, or None to get existing value.
+
+        Returns:
+            The countries value after getting or setting.
+        """
+        if countries:
+            if hasattr(self, "countries"):
+                self.countries = countries
+            else:
+                for serie in self.constituents:  # type: ignore[attr-defined]
+                    serie.countries = countries
+        elif hasattr(self, "countries"):
+            countries = self.countries
+        else:
+            countries = self.constituents[0].countries  # type: ignore[attr-defined]
+
+        return countries
+
+    def _get_or_set_markets(
+        self: Self, markets: list[str] | str | None
+    ) -> list[str] | str | None:
+        """Get or set markets attribute, handling both OpenTimeSeries and OpenFrame.
+
+        Args:
+            markets: Market code(s) to set, or None to get existing value.
+
+        Returns:
+            The markets value after getting or setting.
+        """
+        if markets:
+            if hasattr(self, "markets"):
+                self.markets = markets
+            else:
+                for serie in self.constituents:  # type: ignore[attr-defined]
+                    serie.markets = markets
+        elif hasattr(self, "markets"):
+            markets = self.markets
+        else:
+            markets = self.constituents[0].markets  # type: ignore[attr-defined]
+
+        return markets
+
     def align_index_to_local_cdays(
         self: Self,
         countries: CountriesType | None = None,
@@ -754,29 +805,8 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
         endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
 
-        if countries:
-            try:
-                self.countries = countries
-            except ValidationError:
-                for serie in self.constituents:  # type: ignore[attr-defined]
-                    serie.countries = countries
-        else:
-            try:
-                countries = self.countries
-            except AttributeError:
-                countries = self.constituents[0].countries  # type: ignore[attr-defined]
-
-        if markets:
-            try:
-                self.markets = markets
-            except ValidationError:
-                for serie in self.constituents:  # type: ignore[attr-defined]
-                    serie.markets = markets
-        else:
-            try:
-                markets = self.markets
-            except AttributeError:
-                markets = self.constituents[0].markets  # type: ignore[attr-defined]
+        countries = self._get_or_set_countries(countries)
+        markets = self._get_or_set_markets(markets)
 
         calendar = holiday_calendar(
             startyear=startyear,
@@ -1065,7 +1095,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         if add_logo and logo:
             source = logo.get("source", "")
             logo_url = str(source) if source else None
-            # Even if logo fails, ensure images array exists for test compatibility
             figure.add_layout_image(
                 {
                     "source": "",
@@ -1081,7 +1110,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
                 }
             )
         elif add_logo:
-            # Even if logo fails, ensure images array exists for test compatibility
             figure.add_layout_image(
                 {
                     "source": "",
@@ -1096,8 +1124,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
                     "opacity": 0,
                 }
             )
-        # Title is rendered in separate HTML div, not in Plotly layout
-        # Set reasonable margins without title space
         figure.update_layout(
             {
                 "margin": {"t": 20, "b": 60, "l": 60, "r": 60, "pad": 4},

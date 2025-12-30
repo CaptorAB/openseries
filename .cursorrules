@@ -9,6 +9,7 @@ Guidelines:
 - Do not modify `Makefile` to achieve environment activation.
 - Keep `Makefile` (macOS/Linux) and `make.ps1` (Windows) in sync when either is modified.
 - Do not add any commentary when implementing code changes.
+- When fixing tests that fail then change the test code, do not change the code that is tested.
 
 Assistant behavior:
 

@@ -197,17 +197,23 @@ class TestReport:
             msg = "report_html bar_freq BME argument not setup correctly."
             raise ReportTestError(msg)
 
-        _, html_logo = report_html(
-            data=plotframe,
-            auto_open=False,
-            add_logo=True,
-            output_type="div",
-        )
-        logo_source = logo.get("source", "")
-        logo_str = logo_source if isinstance(logo_source, str) else ""
-        if logo_str and logo_str not in html_logo:
-            msg = "report_html add_logo argument not setup correctly"
-            raise ReportTestError(msg)
+        with patch(
+            "openseries.load_plotly._check_remote_file_existence",
+            return_value=True,
+        ):
+            _, html_logo = report_html(
+                data=plotframe,
+                auto_open=False,
+                add_logo=True,
+                output_type="div",
+            )
+
+            _, logo_updated = load_plotly_dict()
+            logo_source = logo_updated.get("source", "")
+            logo_str = logo_source if isinstance(logo_source, str) else ""
+            if logo_str and logo_str not in html_logo:
+                msg = "report_html add_logo argument not setup correctly"
+                raise ReportTestError(msg)
 
         _, html_nologo = report_html(
             data=plotframe,
@@ -215,6 +221,10 @@ class TestReport:
             add_logo=False,
             output_type="div",
         )
+
+        if not logo_str:
+            logo_source = logo.get("source", "")
+            logo_str = logo_source if isinstance(logo_source, str) else ""
         if logo_str and logo_str in html_nologo:
             msg = "report_html add_logo argument not setup correctly"
             raise ReportTestError(msg)
@@ -280,6 +290,7 @@ class TestReport:
                 data=plotframe,
                 filename="seriesfile.html",
                 auto_open=False,
+                directory=directory,
             )
             mockfilepath = Path(mockfile).resolve()
 
@@ -458,31 +469,10 @@ class TestReport:
                 msg = "Capture ratio with NaN values test not working as intended."
                 raise ReportTestError(msg)
 
-    def test_report_html_auto_open_file(
-        self: TestReport,
-        *,
-        manual: bool = False,  # noqa: PT028
-    ) -> None:
+    def test_report_html_auto_open_file(self: TestReport) -> None:
         """Test report_html with auto_open=True and output_type='file'."""
         frame = self.randomframe.from_deepcopy()
         frame.to_cumret()
-
-        if manual:
-            report_html(
-                data=frame,
-                auto_open=True,
-                filename="tst.html",
-                title="Nice Longish Title To Check",
-            )
-            narrow = frame.from_deepcopy()
-            narrow.delete_timeseries(lvl_zero_item="Asset_1")
-            narrow.delete_timeseries(lvl_zero_item="Asset_2")
-            report_html(
-                data=narrow,
-                auto_open=True,
-                filename="tst_narrow.html",
-                title="Nice Longish Title To Check",
-            )
 
         directory = Path(__file__).parent
         test_filename = "test_report_html_auto_open_file.html"
@@ -582,6 +572,41 @@ class TestReport:
             if not plotfile.exists():
                 msg = "html file not created when browser open fails"
                 raise FileNotFoundError(msg)
+
+            if plotfile.exists():
+                plotfile.unlink()
+
+    def test_report_html_no_documents_folder(self: TestReport) -> None:
+        """Test report_html fallback when Documents folder doesn't exist."""
+        frame = self.randomframe.from_deepcopy()
+        frame.to_cumret()
+
+        test_filename = "test_report_html_no_documents.html"
+
+        documents_path_str = str(Path.home() / "Documents")
+        original_exists = Path.exists
+
+        def exists_side_effect(self: Path) -> bool:
+            if str(self) == documents_path_str:
+                return False
+            return original_exists(self)
+
+        with patch(
+            "pathlib.Path.exists", side_effect=exists_side_effect, autospec=True
+        ):
+            _, filepath = report_html(
+                data=frame,
+                auto_open=False,
+                filename=test_filename,
+            )
+            plotfile = Path(filepath).resolve()
+            if not plotfile.exists():
+                msg = "html file not created when Documents doesn't exist"
+                raise FileNotFoundError(msg)
+
+            if plotfile.name != test_filename:
+                msg = f"File name mismatch: {plotfile.name}"
+                raise ReportTestError(msg)
 
             if plotfile.exists():
                 plotfile.unlink()

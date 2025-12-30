@@ -14,6 +14,7 @@ from openseries._common_model import _calculate_time_factor, _get_base_column_da
 
 if TYPE_CHECKING:  # pragma: no cover
     from openseries.frame import OpenFrame
+    from openseries.owntypes import ValueType
     from openseries.simulation import ReturnSimulation
 
 
@@ -36,10 +37,10 @@ class TestCommonModel:
         earlier = dt.date(2010, 1, 1)
         later = dt.date(2019, 6, 30)
 
-        first_column = frame.tsdf.columns[0]
+        first_column = cast("tuple[str, ValueType]", frame.tsdf.columns[0])
         data_tuple, item_tuple, label_tuple = _get_base_column_data(
             self=frame,
-            base_column=first_column,  # type: ignore[arg-type]
+            base_column=first_column,
             earlier=earlier,
             later=later,
         )
@@ -48,7 +49,7 @@ class TestCommonModel:
         if not isinstance(data_tuple, Series):
             raise CommonModelTestError(msg)
 
-        if cast("str", item_tuple) != first_column:
+        if item_tuple != first_column:
             msg = (
                 "_get_base_column_data item mismatch: "
                 f"expected {first_column}, got {item_tuple}"
@@ -75,7 +76,7 @@ class TestCommonModel:
 
         data_narrow, _, _ = _get_base_column_data(
             self=frame,
-            base_column=first_column,  # type: ignore[arg-type]
+            base_column=first_column,
             earlier=earlier_narrow,
             later=later_narrow,
         )
@@ -83,7 +84,7 @@ class TestCommonModel:
         # Verify narrower date range returns fewer data points
         data_full, _, _ = _get_base_column_data(
             self=frame,
-            base_column=first_column,  # type: ignore[arg-type]
+            base_column=first_column,
             earlier=earlier,
             later=later,
         )
@@ -98,7 +99,9 @@ class TestCommonModel:
         last_col_idx = len(frame.tsdf.columns) - 1
         data_last, item_last, label_last = _get_base_column_data(
             self=frame,
-            base_column=frame.tsdf.columns[last_col_idx],  # type: ignore[arg-type]
+            base_column=cast(
+                "tuple[str, ValueType]", frame.tsdf.columns[last_col_idx]
+            ),
             earlier=earlier,
             later=later,
         )
@@ -107,7 +110,8 @@ class TestCommonModel:
         if not isinstance(data_last, Series):
             raise CommonModelTestError(msg)
 
-        if cast("str", item_last) != frame.tsdf.columns[last_col_idx]:
+        last_column = cast("tuple[str, ValueType]", frame.tsdf.columns[last_col_idx])
+        if item_last != last_column:
             msg = (
                 "_get_base_column_data last column item mismatch: "
                 f"expected {frame.tsdf.columns[last_col_idx]}, got {item_last}"
@@ -175,7 +179,7 @@ class TestCommonModel:
         ):
             _get_base_column_data(
                 self=frame,
-                base_column="invalid_column",  # type: ignore[arg-type]
+                base_column=cast("tuple[str, ValueType] | int", "invalid_column"),
                 earlier=earlier,
                 later=later,
             )

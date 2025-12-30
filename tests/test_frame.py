@@ -19,10 +19,10 @@ from numpy import array, bool_, float64, nan
 from pydantic import BaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Hashable, Mapping
+    from collections.abc import Callable, Hashable, Mapping
     from typing import Literal
 
-    from pandas import Timestamp
+    from pandas import DataFrame, Series, Timestamp
 
     from openseries.simulation import ReturnSimulation
 
@@ -389,11 +389,11 @@ class TestOpenFrame:
             msg = "test_save_to_xlsx test case setup failed."
             raise OpenFrameTestError(msg)
 
-        dframe = read_excel(  # type: ignore[call-overload]
+        dframe = read_excel(
             io=seriesfile,
             header=0,
             index_col=0,
-            usecols=cast("int", "A:F"),
+            usecols="A:F",
             skiprows=[1, 2],
             engine="openpyxl",
         )
@@ -768,14 +768,20 @@ class TestOpenFrame:
 
         _ = mpframe.make_portfolio(name=name, weight_strat="max_div")
 
-        weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
+        if mpframe.weights is None:
+            msg = "make_portfolio() max_div should set weights"
+            raise OpenFrameTestError(msg)
+        weight_sum = sum(mpframe.weights)
         if abs(weight_sum - 1.0) > tolerance:
             msg = f"make_portfolio() max_div weights do not sum to 1.0: {weight_sum}"
             raise OpenFrameTestError(msg)
 
         _ = mpframe.make_portfolio(name=name, weight_strat="min_vol_overweight")
 
-        weight_sum = sum(mpframe.weights)  # type: ignore[arg-type]
+        if mpframe.weights is None:
+            msg = "make_portfolio() min_vol_overweight should set weights"
+            raise OpenFrameTestError(msg)
+        weight_sum = sum(mpframe.weights)
         if abs(weight_sum - 1.0) > tolerance:
             msg = (
                 "make_portfolio() min_vol_overweight "
@@ -1007,13 +1013,13 @@ class TestOpenFrame:
             right=Series(sameframe.tsdf.iloc[:, 0]).to_frame(),
         )
 
-        smethods = [
+        smethods: list[Callable[..., DataFrame]] = [
             sameseries.rolling_return,
             sameseries.rolling_vol,
             sameseries.rolling_var_down,
             sameseries.rolling_cvar_down,
         ]
-        fmethods = [
+        fmethods: list[Callable[..., DataFrame]] = [
             sameframe.rolling_return,
             sameframe.rolling_vol,
             sameframe.rolling_var_down,
@@ -1021,8 +1027,8 @@ class TestOpenFrame:
         ]
         for smethod, fmethod in zip(smethods, fmethods, strict=False):
             assert_frame_equal(
-                left=smethod(),  # type: ignore[operator]
-                right=fmethod(column=0),  # type: ignore[operator]
+                left=smethod(),
+                right=fmethod(column=0),
             )
 
         cumseries = sameseries.from_deepcopy()
@@ -1092,7 +1098,7 @@ class TestOpenFrame:
             "worst_func",
             "z_score_func",
         ]
-        smethods_to_compare = [
+        smethods_to_compare: list[Callable[..., float]] = [
             sames.arithmetic_ret_func,
             sames.cvar_down_func,
             sames.lower_partial_moment_func,
@@ -1109,7 +1115,7 @@ class TestOpenFrame:
             sames.worst_func,
             sames.z_score_func,
         ]
-        fmethods_to_compare = [
+        fmethods_to_compare: list[Callable[..., Series[float]]] = [
             samef.arithmetic_ret_func,
             samef.cvar_down_func,
             samef.lower_partial_moment_func,
@@ -1133,8 +1139,8 @@ class TestOpenFrame:
             strict=False,
         ):
             if (
-                f"{smethod(months_from_last=12):.9f}"  # type: ignore[operator]
-                != f"{float(fmethod(months_from_last=12).iloc[0]):.9f}"  # type: ignore[operator]
+                f"{smethod(months_from_last=12):.9f}"
+                != f"{float(fmethod(months_from_last=12).iloc[0]):.9f}"
             ):
                 msg = (
                     f"Calc method {method} not aligned between "
@@ -1598,22 +1604,19 @@ class TestOpenFrame:
             if title not in html_output:
                 msg = f"{method_name} title argument not setup correctly in HTML"
                 raise OpenFrameTestError(msg)
-            # Verify title is bold in HTML
+
             bold_title = f"<b>{title}</b>"
             h1_bold_title = f"<h1><b>{title}</b></h1>"
             if bold_title not in html_output and h1_bold_title not in html_output:
                 msg = f"{method_name} title not bold in HTML"
                 raise OpenFrameTestError(msg)
 
-    def test_plot_series(self: TestOpenFrame) -> None:  # noqa: PLR0915
-        """Test plot_series method."""
-        plotframe = self.randomframe.from_deepcopy()
-        plotframe.to_cumret()
+    def _test_plot_series_show_last(self: TestOpenFrame, plotframe: OpenFrame) -> None:
+        """Test plot_series show_last functionality.
 
-        fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
-        fig_json = loads(cast("str", fig.to_json()))
-        self._verify_plot_data_alignment(plotframe, fig_json)
-
+        Args:
+            plotframe: Frame to test with.
+        """
         fig_last, _ = plotframe.plot_series(
             auto_open=False,
             output_type="div",
@@ -1634,26 +1637,16 @@ class TestOpenFrame:
         )
         fig_last_fmt_json = loads(cast("str", fig_last_fmt.to_json()))
         last_fmt = fig_last_fmt_json["data"][-1]["text"][0]
-
         if last_fmt != "Last 116.964%":
             msg = f"Unaligned data in Figure: '{last_fmt}'"
             raise OpenFrameTestError(msg)
 
-        intended_labels = ["a", "b", "c", "d", "e"]
-        fig_labels, _ = plotframe.plot_series(
-            auto_open=False,
-            output_type="div",
-            labels=intended_labels,
-        )
-        fig_labels_json = loads(cast("str", fig_labels.to_json()))
-        self._verify_plot_labels(fig_labels_json, intended_labels)
+    def _test_plot_series_logo(self: TestOpenFrame, plotframe: OpenFrame) -> None:
+        """Test plot_series logo functionality.
 
-        with pytest.raises(
-            expected_exception=NumberOfItemsAndLabelsNotSameError,
-            match=r"Must provide same number of labels as items in frame.",
-        ):
-            _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
-
+        Args:
+            plotframe: Frame to test with.
+        """
         _, logo = load_plotly_dict()
 
         _, file_path_logo = plotframe.plot_series(
@@ -1677,6 +1670,12 @@ class TestOpenFrame:
             msg = "plot_series add_logo argument not setup correctly"
             raise OpenFrameTestError(msg)
 
+    def _test_plot_series_title(self: TestOpenFrame, plotframe: OpenFrame) -> None:
+        """Test plot_series title functionality.
+
+        Args:
+            plotframe: Frame to test with.
+        """
         title = "My Plot"
         fig_title, file_path = plotframe.plot_series(
             auto_open=False,
@@ -1685,7 +1684,7 @@ class TestOpenFrame:
         )
         html_content = Path(file_path).read_text(encoding="utf-8")
         self._verify_plot_title(html_content, title, "plot_series")
-        # Verify no title in Plotly layout
+
         fig_title_json = loads(cast("str", fig_title.to_json()))
         if fig_title_json["layout"].get("title", {}).get("text", None):
             msg = "plot_series title should not be in Plotly layout"
@@ -1700,14 +1699,21 @@ class TestOpenFrame:
         )
         html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
         self._verify_plot_title(html_no_title, None, "plot_series")
-        # Verify no title in Plotly layout
+
         fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
         if fig_no_title_json["layout"].get("title", {}).get("text", None):
             msg = "plot_series title should not be in Plotly layout when title is None"
             raise OpenFrameTestError(msg)
         Path(file_path_no_title).unlink()
 
-        # Test include_plotlyjs=False to cover html_utils._get_plotly_script branch
+    def _test_plot_series_include_plotlyjs(
+        self: TestOpenFrame, plotframe: OpenFrame
+    ) -> None:
+        """Test plot_series include_plotlyjs functionality.
+
+        Args:
+            plotframe: Frame to test with.
+        """
         _, file_path_inline = plotframe.plot_series(
             auto_open=False,
             output_type="file",
@@ -1718,6 +1724,36 @@ class TestOpenFrame:
             msg = "plot_series include_plotlyjs=False not working correctly"
             raise OpenFrameTestError(msg)
         Path(file_path_inline).unlink()
+
+    def test_plot_series(self: TestOpenFrame) -> None:
+        """Test plot_series method."""
+        plotframe = self.randomframe.from_deepcopy()
+        plotframe.to_cumret()
+
+        fig, _ = plotframe.plot_series(auto_open=False, output_type="div")
+        fig_json = loads(cast("str", fig.to_json()))
+        self._verify_plot_data_alignment(plotframe, fig_json)
+
+        self._test_plot_series_show_last(plotframe)
+
+        intended_labels = ["a", "b", "c", "d", "e"]
+        fig_labels, _ = plotframe.plot_series(
+            auto_open=False,
+            output_type="div",
+            labels=intended_labels,
+        )
+        fig_labels_json = loads(cast("str", fig_labels.to_json()))
+        self._verify_plot_labels(fig_labels_json, intended_labels)
+
+        with pytest.raises(
+            expected_exception=NumberOfItemsAndLabelsNotSameError,
+            match=r"Must provide same number of labels as items in frame.",
+        ):
+            _, _ = plotframe.plot_series(auto_open=False, labels=["a", "b"])
+
+        self._test_plot_series_logo(plotframe)
+        self._test_plot_series_title(plotframe)
+        self._test_plot_series_include_plotlyjs(plotframe)
 
     def test_plot_series_filefolders(self: TestOpenFrame) -> None:
         """Test plot_series method with different file folder options."""
@@ -1792,7 +1828,109 @@ class TestOpenFrame:
         finally:
             plotfile.unlink()
 
-    def test_plot_bars(self: TestOpenFrame) -> None:  # noqa: PLR0915
+    def _test_plot_bars_overlay(self: TestOpenFrame, plotframe: OpenFrame) -> None:
+        """Test plot_bars overlay mode functionality.
+
+        Args:
+            plotframe: Frame to test with.
+        """
+        overlayfig, _ = plotframe.plot_bars(
+            auto_open=False,
+            output_type="div",
+            mode="overlay",
+        )
+        overlayfig_json = loads(cast("str", overlayfig.to_json()))
+
+        fig_keys = ["hovertemplate", "name", "type", "x", "y", "opacity"]
+        if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
+            msg = "Data in Figure not as intended."
+            raise OpenFrameTestError(msg)
+
+    def _test_plot_bars_logo(self: TestOpenFrame, plotframe: OpenFrame) -> None:
+        """Test plot_bars logo functionality.
+
+        Args:
+            plotframe: Frame to test with.
+        """
+        _, logo = load_plotly_dict()
+
+        _, file_path_logo = plotframe.plot_bars(
+            auto_open=False,
+            add_logo=True,
+            output_type="file",
+        )
+        html_logo = Path(file_path_logo).read_text(encoding="utf-8")
+        if logo and logo.get("source") and f'src="{logo["source"]}"' not in html_logo:
+            msg = "plot_bars logo not found in HTML"
+            raise OpenFrameTestError(msg)
+        Path(file_path_logo).unlink()
+
+        fig_nologo, _ = plotframe.plot_bars(
+            auto_open=False,
+            add_logo=False,
+            output_type="div",
+        )
+        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
+        if fig_nologo_json["layout"].get("images", None):
+            msg = "plot_bars add_logo argument not setup correctly"
+            raise OpenFrameTestError(msg)
+
+    def _test_plot_bars_title(self: TestOpenFrame, plotframe: OpenFrame) -> None:
+        """Test plot_bars title functionality.
+
+        Args:
+            plotframe: Frame to test with.
+        """
+        title = "My Plot"
+        fig_title, file_path = plotframe.plot_bars(
+            auto_open=False,
+            title=title,
+            output_type="file",
+        )
+        html_content = Path(file_path).read_text(encoding="utf-8")
+        self._verify_plot_title(html_content, title, "plot_bars")
+
+        fig_title_json = loads(cast("str", fig_title.to_json()))
+        if fig_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_bars title should not be in Plotly layout"
+            raise OpenFrameTestError(msg)
+        Path(file_path).unlink()
+
+        fig_no_title, file_path_no_title = plotframe.plot_bars(
+            auto_open=False,
+            title=None,
+            add_logo=False,
+            output_type="file",
+        )
+        html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
+        self._verify_plot_title(html_no_title, None, "plot_bars")
+
+        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
+        if fig_no_title_json["layout"].get("title", {}).get("text", None):
+            msg = "plot_bars title should not be in Plotly layout when title is None"
+            raise OpenFrameTestError(msg)
+        Path(file_path_no_title).unlink()
+
+    def _test_plot_bars_include_plotlyjs(
+        self: TestOpenFrame, plotframe: OpenFrame
+    ) -> None:
+        """Test plot_bars include_plotlyjs functionality.
+
+        Args:
+            plotframe: Frame to test with.
+        """
+        _, file_path_inline = plotframe.plot_bars(
+            auto_open=False,
+            output_type="file",
+            include_plotlyjs=False,
+        )
+        html_inline = Path(file_path_inline).read_text(encoding="utf-8")
+        if "plotly-2.35.2.min.js" in html_inline:
+            msg = "plot_bars include_plotlyjs=False not working correctly"
+            raise OpenFrameTestError(msg)
+        Path(file_path_inline).unlink()
+
+    def test_plot_bars(self: TestOpenFrame) -> None:
         """Test plot_bars method."""
         plotframe = self.randomframe.from_deepcopy()
 
@@ -1822,82 +1960,10 @@ class TestOpenFrame:
         ):
             _, _ = plotframe.plot_bars(auto_open=False, labels=["a", "b"])
 
-        overlayfig, _ = plotframe.plot_bars(
-            auto_open=False,
-            output_type="div",
-            mode="overlay",
-        )
-        overlayfig_json = loads(cast("str", overlayfig.to_json()))
-
-        fig_keys.append("opacity")
-        if sorted(overlayfig_json["data"][0].keys()) != sorted(fig_keys):
-            msg = "Data in Figure not as intended."
-            raise OpenFrameTestError(msg)
-
-        _, logo = load_plotly_dict()
-
-        _, file_path_logo = plotframe.plot_bars(
-            auto_open=False,
-            add_logo=True,
-            output_type="file",
-        )
-        html_logo = Path(file_path_logo).read_text(encoding="utf-8")
-        if logo and logo.get("source") and f'src="{logo["source"]}"' not in html_logo:
-            msg = "plot_bars logo not found in HTML"
-            raise OpenFrameTestError(msg)
-        Path(file_path_logo).unlink()
-
-        fig_nologo, _ = plotframe.plot_bars(
-            auto_open=False,
-            add_logo=False,
-            output_type="div",
-        )
-        fig_nologo_json = loads(cast("str", fig_nologo.to_json()))
-        if fig_nologo_json["layout"].get("images", None):
-            msg = "plot_bars add_logo argument not setup correctly"
-            raise OpenFrameTestError(msg)
-
-        title = "My Plot"
-        fig_title, file_path = plotframe.plot_bars(
-            auto_open=False,
-            title=title,
-            output_type="file",
-        )
-        html_content = Path(file_path).read_text(encoding="utf-8")
-        self._verify_plot_title(html_content, title, "plot_bars")
-        # Verify no title in Plotly layout
-        fig_title_json = loads(cast("str", fig_title.to_json()))
-        if fig_title_json["layout"].get("title", {}).get("text", None):
-            msg = "plot_bars title should not be in Plotly layout"
-            raise OpenFrameTestError(msg)
-        Path(file_path).unlink()
-
-        fig_no_title, file_path_no_title = plotframe.plot_bars(
-            auto_open=False,
-            title=None,
-            add_logo=False,
-            output_type="file",
-        )
-        html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
-        self._verify_plot_title(html_no_title, None, "plot_bars")
-        # Verify no title in Plotly layout
-        fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
-        if fig_no_title_json["layout"].get("title", {}).get("text", None):
-            msg = "plot_bars title should not be in Plotly layout when title is None"
-            raise OpenFrameTestError(msg)
-        Path(file_path_no_title).unlink()
-
-        # Test include_plotlyjs=False to cover html_utils._get_plotly_script branch
-        _, file_path_inline = plotframe.plot_bars(
-            auto_open=False,
-            output_type="file",
-            include_plotlyjs=False,
-        )
-        html_inline = Path(file_path_inline).read_text(encoding="utf-8")
-        if "plotly-2.35.2.min.js" in html_inline:
-            msg = "plot_bars include_plotlyjs=False not working correctly"
-            raise OpenFrameTestError(msg)
-        Path(file_path_inline).unlink()
+        self._test_plot_bars_overlay(plotframe)
+        self._test_plot_bars_logo(plotframe)
+        self._test_plot_bars_title(plotframe)
+        self._test_plot_bars_include_plotlyjs(plotframe)
 
     def test_plot_bars_filefolders(self: TestOpenFrame) -> None:
         """Test plot_bars method with different file folder options."""
@@ -2009,83 +2075,93 @@ class TestOpenFrame:
         ):
             _, _ = plotframe.plot_histogram(auto_open=False, labels=["a", "b"])
 
-    def test_plot_histogram_bars_logo(self: TestOpenFrame) -> None:  # noqa: C901
+    def test_plot_histogram_bars_logo(self: TestOpenFrame) -> None:
         """Test plot_histogram method logo."""
         plotframe = self.randomframe.from_deepcopy()
-        _, logo = load_plotly_dict()
 
-        file_path_logo: str | None = None
-        file_path_nologo: str | None = None
-        file_path_logo_no_title: str | None = None
-        file_path_title_no_logo: str | None = None
-        try:
-            _, file_path_logo = plotframe.plot_histogram(
-                auto_open=False,
-                add_logo=True,
-                output_type="file",
-            )
-            html_logo = Path(file_path_logo).read_text(encoding="utf-8")
-            logo_src = f'src="{logo["source"]}"' if logo and logo.get("source") else ""
-            if logo_src and logo_src not in html_logo:
-                msg = "plot_histogram logo not found in HTML"
-                raise OpenFrameTestError(msg)
+        with patch(
+            "openseries.load_plotly._check_remote_file_existence", return_value=True
+        ):
+            _, logo = load_plotly_dict()
 
-            _, file_path_nologo = plotframe.plot_histogram(
-                auto_open=False,
-                add_logo=False,
-                output_type="file",
-            )
-            html_nologo = Path(file_path_nologo).read_text(encoding="utf-8")
-            if logo_src and logo_src in html_nologo:
-                msg = "plot_histogram logo should not be in HTML when add_logo=False"
-                raise OpenFrameTestError(msg)
+            file_path_logo: str | None = None
+            file_path_nologo: str | None = None
+            file_path_logo_no_title: str | None = None
+            file_path_title_no_logo: str | None = None
+            try:
+                _, file_path_logo = plotframe.plot_histogram(
+                    auto_open=False,
+                    add_logo=True,
+                    output_type="file",
+                )
+                html_logo = Path(file_path_logo).read_text(encoding="utf-8")
+                logo_src = (
+                    f'src="{logo["source"]}"' if logo and logo.get("source") else ""
+                )
+                if logo_src and logo_src not in html_logo:
+                    msg = "plot_histogram logo not found in HTML"
+                    raise OpenFrameTestError(msg)
 
-            # Test logo with no title to cover html_utils lines 126-128
-            _, file_path_logo_no_title = plotframe.plot_histogram(
-                auto_open=False,
-                add_logo=True,
-                title=None,
-                output_type="file",
-            )
-            html_logo_no_title = Path(file_path_logo_no_title).read_text(
-                encoding="utf-8"
-            )
-            if logo_src and logo_src not in html_logo_no_title:
-                msg = "plot_histogram logo not found in HTML when title is None"
-                raise OpenFrameTestError(msg)
-            # Verify title-container exists with logo but no title text
-            if '<div class="title-container">' not in html_logo_no_title:
-                msg = "plot_histogram title-container missing when logo present"
-                raise OpenFrameTestError(msg)
-            if "<h1>" in html_logo_no_title:
-                msg = "plot_histogram title should not be in HTML when title is None"
-                raise OpenFrameTestError(msg)
+                _, file_path_nologo = plotframe.plot_histogram(
+                    auto_open=False,
+                    add_logo=False,
+                    output_type="file",
+                )
+                html_nologo = Path(file_path_nologo).read_text(encoding="utf-8")
+                if logo_src and logo_src in html_nologo:
+                    msg = (
+                        "plot_histogram logo should not be in HTML when add_logo=False"
+                    )
+                    raise OpenFrameTestError(msg)
 
-            # Test title with no logo to cover html_utils branch 126->128
-            _, file_path_title_no_logo = plotframe.plot_histogram(
-                auto_open=False,
-                add_logo=False,
-                title="Test Title",
-                output_type="file",
-            )
-            html_title_no_logo = Path(file_path_title_no_logo).read_text(
-                encoding="utf-8"
-            )
-            if "Test Title" not in html_title_no_logo:
-                msg = "plot_histogram title not found in HTML when logo is False"
-                raise OpenFrameTestError(msg)
-            if logo_src and logo_src in html_title_no_logo:
-                msg = "plot_histogram logo should not be in HTML when add_logo=False"
-                raise OpenFrameTestError(msg)
-        finally:
-            if file_path_logo:
-                Path(file_path_logo).unlink(missing_ok=True)
-            if file_path_nologo:
-                Path(file_path_nologo).unlink(missing_ok=True)
-            if file_path_logo_no_title:
-                Path(file_path_logo_no_title).unlink(missing_ok=True)
-            if file_path_title_no_logo:
-                Path(file_path_title_no_logo).unlink(missing_ok=True)
+                _, file_path_logo_no_title = plotframe.plot_histogram(
+                    auto_open=False,
+                    add_logo=True,
+                    title=None,
+                    output_type="file",
+                )
+                html_logo_no_title = Path(file_path_logo_no_title).read_text(
+                    encoding="utf-8"
+                )
+                if logo_src and logo_src not in html_logo_no_title:
+                    msg = "plot_histogram logo not found in HTML when title is None"
+                    raise OpenFrameTestError(msg)
+
+                if '<div class="title-container">' not in html_logo_no_title:
+                    msg = "plot_histogram title-container missing when logo present"
+                    raise OpenFrameTestError(msg)
+                if "<h1>" in html_logo_no_title:
+                    msg = (
+                        "plot_histogram title should not be in HTML when title is None"
+                    )
+                    raise OpenFrameTestError(msg)
+
+                _, file_path_title_no_logo = plotframe.plot_histogram(
+                    auto_open=False,
+                    add_logo=False,
+                    title="Test Title",
+                    output_type="file",
+                )
+                html_title_no_logo = Path(file_path_title_no_logo).read_text(
+                    encoding="utf-8"
+                )
+                if "Test Title" not in html_title_no_logo:
+                    msg = "plot_histogram title not found in HTML when logo is False"
+                    raise OpenFrameTestError(msg)
+                if logo_src and logo_src in html_title_no_logo:
+                    msg = (
+                        "plot_histogram logo should not be in HTML when add_logo=False"
+                    )
+                    raise OpenFrameTestError(msg)
+            finally:
+                for file_path in (
+                    file_path_logo,
+                    file_path_nologo,
+                    file_path_logo_no_title,
+                    file_path_title_no_logo,
+                ):
+                    if file_path:
+                        Path(file_path).unlink(missing_ok=True)
 
     def test_plot_histogram_bars_title(self: TestOpenFrame) -> None:
         """Test plot_histogram method title."""
@@ -2098,17 +2174,17 @@ class TestOpenFrame:
             output_type="file",
         )
         html_content = Path(file_path).read_text(encoding="utf-8")
-        # Title is rendered in HTML, not in Plotly layout
+
         if title not in html_content:
             msg = "plot_histogram title argument not setup correctly in HTML"
             raise OpenFrameTestError(msg)
-        # Verify title is bold in HTML
+
         bold_title = f"<b>{title}</b>"
         h1_bold_title = f"<h1><b>{title}</b></h1>"
         if bold_title not in html_content and h1_bold_title not in html_content:
             msg = "plot_histogram title not bold in HTML"
             raise OpenFrameTestError(msg)
-        # Verify no title in Plotly layout
+
         fig_title_json = loads(cast("str", fig_title.to_json()))
         if fig_title_json["layout"].get("title", {}).get("text", None):
             msg = "plot_histogram title should not be in Plotly layout"
@@ -2122,14 +2198,14 @@ class TestOpenFrame:
             output_type="file",
         )
         html_no_title = Path(file_path_no_title).read_text(encoding="utf-8")
-        # Verify no title in HTML when title is None and logo is False
+
         if '<div class="title-container">' in html_no_title:
             msg = (
                 "plot_histogram title container should not exist "
                 "when title is None and logo is False"
             )
             raise OpenFrameTestError(msg)
-        # Verify no title in Plotly layout
+
         fig_no_title_json = loads(cast("str", fig_no_title.to_json()))
         if fig_no_title_json["layout"].get("title", {}).get("text", None):
             msg = (
@@ -2139,7 +2215,6 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
         Path(file_path_no_title).unlink()
 
-        # Test include_plotlyjs=False to cover html_utils._get_plotly_script branch
         _, file_path_inline = plotframe.plot_histogram(
             auto_open=False,
             output_type="file",
@@ -2922,10 +2997,95 @@ class TestOpenFrame:
             msg = "Sweden National Day not in date range"
             raise OpenFrameTestError(msg_notin)
 
-        noneframe.align_index_to_local_cdays(countries=None)  # default option
+        noneframe.align_index_to_local_cdays(countries=None)
         if swedennationalday in noneframe.tsdf.index:
             msg = "Sweden National Day in date range"
             raise OpenFrameTestError(msg_in)
+
+    def test_align_index_to_local_cdays_set_countries(self: TestOpenFrame) -> None:
+        """Test align_index_to_local_cdays setting countries on OpenFrame."""
+        d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
+        asim = [1.0] * len(d_range)
+        adf = DataFrame(
+            data=asim,
+            index=d_range,
+            columns=[["Asset_a"], [ValueType.PRICE]],
+        )
+        aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries.set_new_label("Asset_b")
+
+        aframe = OpenFrame(constituents=[aseries, bseries])
+        aframe.align_index_to_local_cdays(countries="US")
+        if [c.countries for c in aframe.constituents] != ["US", "US"]:
+            msg = "Countries not set on constituents"
+            raise OpenFrameTestError(msg)
+
+    def test_align_index_to_local_cdays_set_markets(self: TestOpenFrame) -> None:
+        """Test align_index_to_local_cdays setting markets on OpenFrame."""
+        d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
+        asim = [1.0] * len(d_range)
+        adf = DataFrame(
+            data=asim,
+            index=d_range,
+            columns=[["Asset_a"], [ValueType.PRICE]],
+        )
+        aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries.set_new_label("Asset_b")
+
+        bframe = OpenFrame(constituents=[aseries, bseries])
+        bframe.align_index_to_local_cdays(markets="XSTO")
+        if [m.markets for m in bframe.constituents] != ["XSTO", "XSTO"]:
+            msg = "Markets not set on constituents"
+            raise OpenFrameTestError(msg)
+
+    def test_align_index_to_local_cdays_get_countries(self: TestOpenFrame) -> None:
+        """Test align_index_to_local_cdays getting countries from OpenFrame."""
+        d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
+        asim = [1.0] * len(d_range)
+        adf = DataFrame(
+            data=asim,
+            index=d_range,
+            columns=[["Asset_a"], [ValueType.PRICE]],
+        )
+        aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries.set_new_label("Asset_b")
+
+        cframe = OpenFrame(constituents=[aseries, bseries])
+        result = cframe.align_index_to_local_cdays(countries=None, markets=None)
+        if result is not cframe:
+            msg = "align_index_to_local_cdays should return self"
+            raise OpenFrameTestError(msg)
+        if [c.countries for c in cframe.constituents] != ["SE", "SE"]:
+            msg = "Countries should be retrieved from constituents"
+            raise OpenFrameTestError(msg)
+
+        dframe = OpenFrame(constituents=[aseries, bseries])
+        dframe.align_index_to_local_cdays(countries=None)
+        if [c.countries for c in dframe.constituents] != ["SE", "SE"]:
+            msg = "Countries should be retrieved from constituents when None"
+            raise OpenFrameTestError(msg)
+
+    def test_align_index_to_local_cdays_get_markets(self: TestOpenFrame) -> None:
+        """Test align_index_to_local_cdays getting markets from OpenFrame."""
+        d_range = [d.date() for d in date_range(start="2022-06-01", end="2022-06-15")]
+        asim = [1.0] * len(d_range)
+        adf = DataFrame(
+            data=asim,
+            index=d_range,
+            columns=[["Asset_a"], [ValueType.PRICE]],
+        )
+        aseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        bseries.set_new_label("Asset_b")
+
+        eframe = OpenFrame(constituents=[aseries, bseries])
+        eframe.align_index_to_local_cdays(markets=None)
+        if [m.markets for m in eframe.constituents] != [None, None]:
+            msg = "Markets should be retrieved from constituents when None"
+            raise OpenFrameTestError(msg)
 
     def test_rolling_info_ratio(self: TestOpenFrame) -> None:
         """Test rolling_info_ratio method."""
@@ -3814,7 +3974,7 @@ class TestOpenFrame:
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 
-        methods = [
+        methods: list[Callable[..., Series[float]]] = [
             mframe.arithmetic_ret_func,
             mframe.vol_func,
             mframe.vol_from_var_func,
@@ -3822,11 +3982,10 @@ class TestOpenFrame:
             mframe.target_weight_from_var,
         ]
         for methd in methods:
-            no_fixed = methd()  # type: ignore[operator]
-            fixed = methd(periods_in_a_year_fixed=252)  # type: ignore[operator]
+            no_fixed = methd()
+            fixed = methd(periods_in_a_year_fixed=252)
             for nofix, fix in zip(no_fixed, fixed, strict=True):
                 diff_percent = 100 * abs(nofix - fix)
-                # Allow up to 1% difference due to holidays update
                 if diff_percent > 1.0:
                     msg = (
                         "Difference with or without fixed periods in year is too great"
@@ -3838,7 +3997,7 @@ class TestOpenFrame:
         mframe = self.randomframe.from_deepcopy()
         mframe.to_cumret()
 
-        methods = [
+        methods: list[Callable[..., Series[float]]] = [
             mframe.arithmetic_ret_func,
             mframe.vol_func,
             mframe.vol_from_var_func,
@@ -3846,11 +4005,11 @@ class TestOpenFrame:
             mframe.target_weight_from_var,
         ]
         for methd in methods:
-            dated = methd(  # type: ignore[operator]
+            dated = methd(
                 from_date=mframe.first_idx,
                 to_date=mframe.last_idx,
             )
-            undated = methd()  # type: ignore[operator]
+            undated = methd()
             for ddat, undat in zip(dated, undated, strict=True):
                 if f"{ddat:.10f}" != f"{undat:.10f}":
                     msg = (
@@ -4718,7 +4877,6 @@ class TestOpenFrame:
         test_frame.to_cumret()
         test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
 
-        # Create series with different currency
         eur_series = OpenTimeSeries.from_df(
             dframe=test_frame.tsdf.iloc[:, 0:1],
             valuetype=ValueType.PRICE,
@@ -4858,19 +5016,17 @@ class TestOpenFrame:
         test_frame.weights = [0.2, 0.2, 0.2, 0.2, 0.2]
         portfolio_name = "Test Portfolio"
 
-        # Create portfolio using rebalanced_portfolio with frequency=1
         rebalanced_result = test_frame.rebalanced_portfolio(
             name=portfolio_name,
             frequency=1,
         )
         rebalanced_series = OpenTimeSeries.from_df(
-            dframe=rebalanced_result.tsdf.iloc[:, -1:],  # Get the portfolio series
+            dframe=rebalanced_result.tsdf.iloc[:, -1:],
             valuetype=ValueType.PRICE,
             baseccy="USD",
             local_ccy=True,
         )
 
-        # Create portfolio using make_portfolio
         make_portfolio_df = test_frame.make_portfolio(name=portfolio_name)
         make_portfolio_series = OpenTimeSeries.from_df(
             dframe=make_portfolio_df,
@@ -4879,13 +5035,8 @@ class TestOpenFrame:
             local_ccy=True,
         )
 
-        # Check that the data matches (allowing for reasonable differences)
-        # rebalanced_portfolio simulates actual trading while make_portfolio is
-        # theoretical. They should be close but not identical due to rebalancing
-        # mechanics
-        tolerance = 1e-2  # 1% tolerance
+        tolerance = 1e-2
         if not rebalanced_series.tsdf.equals(make_portfolio_series.tsdf):
-            # Check if they're close enough (within tolerance)
             diff = abs(rebalanced_series.tsdf - make_portfolio_series.tsdf)
             max_diff = diff.max().max()
             if max_diff > tolerance:
@@ -4896,7 +5047,6 @@ class TestOpenFrame:
                 )
                 raise OpenFrameTestError(msg)
 
-        # Check that the series have the same length
         if len(rebalanced_series.tsdf) != len(make_portfolio_series.tsdf):
             msg = (
                 "rebalanced_portfolio and make_portfolio should have same length. "
@@ -4905,7 +5055,6 @@ class TestOpenFrame:
             )
             raise OpenFrameTestError(msg)
 
-        # Check that the series have the same index
         if not rebalanced_series.tsdf.index.equals(make_portfolio_series.tsdf.index):
             msg = "rebalanced_portfolio and make_portfolio should have same index"
             raise OpenFrameTestError(msg)
