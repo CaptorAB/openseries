@@ -41,22 +41,26 @@
     "legend": {
       "bgcolor": "rgba(0,0,0,0)",
       "orientation": "h",
-      "x": 0.98,
-      "xanchor": "right",
-      "y": -0.15,
-      "yanchor": "bottom"
+      "x": 0.5,
+      "xanchor": "center",
+      "xref": "container",
+      "y": 1.05,
+      "yanchor": "bottom",
+      "yref": "container"
     },
     "paper_bgcolor": "rgba(255,255,255,1)",
     "plot_bgcolor": "rgba(255,255,255,1)",
     "showlegend": true,
     "title": {
       "font": {
-        "size": 32
+        "size": 36
       },
       "x": 0.5,
       "xanchor": "center",
-      "y": 0.95,
-      "yanchor": "top"
+      "xref": "container",
+      "y": 0.93,
+      "yanchor": "bottom",
+      "yref": "container"
     },
     "xaxis": {
       "gridcolor": "#EEEEEE",

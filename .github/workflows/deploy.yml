@@ -3,6 +3,10 @@ name: deploy.yml
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch: {}
 
@@ -112,8 +116,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          persist-credentials: true
+          persist-credentials: false
           fetch-depth: 0
+
+      - name: Configure git authentication for tag push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}"
 
       - name: Import GPG key and create tag
         id: tag
@@ -159,7 +171,7 @@ jobs:
         with:
           tag_name: ${{ needs.version_tag.outputs.tag_version }}
 
-  publish_testpypi:
+  build_dist:
     needs: release
     if: ${{ needs.release.result == 'success' }}
     runs-on: ubuntu-latest
@@ -179,65 +191,78 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Build and Publish to Test PyPI
-        env:
-          TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      - name: Build distributions (sdist + wheel)
         run: |
           python -m venv venv
           . venv/bin/activate
           pip install poetry==2.2.1
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi "$TEST_PYPI_API_TOKEN"
           poetry build
           poetry check
-          poetry publish --repository testpypi --skip-existing
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: dist
+          path: dist/*
+          if-no-files-found: error
+
+  publish_testpypi:
+    needs: build_dist
+    if: ${{ needs.build_dist.result == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/openseries/
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish distributions to TestPyPI (OIDC)
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
 
   publish_pypi:
     needs: publish_testpypi
     if: ${{ needs.publish_testpypi.result == 'success' }}
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/openseries/
     permissions:
       contents: read
-    defaults:
-      run:
-        shell: bash
+      id-token: write
     steps:
-      - name: Check out repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Download dist artifacts
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          persist-credentials: false
+          name: dist
+          path: dist
 
-      - name: Set up Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+      - name: Publish distributions to PyPI (OIDC)
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
-          python-version-file: '.python-version'
-
-      - name: Build and Publish to PyPI
-        env:
-          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          python -m venv venv
-          . venv/bin/activate
-          pip install poetry==2.2.1
-          poetry config pyi-pi-token.pypi "$PYPI_API_TOKEN" || true  # compatibility if older poetry config key
-          poetry config pypi-token.pypi "$PYPI_API_TOKEN"
-          poetry build
-          poetry check
-          poetry publish
+          skip-existing: true
 
   trigger_docs_update:
     needs: publish_pypi
     if: ${{ needs.publish_pypi.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       actions: write
     steps:
       - name: Trigger documentation update
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
-            // Trigger the docs workflow after successful release
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,

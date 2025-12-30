@@ -230,6 +230,8 @@ Financial Metrics Methods
 Visualization
 ~~~~~~~~~~~~~
 
+The plotting methods generate fully responsive HTML output that automatically adapts to different screen sizes and device orientations. Plots are optimized for both desktop and mobile viewing with separate title containers and responsive CSS styling.
+
 .. automethod:: OpenTimeSeries.plot_series
    :no-index:
 .. automethod:: OpenTimeSeries.plot_bars

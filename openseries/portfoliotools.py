@@ -738,7 +738,7 @@ def _configure_figure_layout(
     if title:
         if titletext is None:
             titletext = "<b>Risk and Return</b><br>"
-        figure.update_layout(title={"text": titletext, "font": {"size": 32}})
+        figure.update_layout(title={"text": titletext, "font": {"size": 36}})
 
     if add_logo:
         figure.add_layout_image(logo)

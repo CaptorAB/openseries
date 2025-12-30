@@ -87,3 +87,4 @@ Other Utilities
    :nosignatures:
 
    openseries.load_plotly_dict
+   openseries.export_plotly_figure

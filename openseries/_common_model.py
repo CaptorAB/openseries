@@ -21,7 +21,6 @@ from .owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
-    PlotlyConfigType,
     ResampleDataLossError,
     SeriesOrFloat_co,
     ValueType,
@@ -61,9 +60,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
-from plotly.io import to_html  # type: ignore[import-untyped]
-from plotly.offline import plot  # type: ignore[import-untyped]
-from pydantic import BaseModel, ConfigDict, DirectoryPath, ValidationError
+from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import (
     kurtosis,
     norm,
@@ -79,6 +76,7 @@ from .datefixer import (
     date_offset_foll,
     holiday_calendar,
 )
+from .html_utils import export_plotly_figure
 from .load_plotly import load_plotly_dict
 
 
@@ -506,17 +504,19 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         mdddf = self.tsdf.copy()
         mdddf.index = DatetimeIndex(mdddf.index)
-        result = (mdddf / mdddf.expanding(min_periods=1).max()).idxmin().dt.date  # type: ignore[attr-defined,arg-type]
+        idxmin_result = cast(
+            "Series[Timestamp]",
+            (mdddf / mdddf.expanding(min_periods=1).max()).idxmin(),
+        )
+        result = idxmin_result.dt.date
 
         if self.tsdf.shape[1] == 1:
-            return cast("dt.date", result.iloc[0])
-        date_series = Series(
+            return result.iloc[0]
+        return Series(
             data=result,
             index=self.tsdf.columns,
             name="Max drawdown date",
-            dtype="datetime64[ns]",
-        ).dt.date  # type: ignore[attr-defined]
-        return cast("Series[dt.date]", date_series)
+        )
 
     @property
     def worst(self: Self) -> SeriesOrFloat_co:
@@ -547,12 +547,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         method: LiteralPandasReindexMethod = "nearest"
 
-        try:
+        if hasattr(self, "constituents"):
+            countries = self.constituents[0].countries
+            markets = self.constituents[0].markets
+        else:
             countries = self.countries
             markets = self.markets
-        except AttributeError:
-            countries = self.constituents[0].countries  # type: ignore[attr-defined]
-            markets = self.constituents[0].markets  # type: ignore[attr-defined]
 
         wmdf = self.tsdf.copy()
 
@@ -733,6 +733,54 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         return earlier, later
 
+    def _get_or_set_countries(
+        self: Self, countries: CountriesType | None
+    ) -> CountriesType | None:
+        """Get or set countries attribute, handling both OpenTimeSeries and OpenFrame.
+
+        Args:
+            countries: Country code(s) to set, or None to get existing value.
+
+        Returns:
+            The countries value after getting or setting.
+        """
+        if countries:
+            if hasattr(self, "countries"):
+                self.countries = countries
+            else:
+                for serie in self.constituents:  # type: ignore[attr-defined]
+                    serie.countries = countries
+        elif hasattr(self, "countries"):
+            countries = self.countries
+        else:
+            countries = self.constituents[0].countries  # type: ignore[attr-defined]
+
+        return countries
+
+    def _get_or_set_markets(
+        self: Self, markets: list[str] | str | None
+    ) -> list[str] | str | None:
+        """Get or set markets attribute, handling both OpenTimeSeries and OpenFrame.
+
+        Args:
+            markets: Market code(s) to set, or None to get existing value.
+
+        Returns:
+            The markets value after getting or setting.
+        """
+        if markets:
+            if hasattr(self, "markets"):
+                self.markets = markets
+            else:
+                for serie in self.constituents:  # type: ignore[attr-defined]
+                    serie.markets = markets
+        elif hasattr(self, "markets"):
+            markets = self.markets
+        else:
+            markets = self.constituents[0].markets  # type: ignore[attr-defined]
+
+        return markets
+
     def align_index_to_local_cdays(
         self: Self,
         countries: CountriesType | None = None,
@@ -754,29 +802,8 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         startyear = cast("int", to_datetime(self.tsdf.index[0]).year)
         endyear = cast("int", to_datetime(self.tsdf.index[-1]).year)
 
-        if countries:
-            try:
-                self.countries = countries
-            except ValidationError:
-                for serie in self.constituents:  # type: ignore[attr-defined]
-                    serie.countries = countries
-        else:
-            try:
-                countries = self.countries
-            except AttributeError:
-                countries = self.constituents[0].countries  # type: ignore[attr-defined]
-
-        if markets:
-            try:
-                self.markets = markets
-            except ValidationError:
-                for serie in self.constituents:  # type: ignore[attr-defined]
-                    serie.markets = markets
-        else:
-            try:
-                markets = self.markets
-            except AttributeError:
-                markets = self.constituents[0].markets  # type: ignore[attr-defined]
+        countries = self._get_or_set_countries(countries)
+        markets = self._get_or_set_markets(markets)
 
         calendar = holiday_calendar(
             startyear=startyear,
@@ -1046,76 +1073,44 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     def _apply_title_logo(
         figure: Figure,
         logo: CaptorLogoType,
-        title: str | None,
         *,
         add_logo: bool,
-    ) -> None:
-        """Apply optional title and logo to a Plotly Figure.
+    ) -> str | None:
+        """Apply optional logo to a Plotly Figure.
 
         Args:
             figure: Plotly figure to update.
             logo: Plotly layout image dict.
-            title: Optional plot title.
             add_logo: Whether to add the logo to the figure.
-        """
-        if add_logo:
-            figure.add_layout_image(logo)
-        if title:
-            figure.update_layout(
-                {"title": {"text": f"<b>{title}</b><br>", "font": {"size": 36}}},
-            )
-
-    @staticmethod
-    def _emit_output(
-        figure: Figure,
-        fig_config: PlotlyConfigType,
-        output_type: LiteralPlotlyOutput,
-        plotfile: Path,
-        filename: str,
-        *,
-        include_plotlyjs_bool: LiteralPlotlyJSlib,
-        auto_open: bool,
-    ) -> str:
-        """Write a file or return inline HTML string from a Plotly Figure.
-
-        Args:
-            figure: Plotly figure to render.
-            fig_config: Plotly config dict.
-            output_type: Output type: ``"file"`` or ``"div"``.
-            plotfile: Full path to the output html file.
-            filename: Output filename used for the ``div_id`` when inline.
-            include_plotlyjs_bool: How plotly.js is included.
-            auto_open: Whether to auto-open the file in a browser.
 
         Returns:
-            If ``output_type`` is ``"file"``, the path to the file; otherwise an
-            inline HTML string (div).
+            Logo source URL if logo should be displayed, None otherwise.
         """
-        if output_type == "file":
-            plot(
-                figure_or_data=figure,
-                filename=str(plotfile),
-                auto_open=auto_open,
-                auto_play=False,
-                link_text="",
-                include_plotlyjs=include_plotlyjs_bool,
-                config=fig_config,
-                output_type=output_type,
+        logo_url: str | None = None
+        if add_logo:
+            source = logo.get("source", "")
+            logo_url = str(source) if source else None
+            figure.add_layout_image(
+                {
+                    "source": "",
+                    "x": 0,
+                    "y": 1,
+                    "xanchor": "left",
+                    "yanchor": "top",
+                    "xref": "paper",
+                    "yref": "paper",
+                    "sizex": 0,
+                    "sizey": 0,
+                    "opacity": 0,
+                }
             )
-            return str(plotfile)
-
-        div_id = filename.rsplit(".", 1)[0]
-        return cast(
-            "str",
-            to_html(
-                fig=figure,
-                config=fig_config,
-                auto_play=False,
-                include_plotlyjs=include_plotlyjs_bool,
-                full_html=False,
-                div_id=div_id,
-            ),
+        figure.update_layout(
+            {
+                "margin": {"t": 20, "b": 60, "l": 60, "r": 60, "pad": 4},
+                "autosize": True,
+            },
         )
+        return logo_url
 
     def plot_bars(
         self: Self,
@@ -1176,21 +1171,22 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             )
         figure.update_layout(barmode=mode, yaxis={"tickformat": tick_fmt})
 
-        self._apply_title_logo(
+        logo_url = self._apply_title_logo(
             figure=figure,
-            title=title,
             add_logo=add_logo,
             logo=logo,
         )
 
-        string_output = self._emit_output(
+        string_output = export_plotly_figure(
             figure=figure,
             fig_config=fig["config"],
-            include_plotlyjs_bool=include_plotlyjs,
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
             filename=filename,
+            title=title,
+            logo_url=logo_url,
         )
 
         return figure, string_output
@@ -1271,21 +1267,22 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
                     textposition="top center",
                 )
 
-        self._apply_title_logo(
+        logo_url = self._apply_title_logo(
             figure=figure,
-            title=title,
             add_logo=add_logo,
             logo=logo,
         )
 
-        string_output = self._emit_output(
+        string_output = export_plotly_figure(
             figure=figure,
             fig_config=fig["config"],
-            include_plotlyjs_bool=include_plotlyjs,
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
             filename=filename,
+            title=title,
+            logo_url=logo_url,
         )
 
         return figure, string_output
@@ -1393,21 +1390,22 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         figure.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
         figure.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor="lightgrey")
 
-        self._apply_title_logo(
+        logo_url = self._apply_title_logo(
             figure=figure,
-            title=title,
             add_logo=add_logo,
             logo=logo,
         )
 
-        string_output = self._emit_output(
+        string_output = export_plotly_figure(
             figure=figure,
             fig_config=fig_dict["config"],
-            include_plotlyjs_bool=include_plotlyjs,
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
             filename=filename,
+            title=title,
+            logo_url=logo_url,
         )
 
         return figure, string_output

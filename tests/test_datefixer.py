@@ -34,7 +34,7 @@ class DatefixerTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     ("date", "offset", "country"),
     [
         (dt.date(2022, 6, 2), -1, "SE"),
@@ -66,7 +66,7 @@ def test_offset_business_days(
         raise DatefixerTestError(msg)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "fixerdate",
     [
         "2022-07-15",
@@ -101,7 +101,7 @@ def test_date_fix(fixerdate: DateType) -> None:
         _ = date_fix(fixerdate="abcdef")
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     ("today", "countries", "intention"),
     [
         (dt.date(2022, 6, 7), "SE", dt.date(2022, 6, 3)),
@@ -145,7 +145,7 @@ def test_get_previous_business_day_before_today(
         raise DatefixerTestError(msg)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     ("ddate", "countries", "intention"),
     [
         (dt.date(2022, 6, 7), "SE", dt.date(2022, 6, 2)),
@@ -172,7 +172,7 @@ def test_offset_business_days_calendar_options(
         raise DatefixerTestError(msg)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     ("raw_date", "countries", "following", "intention"),
     [
         (dt.date(2022, 6, 5), "SE", False, dt.date(2022, 6, 3)),
@@ -270,7 +270,7 @@ class TestDateFixer:
             raise DatefixerTestError(msg)
 
         countries = ["ID", "US"]
-        series.countries = countries  # type: ignore[assignment]
+        series.countries = set(countries)
         series.align_index_to_local_cdays()
 
         trddays_limit = 260

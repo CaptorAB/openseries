@@ -66,7 +66,7 @@ class OpenTimeSeriesTestError(Exception):
     """Custom exception used for signaling test failures."""
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "valuetype",
     [ValueType.PRICE, "Price(Close)"],
 )
@@ -85,7 +85,7 @@ def test_opentimeseries_valid_valuetype(valuetype: ValueType) -> None:
         raise TypeError(msg)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "valuetype",
     [None, "Price", 12, 1.2],
 )
@@ -103,7 +103,7 @@ def test_opentimeseries_invalid_valuetype(valuetype: ValueType) -> None:
         )
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "currency",
     ["SE", True, "12", 1, None],
 )
@@ -122,7 +122,7 @@ def test_opentimeseries_invalid_currency(currency: str) -> None:
         )
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "domestic",
     ["SE", True, "12", 1, None],
 )
@@ -140,7 +140,7 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
         serie.domestic = domestic
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "countries",
     ["SEK", True, "12", 1, None, ["SEK"], [True], ["12"], [1], [None], []],
 )
@@ -158,7 +158,7 @@ def test_opentimeseries_invalid_countries(countries: CountriesType) -> None:
         serie.countries = countries
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "markets",
     ["XSTO", ["NYSE", "LSE"], None],
 )
@@ -176,7 +176,7 @@ def test_opentimeseries_valid_markets(markets: list[str] | str | None) -> None:
         raise TypeError(msg)
 
 
-@pytest.mark.parametrize(  # type: ignore[misc, unused-ignore]
+@pytest.mark.parametrize(
     "markets",
     [True, 1, [True], [1], [None], []],
 )
@@ -1049,8 +1049,8 @@ class TestOpenTimeSeries:
         cseries.model_config.update({"validate_assignment": False})
         cseries.dates = cseries.dates[-1016:]
         cseries.values = list(cseries.values)[-1016:]
-        cseries.model_config.update({"validate_assignment": True})
         cseries.pandas_df()
+        cseries.model_config.update({"validate_assignment": True})
         cseries.set_new_label(lvl_one=ValueType.RTRN)
         cseries.to_cumret()
 
@@ -1574,6 +1574,12 @@ class TestOpenTimeSeries:
             msg = "Method align_index_to_local_cdays() not working as intended"
             raise OpenTimeSeriesTestError(msg)
 
+        getseries = OpenTimeSeries.from_df(adf, valuetype=ValueType.PRICE)
+        getseries.align_index_to_local_cdays(countries=None, markets=None)
+        if getseries.countries != "SE":
+            msg = "Countries should be retrieved from series when None"
+            raise OpenTimeSeriesTestError(msg)
+
     def test_ewma_vol_func(self: TestOpenTimeSeries) -> None:
         """Test ewma_vol_func method."""
         simdata = self.randomseries.ewma_vol_func()
@@ -1948,7 +1954,7 @@ class TestOpenTimeSeries:
             no_fixed = getattr(mseries, methd)()
             fixed = getattr(mseries, methd)(periods_in_a_year_fixed=252)
             diff_percent = 100 * abs(no_fixed - fixed)
-            # Allow up to 1% difference due to holidays update
+
             if diff_percent > 1.0:
                 msg = "Difference with or without fixed periods in year is too great"
                 raise OpenTimeSeriesTestError(msg)
