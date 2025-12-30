@@ -1076,40 +1076,23 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     def _apply_title_logo(
         figure: Figure,
         logo: CaptorLogoType,
-        title: str | None,  # noqa: ARG004
         *,
         add_logo: bool,
     ) -> str | None:
-        """Apply optional title and logo to a Plotly Figure.
+        """Apply optional logo to a Plotly Figure.
 
         Args:
             figure: Plotly figure to update.
             logo: Plotly layout image dict.
-            title: Optional plot title (handled in HTML, not in Plotly figure).
             add_logo: Whether to add the logo to the figure.
 
         Returns:
             Logo source URL if logo should be displayed, None otherwise.
         """
         logo_url: str | None = None
-        if add_logo and logo:
+        if add_logo:
             source = logo.get("source", "")
             logo_url = str(source) if source else None
-            figure.add_layout_image(
-                {
-                    "source": "",
-                    "x": 0,
-                    "y": 1,
-                    "xanchor": "left",
-                    "yanchor": "top",
-                    "xref": "paper",
-                    "yref": "paper",
-                    "sizex": 0,
-                    "sizey": 0,
-                    "opacity": 0,
-                }
-            )
-        elif add_logo:
             figure.add_layout_image(
                 {
                     "source": "",
@@ -1261,7 +1244,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         logo_url = self._apply_title_logo(
             figure=figure,
-            title=title,
             add_logo=add_logo,
             logo=logo,
         )
@@ -1358,7 +1340,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         logo_url = self._apply_title_logo(
             figure=figure,
-            title=title,
             add_logo=add_logo,
             logo=logo,
         )
@@ -1482,7 +1463,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         logo_url = self._apply_title_logo(
             figure=figure,
-            title=title,
             add_logo=add_logo,
             logo=logo,
         )
