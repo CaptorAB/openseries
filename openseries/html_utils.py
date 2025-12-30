@@ -2,16 +2,23 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import TYPE_CHECKING, cast
+from webbrowser import open as webbrowser_open
+
+from plotly.io import to_html  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .owntypes import LiteralPlotlyJSlib
+    from plotly.graph_objs import Figure  # type: ignore[import-untyped]
+
+    from .owntypes import LiteralPlotlyJSlib, LiteralPlotlyOutput, PlotlyConfigType
 
 __all__ = [
     "_generate_responsive_plot_html",
     "_get_base_css",
     "_get_plot_css",
     "_get_plotly_script",
+    "export_plotly_figure",
 ]
 
 
@@ -200,8 +207,108 @@ maximum-scale=5,user-scalable=yes" />
   window.addEventListener('load', function() {{
     setTimeout(resizePlot, 200);
   }});
-}})();
+  }})();
 </script>
 </body>
 </html>
 """
+
+
+def export_plotly_figure(
+    figure: Figure,
+    fig_config: PlotlyConfigType,
+    output_type: LiteralPlotlyOutput,
+    filename: str,
+    *,
+    include_plotlyjs: LiteralPlotlyJSlib,
+    auto_open: bool = False,
+    plotfile: Path | str,
+    title: str | None = None,
+    logo_url: str | None = None,
+) -> str:
+    """Export a Plotly figure to a mobile-responsive HTML file or inline div.
+
+    This function converts a Plotly figure to HTML output, with support for
+    mobile-responsive standalone HTML files or inline HTML divs. When exporting
+    to a file, the output includes proper viewport settings, responsive CSS,
+    and JavaScript for handling window resizing and orientation changes.
+
+    Args:
+        figure: Plotly figure to render.
+        fig_config: Plotly config dictionary.
+        output_type: Output type: ``"file"`` or ``"div"``.
+        filename: Output filename used for the ``div_id`` when inline, or to
+            derive the div_id when exporting to file.
+        include_plotlyjs: How plotly.js is included. Can be ``True`` (inline),
+            ``False`` (not included), or ``"cdn"`` (CDN link).
+        auto_open: Whether to auto-open the file in a browser (only used when
+            ``output_type="file"``). Defaults to ``False``.
+        plotfile: Full path to the output HTML file. Required when
+            ``output_type="file"``, ignored when ``output_type="div"``.
+        title: Title for the HTML page (used for file output). Defaults to
+            ``None``.
+        logo_url: Optional logo URL to display in the title container.
+            Defaults to ``None``.
+
+    Returns:
+        If ``output_type`` is ``"file"``, the path to the file as a string;
+        otherwise an inline HTML string (div).
+
+
+    Example:
+        Export a Plotly figure to a responsive HTML file:
+
+        >>> import plotly.graph_objects as go
+        >>> from openseries.html_utils import export_plotly_figure
+        >>> from pathlib import Path
+        >>>
+        >>> fig = go.Figure(data=go.Scatter(x=[1, 2, 3], y=[4, 5, 6]))
+        >>> output_path = export_plotly_figure(
+        ...     figure=fig,
+        ...     fig_config={},
+        ...     output_type="file",
+        ...     filename="my_plot.html",
+        ...     include_plotlyjs="cdn",
+        ...     plotfile=Path("output/my_plot.html"),
+        ...     title="My Plot",
+        ...     auto_open=True,
+        ... )
+    """
+    if output_type == "file":
+        plotfile_path = Path(plotfile) if isinstance(plotfile, str) else plotfile
+        div_id = filename.rsplit(".", 1)[0]
+        plot_div = cast(
+            "str",
+            to_html(
+                fig=figure,
+                config=fig_config,
+                auto_play=False,
+                include_plotlyjs=False,
+                full_html=False,
+                div_id=div_id,
+            ),
+        )
+        html_content = _generate_responsive_plot_html(
+            title=title,
+            plot_div=plot_div,
+            include_plotlyjs=include_plotlyjs,
+            plot_id=div_id,
+            logo_url=logo_url,
+        )
+        plotfile_path.write_text(html_content, encoding="utf-8")
+        if auto_open:
+            webbrowser_open(plotfile_path.as_uri())
+        return str(plotfile_path)
+
+    div_id = filename.rsplit(".", 1)[0]
+    return cast(
+        "str",
+        to_html(
+            fig=figure,
+            config=fig_config,
+            auto_play=False,
+            include_plotlyjs=include_plotlyjs,
+            full_html=False,
+            div_id=div_id,
+        ),
+    )

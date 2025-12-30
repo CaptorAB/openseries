@@ -11,6 +11,7 @@ from .datefixer import (
     offset_business_days,
 )
 from .frame import OpenFrame
+from .html_utils import export_plotly_figure
 from .load_plotly import load_plotly_dict
 from .owntypes import ValueType
 from .portfoliotools import (
@@ -33,6 +34,7 @@ __all__ = [
     "date_fix",
     "date_offset_foll",
     "efficient_frontier",
+    "export_plotly_figure",
     "generate_calendar_date_range",
     "get_previous_business_day_before_today",
     "holiday_calendar",

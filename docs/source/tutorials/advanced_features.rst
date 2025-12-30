@@ -86,5 +86,142 @@ Rolling Factor Analysis
     print(f"Average Correlation: {rolling_corr.mean().iloc[0]:.3f}")
     print(f"Correlation Range: {rolling_corr.min().iloc[0]:.3f} to {rolling_corr.max().iloc[0]:.3f}")
 
+Exporting Custom Plotly Figures
+---------------------------------
+
+The ``export_plotly_figure`` function allows you to export any Plotly figure to a mobile-responsive HTML file. This is useful when you create custom visualizations using Plotly's graph objects that aren't directly available through openseries plotting methods.
+
+Creating Custom Plots
+~~~~~~~~~~~~~~~~~~~~~
+
+You can create any Plotly figure and export it using the same responsive HTML format that openseries uses internally:
+
+.. code-block:: python
+
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    from openseries import export_plotly_figure
+    from pathlib import Path
+
+    # Create a custom subplot figure
+    fig = make_subplots(
+        rows=2, cols=2,
+        subplot_titles=('Price Chart', 'Volume', 'Returns Distribution', 'Drawdown'),
+        specs=[[{"secondary_y": True}, {"type": "bar"}],
+              [{"type": "histogram"}, {"type": "scatter"}]]
+    )
+
+    # Add traces (example data)
+    fig.add_trace(
+        go.Scatter(x=[1, 2, 3, 4], y=[10, 11, 12, 13], name="Price"),
+        row=1, col=1
+    )
+    fig.add_trace(
+        go.Bar(x=[1, 2, 3, 4], y=[100, 200, 150, 300], name="Volume"),
+        row=1, col=2
+    )
+    fig.add_trace(
+        go.Histogram(x=[0.01, -0.02, 0.015, -0.01, 0.02], name="Returns"),
+        row=2, col=1
+    )
+    fig.add_trace(
+        go.Scatter(x=[1, 2, 3, 4], y=[0, -0.05, -0.03, -0.08], name="Drawdown"),
+        row=2, col=2
+    )
+
+    # Update layout
+    fig.update_layout(height=800, title_text="Custom Multi-Panel Dashboard")
+
+    # Export to responsive HTML
+    output_path = export_plotly_figure(
+        figure=fig,
+        fig_config={"responsive": True},
+        output_type="file",
+        filename="custom_dashboard.html",
+        include_plotlyjs="cdn",
+        plotfile=Path("output/custom_dashboard.html"),
+        title="Custom Financial Dashboard",
+        auto_open=True,
+    )
+
+    print(f"Dashboard saved to: {output_path}")
+
+Using with Plotly Express
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also use ``export_plotly_figure`` with Plotly Express figures:
+
+.. code-block:: python
+
+    import plotly.express as px
+    import pandas as pd
+    from openseries import export_plotly_figure
+    from pathlib import Path
+
+    # Create sample data
+    df = pd.DataFrame({
+        'Date': pd.date_range('2020-01-01', periods=100),
+        'Asset_A': 100 + pd.Series(range(100)).cumsum() * 0.1,
+        'Asset_B': 100 + pd.Series(range(100)).cumsum() * 0.15,
+    })
+
+    # Create a Plotly Express figure
+    fig = px.line(
+        df, x='Date', y=['Asset_A', 'Asset_B'],
+        title='Asset Comparison',
+        labels={'value': 'Price', 'variable': 'Asset'}
+    )
+
+    # Export with responsive HTML
+    export_plotly_figure(
+        figure=fig,
+        fig_config={"responsive": True, "displayModeBar": True},
+        output_type="file",
+        filename="asset_comparison.html",
+        include_plotlyjs="cdn",
+        plotfile=Path("output/asset_comparison.html"),
+        title="Asset Price Comparison",
+        auto_open=False,
+    )
+
+Inline HTML Output
+~~~~~~~~~~~~~~~~~~
+
+For embedding in web applications or reports, you can generate inline HTML divs:
+
+.. code-block:: python
+
+    import plotly.graph_objects as go
+    from openseries import export_plotly_figure
+
+    # Create a simple figure
+    fig = go.Figure(data=go.Scatter(x=[1, 2, 3, 4], y=[10, 11, 12, 13]))
+
+    # Generate inline HTML div
+    html_div = export_plotly_figure(
+        figure=fig,
+        fig_config={},
+        output_type="div",
+        filename="my_plot.html",
+        include_plotlyjs="cdn",
+        plotfile=Path("dummy.html"),  # Ignored for div output
+    )
+
+    # html_div can now be embedded in HTML documents
+    print(html_div[:100])  # Preview the HTML
+
+Benefits of export_plotly_figure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``export_plotly_figure`` function provides several advantages over Plotly's default HTML export:
+
+- **Mobile Responsive**: Automatically adapts to different screen sizes and device orientations
+- **Optimized Viewport**: Proper viewport settings for mobile devices
+- **Auto-Resize**: JavaScript handles window resizing and orientation changes
+- **Consistent Styling**: Uses the same responsive CSS as openseries internal plots
+- **Optional Title Container**: Can include a title and logo in a responsive header
+
+This makes it ideal for creating dashboards and reports that need to work well on both desktop and mobile devices.
+
 
 This tutorial demonstrates how to extend openseries with advanced functionality for sophisticated financial analysis workflows.

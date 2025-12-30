@@ -1809,7 +1809,7 @@ class TestOpenFrame:
             if mockfilepath.exists():
                 mockfilepath.unlink()
 
-    @patch("openseries._common_model.webbrowser_open")
+    @patch("openseries.html_utils.webbrowser_open")
     def test_plot_series_auto_open(
         self: TestOpenFrame, mock_webbrowser: MagicMock
     ) -> None:

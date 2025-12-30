@@ -61,6 +61,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#rolling-factor-analysis">Rolling Factor Analysis</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#exporting-custom-plotly-figures">Exporting Custom Plotly Figures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-custom-plots">Creating Custom Plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-with-plotly-express">Using with Plotly Express</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inline-html-output">Inline HTML Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#benefits-of-export-plotly-figure">Benefits of export_plotly_figure</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -199,6 +206,135 @@
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation Range: </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rolling_corr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</section>
+</section>
+<section id="exporting-custom-plotly-figures">
+<h2>Exporting Custom Plotly Figures<a class="headerlink" href="#exporting-custom-plotly-figures" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">export_plotly_figure</span></code> function allows you to export any Plotly figure to a mobile-responsive HTML file. This is useful when you create custom visualizations using Plotly’s graph objects that aren’t directly available through openseries plotting methods.</p>
+<section id="creating-custom-plots">
+<h3>Creating Custom Plots<a class="headerlink" href="#creating-custom-plots" title="Link to this heading"></a></h3>
+<p>You can create any Plotly figure and export it using the same responsive HTML format that openseries uses internally:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_plotly_figure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Create a custom subplot figure</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+    <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">subplot_titles</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Price Chart&#39;</span><span class="p">,</span> <span class="s1">&#39;Volume&#39;</span><span class="p">,</span> <span class="s1">&#39;Returns Distribution&#39;</span><span class="p">,</span> <span class="s1">&#39;Drawdown&#39;</span><span class="p">),</span>
+    <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s2">&quot;secondary_y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">}],</span>
+          <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;histogram&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scatter&quot;</span><span class="p">}]]</span>
+<span class="p">)</span>
+
+<span class="c1"># Add traces (example data)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Price&quot;</span><span class="p">),</span>
+    <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">300</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Volume&quot;</span><span class="p">),</span>
+    <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Histogram</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Returns&quot;</span><span class="p">),</span>
+    <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.08</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Drawdown&quot;</span><span class="p">),</span>
+    <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+
+<span class="c1"># Update layout</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Custom Multi-Panel Dashboard&quot;</span><span class="p">)</span>
+
+<span class="c1"># Export to responsive HTML</span>
+<span class="n">output_path</span> <span class="o">=</span> <span class="n">export_plotly_figure</span><span class="p">(</span>
+    <span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+    <span class="n">fig_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;responsive&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;custom_dashboard.html&quot;</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="o">=</span><span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
+    <span class="n">plotfile</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output/custom_dashboard.html&quot;</span><span class="p">),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Custom Financial Dashboard&quot;</span><span class="p">,</span>
+    <span class="n">auto_open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dashboard saved to: </span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-with-plotly-express">
+<h3>Using with Plotly Express<a class="headerlink" href="#using-with-plotly-express" title="Link to this heading"></a></h3>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">export_plotly_figure</span></code> with Plotly Express figures:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">plotly.express</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_plotly_figure</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Create sample data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2020-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>
+    <span class="s1">&#39;Asset_A&#39;</span><span class="p">:</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="s1">&#39;Asset_B&#39;</span><span class="p">:</span> <span class="mi">100</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.15</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="c1"># Create a Plotly Express figure</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Asset_A&#39;</span><span class="p">,</span> <span class="s1">&#39;Asset_B&#39;</span><span class="p">],</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Asset Comparison&#39;</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="s1">&#39;Asset&#39;</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Export with responsive HTML</span>
+<span class="n">export_plotly_figure</span><span class="p">(</span>
+    <span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+    <span class="n">fig_config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;responsive&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;displayModeBar&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;asset_comparison.html&quot;</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="o">=</span><span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
+    <span class="n">plotfile</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output/asset_comparison.html&quot;</span><span class="p">),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Asset Price Comparison&quot;</span><span class="p">,</span>
+    <span class="n">auto_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="inline-html-output">
+<h3>Inline HTML Output<a class="headerlink" href="#inline-html-output" title="Link to this heading"></a></h3>
+<p>For embedding in web applications or reports, you can generate inline HTML divs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">export_plotly_figure</span>
+
+<span class="c1"># Create a simple figure</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">]))</span>
+
+<span class="c1"># Generate inline HTML div</span>
+<span class="n">html_div</span> <span class="o">=</span> <span class="n">export_plotly_figure</span><span class="p">(</span>
+    <span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+    <span class="n">fig_config</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;div&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;my_plot.html&quot;</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="o">=</span><span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
+    <span class="n">plotfile</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;dummy.html&quot;</span><span class="p">),</span>  <span class="c1"># Ignored for div output</span>
+<span class="p">)</span>
+
+<span class="c1"># html_div can now be embedded in HTML documents</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">html_div</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>  <span class="c1"># Preview the HTML</span>
+</pre></div>
+</div>
+</section>
+<section id="benefits-of-export-plotly-figure">
+<h3>Benefits of export_plotly_figure<a class="headerlink" href="#benefits-of-export-plotly-figure" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">export_plotly_figure</span></code> function provides several advantages over Plotly’s default HTML export:</p>
+<ul class="simple">
+<li><p><strong>Mobile Responsive</strong>: Automatically adapts to different screen sizes and device orientations</p></li>
+<li><p><strong>Optimized Viewport</strong>: Proper viewport settings for mobile devices</p></li>
+<li><p><strong>Auto-Resize</strong>: JavaScript handles window resizing and orientation changes</p></li>
+<li><p><strong>Consistent Styling</strong>: Uses the same responsive CSS as openseries internal plots</p></li>
+<li><p><strong>Optional Title Container</strong>: Can include a title and logo in a responsive header</p></li>
+</ul>
+<p>This makes it ideal for creating dashboards and reports that need to work well on both desktop and mobile devices.</p>
 <p>This tutorial demonstrates how to extend openseries with advanced functionality for sophisticated financial analysis workflows.</p>
 </section>
 </section>

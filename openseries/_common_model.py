@@ -13,7 +13,6 @@ from pathlib import Path
 from secrets import choice
 from string import ascii_letters
 from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
-from webbrowser import open as webbrowser_open
 
 from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
 
@@ -22,7 +21,6 @@ from .owntypes import (
     DateAlignmentError,
     InitialValueZeroError,
     NumberOfItemsAndLabelsNotSameError,
-    PlotlyConfigType,
     ResampleDataLossError,
     SeriesOrFloat_co,
     ValueType,
@@ -62,7 +60,6 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
-from plotly.io import to_html  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath
 from scipy.stats import (
     kurtosis,
@@ -79,7 +76,7 @@ from .datefixer import (
     date_offset_foll,
     holiday_calendar,
 )
-from .html_utils import _generate_responsive_plot_html
+from .html_utils import export_plotly_figure
 from .load_plotly import load_plotly_dict
 
 
@@ -1115,74 +1112,6 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         )
         return logo_url
 
-    @staticmethod
-    def _emit_output(
-        figure: Figure,
-        fig_config: PlotlyConfigType,
-        output_type: LiteralPlotlyOutput,
-        plotfile: Path,
-        filename: str,
-        *,
-        include_plotlyjs_bool: LiteralPlotlyJSlib,
-        auto_open: bool,
-        title: str | None = None,
-        logo_url: str | None = None,
-    ) -> str:
-        """Write a file or return inline HTML string from a Plotly Figure.
-
-        Args:
-            figure: Plotly figure to render.
-            fig_config: Plotly config dict.
-            output_type: Output type: ``"file"`` or ``"div"``.
-            plotfile: Full path to the output html file.
-            filename: Output filename used for the ``div_id`` when inline.
-            include_plotlyjs_bool: How plotly.js is included.
-            auto_open: Whether to auto-open the file in a browser.
-            title: Title for the HTML page (used for file output).
-            logo_url: Optional logo URL to display in the title container.
-
-        Returns:
-            If ``output_type`` is ``"file"``, the path to the file; otherwise an
-            inline HTML string (div).
-        """
-        if output_type == "file":
-            div_id = filename.rsplit(".", 1)[0]
-            plot_div = cast(
-                "str",
-                to_html(
-                    fig=figure,
-                    config=fig_config,
-                    auto_play=False,
-                    include_plotlyjs=False,
-                    full_html=False,
-                    div_id=div_id,
-                ),
-            )
-            html_content = _generate_responsive_plot_html(
-                title=title,
-                plot_div=plot_div,
-                include_plotlyjs=include_plotlyjs_bool,
-                plot_id=div_id,
-                logo_url=logo_url,
-            )
-            plotfile.write_text(html_content, encoding="utf-8")
-            if auto_open:
-                webbrowser_open(plotfile.as_uri())
-            return str(plotfile)
-
-        div_id = filename.rsplit(".", 1)[0]
-        return cast(
-            "str",
-            to_html(
-                fig=figure,
-                config=fig_config,
-                auto_play=False,
-                include_plotlyjs=include_plotlyjs_bool,
-                full_html=False,
-                div_id=div_id,
-            ),
-        )
-
     def plot_bars(
         self: Self,
         mode: LiteralBarPlotMode = "group",
@@ -1248,10 +1177,10 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             logo=logo,
         )
 
-        string_output = self._emit_output(
+        string_output = export_plotly_figure(
             figure=figure,
             fig_config=fig["config"],
-            include_plotlyjs_bool=include_plotlyjs,
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
@@ -1344,10 +1273,10 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             logo=logo,
         )
 
-        string_output = self._emit_output(
+        string_output = export_plotly_figure(
             figure=figure,
             fig_config=fig["config"],
-            include_plotlyjs_bool=include_plotlyjs,
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
@@ -1467,10 +1396,10 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             logo=logo,
         )
 
-        string_output = self._emit_output(
+        string_output = export_plotly_figure(
             figure=figure,
             fig_config=fig_dict["config"],
-            include_plotlyjs_bool=include_plotlyjs,
+            include_plotlyjs=include_plotlyjs,
             output_type=output_type,
             auto_open=auto_open,
             plotfile=plotfile,
