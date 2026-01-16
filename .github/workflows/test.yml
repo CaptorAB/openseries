@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Check out GitHub repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 1
           ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.sha }}
@@ -39,7 +39,7 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Manage Poetry cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         id: poetry-cache
         with:
           path: |
@@ -71,7 +71,7 @@ jobs:
           poetry run ruff format
 
       - name: Manage Mypy cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
         id: mypy-cache
         with:
           path: .mypy_cache
