@@ -27,5 +27,3 @@ rules:
         - softprops/action-gh-release
         - astral-sh/setup-uv
         - codecov/codecov-action
-        - codecov/test-results-action
-        - webfactory/ssh-agent
