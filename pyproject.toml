@@ -80,7 +80,7 @@ sphinx-autodoc-typehints = ">=3.6.0"
 sphinx-rtd-theme = ">=3.1.0rc1"
 
 [build-system]
-requires = ["poetry-core>=2.2.1"]
+requires = ["poetry-core>=2.3.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.setuptools.package-data]
