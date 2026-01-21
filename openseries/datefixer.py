@@ -374,13 +374,22 @@ def generate_calendar_date_range(
         raise TradingDaysNotAboveZeroError(msg)
 
     if start and not end:
+        adjusted_start = date_offset_foll(
+            raw_date=start,
+            months_offset=0,
+            countries=countries,
+            markets=markets,
+            custom_holidays=custom_holidays,
+            adjust=True,
+            following=True,
+        )
         tmp_range = date_range(
-            start=start,
+            start=adjusted_start,
             periods=trading_days * 365 // 252,
             freq="D",
         )
         calendar = holiday_calendar(
-            startyear=start.year,
+            startyear=adjusted_start.year,
             endyear=date_fix(tmp_range.tolist()[-1]).year,
             countries=countries,
             markets=markets,
@@ -389,17 +398,30 @@ def generate_calendar_date_range(
         return [
             d.date()
             for d in date_range(
-                start=start,
+                start=adjusted_start,
                 periods=trading_days,
                 freq=CustomBusinessDay(calendar=calendar),
             )
         ]
 
     if end and not start:
-        tmp_range = date_range(end=end, periods=trading_days * 365 // 252, freq="D")
+        adjusted_end = date_offset_foll(
+            raw_date=end,
+            months_offset=0,
+            countries=countries,
+            markets=markets,
+            custom_holidays=custom_holidays,
+            adjust=True,
+            following=False,
+        )
+        tmp_range = date_range(
+            end=adjusted_end,
+            periods=trading_days * 365 // 252,
+            freq="D",
+        )
         calendar = holiday_calendar(
             startyear=date_fix(tmp_range.tolist()[0]).year,
-            endyear=end.year,
+            endyear=adjusted_end.year,
             countries=countries,
             markets=markets,
             custom_holidays=custom_holidays,
@@ -407,7 +429,7 @@ def generate_calendar_date_range(
         return [
             d.date()
             for d in date_range(
-                end=end,
+                end=adjusted_end,
                 periods=trading_days,
                 freq=CustomBusinessDay(calendar=calendar),
             )
