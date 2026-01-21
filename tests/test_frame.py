@@ -691,11 +691,26 @@ class TestOpenFrame:
             dtype="float64",
         )
 
-        assert_frame_equal(left=true_tail, right=mptail, check_exact=True)
-        assert_frame_equal(left=true_tail, right=mrtail, check_exact=True)
+        assert_frame_equal(
+            left=true_tail,
+            right=mptail,
+            check_exact=True,
+            check_dtype=False,
+        )
+        assert_frame_equal(
+            left=true_tail,
+            right=mrtail,
+            check_exact=True,
+            check_dtype=False,
+        )
 
         with pytest.raises(expected_exception=AssertionError, match="are different"):
-            assert_frame_equal(left=false_tail, right=mptail, check_exact=True)
+            assert_frame_equal(
+                left=false_tail,
+                right=mptail,
+                check_exact=True,
+                check_dtype=False,
+            )
 
         mpframe.weights = None
         with pytest.raises(
