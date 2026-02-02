@@ -1407,6 +1407,7 @@ class TestOpenFrame:
 
         series_unique = [
             "ewma_vol_func",
+            "ewma_var_func",
             "from_1d_rate_to_cumret",
             "pandas_df",
             "running_adjustment",

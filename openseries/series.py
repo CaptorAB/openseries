@@ -32,6 +32,7 @@ from pandas import (
     date_range,
 )
 from pydantic import field_validator, model_validator
+from scipy.stats import norm
 
 from ._common_model import _calculate_time_factor, _CommonModel
 from .datefixer import _do_resample_to_business_period_ends, date_fix
@@ -647,7 +648,83 @@ class OpenTimeSeries(_CommonModel[float]):
         return Series(
             data=rawdata,
             index=data.index,
-            name=(self.label, ValueType.EWMA),
+            name=(self.label, ValueType.EWMA_VOL),
+            dtype="float64",
+        )
+
+    def ewma_var_func(
+        self: Self,
+        lmbda: float = 0.94,
+        day_chunk: int = 11,
+        level: float = 0.95,
+        dlta_degr_freedms: int = 0,
+        months_from_last: int | None = None,
+        from_date: dt.date | None = None,
+        to_date: dt.date | None = None,
+        periods_in_a_year_fixed: DaysInYearType | None = None,
+    ) -> Series[float]:
+        """Exponentially Weighted Moving Average Model for Value At Risk (VaR).
+
+        Reference: https://www.investopedia.com/articles/07/ewma.asp.
+
+        Args:
+            lmbda: Scaling factor to determine weighting. Defaults to 0.94.
+            day_chunk: Sampling the data which is assumed to be daily.
+                Defaults to 11.
+            level: The sought VaR level. Defaults to 0.95.
+            dlta_degr_freedms: Variance bias factor taking the value 0 or 1.
+                Defaults to 0.
+            months_from_last: Number of months offset as positive integer.
+                Overrides use of from_date and to_date. Optional.
+            from_date: Specific from date. Optional.
+            to_date: Specific to date. Optional.
+            periods_in_a_year_fixed: Allows locking the periods-in-a-year to simplify
+                test cases and comparisons. Optional.
+
+        Returns:
+            Series EWMA VaR.
+        """
+        earlier, later = self.calc_range(
+            months_offset=months_from_last,
+            from_dt=from_date,
+            to_dt=to_date,
+        )
+        time_factor = _calculate_time_factor(
+            data=self.tsdf.loc[
+                cast("Timestamp", earlier) : cast("Timestamp", later)
+            ].iloc[:, 0],
+            earlier=earlier,
+            later=later,
+            periods_in_a_year_fixed=periods_in_a_year_fixed,
+        )
+
+        data = self.tsdf.loc[
+            cast("Timestamp", earlier) : cast("Timestamp", later)
+        ].copy()
+
+        data.loc[:, (self.label, ValueType.RTRN)] = log(
+            data.loc[:, self.tsdf.columns.to_numpy()[0]],
+        ).diff()
+
+        rawdata = [
+            data[(self.label, ValueType.RTRN)]
+            .iloc[1:day_chunk]
+            .std(ddof=dlta_degr_freedms)
+            * sqrt(time_factor),
+        ]
+
+        for item in data[(self.label, ValueType.RTRN)].iloc[1:]:
+            prev = rawdata[-1]
+            rawdata.append(
+                sqrt(
+                    square(item) * time_factor * (1 - lmbda) + square(prev) * lmbda,
+                ),
+            )
+
+        return Series(
+            data=array(rawdata) * norm.ppf(1 - level),
+            index=data.index,
+            name=(self.label, ValueType.EWMA_VAR),
             dtype="float64",
         )
 

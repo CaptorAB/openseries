@@ -1596,6 +1596,41 @@ class TestOpenTimeSeries:
             msg = f"Result from method ewma_vol_func() not as intended\n{values}"
             raise OpenTimeSeriesTestError(msg)
 
+    def test_ewma_var_func(self: TestOpenTimeSeries) -> None:
+        """Test ewma_var_func method."""
+        simdata = self.randomseries.ewma_var_func()
+        values = [f"{v:.11f}" for v in simdata.iloc[:5]]
+        checkdata = [
+            "-0.10329266793",
+            "-0.10260660688",
+            "-0.09952679955",
+            "-0.09651929255",
+            "-0.09606316053",
+        ]
+
+        if values != checkdata:
+            msg = f"Result from method ewma_var_func() not as intended\n{values}"
+            raise OpenTimeSeriesTestError(msg)
+
+        simdata_fxd_per_yr = self.randomseries.ewma_var_func(
+            periods_in_a_year_fixed=251,
+        )
+        values_fxd_per_yr = [f"{v:.11f}" for v in simdata_fxd_per_yr.iloc[:5]]
+        checkdata_fxd_per_yr = [
+            "-0.10273434035",
+            "-0.10205198766",
+            "-0.09898882761",
+            "-0.09599757708",
+            "-0.09554391058",
+        ]
+
+        if values_fxd_per_yr != checkdata_fxd_per_yr:
+            msg = (
+                "Result from method ewma_var_func() "
+                f"not as intended\n{values_fxd_per_yr}"
+            )
+            raise OpenTimeSeriesTestError(msg)
+
         simdata_fxd_per_yr = self.randomseries.ewma_vol_func(
             periods_in_a_year_fixed=251,
         )

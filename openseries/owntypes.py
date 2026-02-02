@@ -303,7 +303,8 @@ class OpenFramePropertiesList(PropertiesList):
 class ValueType(str, Enum):
     """Enum types of OpenTimeSeries to identify the output."""
 
-    EWMA = "EWMA"
+    EWMA_VOL = "EWMA volatility"
+    EWMA_VAR = "EWMA VaR"
     PRICE = "Price(Close)"
     RTRN = "Return(Total)"
     RELRTRN = "Relative return"
