@@ -38,7 +38,7 @@ jobs:
       - name: Install Poetry
         run: |
           . venv/bin/activate
-          pip install poetry==2.3.1
+          pip install poetry==2.3.2
 
       - name: Install dependencies with Poetry
         run: |
@@ -197,7 +197,7 @@ jobs:
         run: |
           python -m venv venv
           . venv/bin/activate
-          pip install poetry==2.3.1
+          pip install poetry==2.3.2
           poetry build
           poetry check
 

@@ -296,8 +296,10 @@ def _build_frontier_dataframe(
     weight_cols = columns_lvl_zero
     weight_header = "<br><br>Weights:<br>"
     line_df["text"] = line_df[weight_cols].apply(
-        lambda row: weight_header
-        + "<br>".join([f"{row[col]:.1%}  {col}" for col in weight_cols]),
+        lambda row: (
+            weight_header
+            + "<br>".join([f"{row[col]:.1%}  {col}" for col in weight_cols])
+        ),
         axis=1,
     )
 
@@ -781,7 +783,7 @@ def _generate_sharpeplot_output(
         )
         return str(plotfile)
 
-    div_id = filename.split(sep=".")[0]
+    div_id = filename.split(maxsplit=1, sep=".")[0]
     return cast(
         "str",
         to_html(

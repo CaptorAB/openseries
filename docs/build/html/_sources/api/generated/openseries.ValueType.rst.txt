@@ -70,7 +70,8 @@
 
    .. autosummary::
    
-      ~ValueType.EWMA
+      ~ValueType.EWMA_VOL
+      ~ValueType.EWMA_VAR
       ~ValueType.PRICE
       ~ValueType.RTRN
       ~ValueType.RELRTRN
