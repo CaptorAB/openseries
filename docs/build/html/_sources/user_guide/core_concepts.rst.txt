@@ -18,6 +18,18 @@ Both classes provide:
 - **Consistent API** - similar methods across both classes
 - **Financial focus** - methods designed for financial analysis
 
+Mutation and data layers
+------------------------
+
+openseries favors in-place transformations. Many methods modify the existing object
+and return ``self`` for chaining rather than creating a new object.
+On ``OpenTimeSeries``, the ``dates`` and ``values`` arrays are always left untouched,
+while the working data in the ``tsdf`` pandas ``DataFrame`` is mutable.
+On ``OpenFrame``, the ``tsdf`` ``DataFrame`` is also mutable and reflects
+transformations applied to the frame. If you need to preserve the original state or
+compare before/after results, create an explicit copy
+(for example, ``OpenTimeSeries.from_deepcopy()`` or ``OpenFrame.from_deepcopy()``).
+
 The OpenTimeSeries Class
 -------------------------
 
