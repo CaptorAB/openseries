@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from enum import Enum
+from enum import StrEnum
 from pprint import pformat
 from typing import (
     TYPE_CHECKING,
@@ -300,10 +300,11 @@ class OpenFramePropertiesList(PropertiesList):
         self._validate()
 
 
-class ValueType(str, Enum):
+class ValueType(StrEnum):
     """Enum types of OpenTimeSeries to identify the output."""
 
-    EWMA = "EWMA"
+    EWMA_VOL = "EWMA volatility"
+    EWMA_VAR = "EWMA VaR"
     PRICE = "Price(Close)"
     RTRN = "Return(Total)"
     RELRTRN = "Relative return"

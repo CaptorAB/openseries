@@ -586,19 +586,21 @@ def report_html(
 
     for item, f in zip(rpt_df.index, formats, strict=False):
         rpt_df.loc[item] = rpt_df.loc[item].apply(
-            lambda x, fmt=f: ""
-            if (
-                x is None
-                or (not isinstance(x, str) and isna(x))
-                or (isinstance(x, str) and x.lower() in ("nan", "nan%", ""))
-            )
-            else (
-                str(x)
-                if isinstance(x, str)
+            lambda x, fmt=f: (
+                ""
+                if (
+                    x is None
+                    or (not isinstance(x, str) and isna(x))
+                    or (isinstance(x, str) and x.lower() in ("nan", "nan%", ""))
+                )
                 else (
-                    Timestamp(x).strftime("%Y-%m-%d")
-                    if "%Y-%m-%d" in fmt and not isinstance(x, str)
-                    else fmt.format(x)
+                    str(x)
+                    if isinstance(x, str)
+                    else (
+                        Timestamp(x).strftime("%Y-%m-%d")
+                        if "%Y-%m-%d" in fmt and not isinstance(x, str)
+                        else fmt.format(x)
+                    )
                 )
             ),
         )

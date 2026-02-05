@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Core Concepts &mdash; openseries 2.1.5 documentation</title>
+  <title>Core Concepts &mdash; openseries 2.1.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=786ba454"></script>
+      <script src="../_static/documentation_options.js?v=4f932e3e"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Core Concepts</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mutation-and-data-layers">Mutation and data layers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-opentimeseries-class">The OpenTimeSeries Class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#core-properties">Core Properties</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#data-immutability">Data Immutability</a></li>
@@ -171,6 +172,17 @@
 <li><p><strong>Consistent API</strong> - similar methods across both classes</p></li>
 <li><p><strong>Financial focus</strong> - methods designed for financial analysis</p></li>
 </ul>
+</section>
+<section id="mutation-and-data-layers">
+<h2>Mutation and data layers<a class="headerlink" href="#mutation-and-data-layers" title="Link to this heading"></a></h2>
+<p>openseries favors in-place transformations. Many methods modify the existing object
+and return <code class="docutils literal notranslate"><span class="pre">self</span></code> for chaining rather than creating a new object.
+On <code class="docutils literal notranslate"><span class="pre">OpenTimeSeries</span></code>, the <code class="docutils literal notranslate"><span class="pre">dates</span></code> and <code class="docutils literal notranslate"><span class="pre">values</span></code> arrays are always left untouched,
+while the working data in the <code class="docutils literal notranslate"><span class="pre">tsdf</span></code> pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is mutable.
+On <code class="docutils literal notranslate"><span class="pre">OpenFrame</span></code>, the <code class="docutils literal notranslate"><span class="pre">tsdf</span></code> <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> is also mutable and reflects
+transformations applied to the frame. If you need to preserve the original state or
+compare before/after results, create an explicit copy
+(for example, <code class="docutils literal notranslate"><span class="pre">OpenTimeSeries.from_deepcopy()</span></code> or <code class="docutils literal notranslate"><span class="pre">OpenFrame.from_deepcopy()</span></code>).</p>
 </section>
 <section id="the-opentimeseries-class">
 <h2>The OpenTimeSeries Class<a class="headerlink" href="#the-opentimeseries-class" title="Link to this heading"></a></h2>

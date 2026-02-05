@@ -22,6 +22,7 @@
       ~OpenTimeSeries.copy
       ~OpenTimeSeries.cvar_down_func
       ~OpenTimeSeries.dict
+      ~OpenTimeSeries.ewma_var_func
       ~OpenTimeSeries.ewma_vol_func
       ~OpenTimeSeries.from_1d_rate_to_cumret
       ~OpenTimeSeries.from_arrays

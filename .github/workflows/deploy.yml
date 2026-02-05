@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         id: setup_python
         with:
           python-version-file: '.python-version'
@@ -38,7 +38,7 @@ jobs:
       - name: Install Poetry
         run: |
           . venv/bin/activate
-          pip install poetry==2.3.1
+          pip install poetry==2.3.2
 
       - name: Install dependencies with Poetry
         run: |
@@ -189,7 +189,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version-file: '.python-version'
 
@@ -197,7 +197,7 @@ jobs:
         run: |
           python -m venv venv
           . venv/bin/activate
-          pip install poetry==2.3.1
+          pip install poetry==2.3.2
           poetry build
           poetry check
 

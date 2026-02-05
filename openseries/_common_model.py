@@ -282,8 +282,9 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         result = (
             self.tsdf.groupby(years)
             .apply(
-                lambda prices: (prices / prices.expanding(min_periods=1).max()).min()
-                - 1,
+                lambda prices: (
+                    (prices / prices.expanding(min_periods=1).max()).min() - 1
+                ),
             )
             .min()
         )
