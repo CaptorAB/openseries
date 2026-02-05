@@ -376,14 +376,14 @@ files = [
 
 [[package]]
 name = "exchange-calendars"
-version = "4.13"
+version = "4.13.1"
 description = "Calendars for securities exchanges"
 optional = false
 python-versions = "<4,>=3.10"
 groups = ["main"]
 files = [
-    {file = "exchange_calendars-4.13-py3-none-any.whl", hash = "sha256:652a2ae9c81d09b5bc4ee09e4a7e5b9b8540ffe481e19c2ea56dcc223e0e2d30"},
-    {file = "exchange_calendars-4.13.tar.gz", hash = "sha256:d846ab0e4e584721137efe3b3795123407a0c4f8ff3305c63b4843c2e3451068"},
+    {file = "exchange_calendars-4.13.1-py3-none-any.whl", hash = "sha256:cf39d2128a4da3ac253283f91ab63d79930a68196a3aac811091a4e38b6cbe49"},
+    {file = "exchange_calendars-4.13.1.tar.gz", hash = "sha256:42a4c7296da1f71b9625c668c9b3359cf5de4a2ffca28842b230e062bb4961ba"},
 ]
 
 [package.dependencies]
