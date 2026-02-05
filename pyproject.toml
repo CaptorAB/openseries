@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "2.1.5"
+version = "2.1.6"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin", email = "martin.karrin@captor.se" },
@@ -80,7 +80,7 @@ sphinx-autodoc-typehints = ">=3.6.0"
 sphinx-rtd-theme = ">=3.1.0rc1"
 
 [build-system]
-requires = ["poetry-core>=2.3.0"]
+requires = ["poetry-core>=2.3.1"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.setuptools.package-data]
