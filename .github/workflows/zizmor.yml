@@ -2,7 +2,7 @@ name: zizmor.yml
 
 permissions:
   contents: read
-  actions: read
+  actions: read  # Required for setup-uv and other actions to read action metadata
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -15,9 +15,10 @@ on:
 
 jobs:
   zizmor:
+    name: Run zizmor audit
     runs-on: ubuntu-latest
     permissions:
-      security-events: write
+      security-events: write  # Required for github/codeql-action/upload-sarif to upload SARIF results
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
