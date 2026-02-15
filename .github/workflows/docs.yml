@@ -21,6 +21,7 @@ on:
 
 jobs:
   build-and-deploy:
+    name: Build and deploy documentation
     defaults:
       run:
         shell: bash
@@ -28,8 +29,8 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/master'
     permissions:
       contents: read
-      pages: write
-      id-token: write
+      pages: write  # Required for actions/deploy-pages to deploy to GitHub Pages
+      id-token: write  # Required for OIDC token for GitHub Pages deployment
     environment:
       name: github-pages
 

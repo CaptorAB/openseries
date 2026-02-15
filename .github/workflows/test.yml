@@ -2,7 +2,7 @@ name: tests.yml
 
 permissions:
   contents: read
-  actions: read
+  actions: read  # Required for setup-python and other actions to read action metadata
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -18,12 +18,13 @@ on:
 
 jobs:
   run_tests:
+    name: Run tests
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     permissions:
-      issues: write
+      issues: write  # Required for actions/github-script to create issues on test failure
 
     steps:
       - name: Check out GitHub repository
