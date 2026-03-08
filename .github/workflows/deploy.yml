@@ -14,6 +14,7 @@ jobs:
   build_test:
     name: Build and test
     runs-on: ubuntu-latest
+    environment: codecov
     permissions:
       contents: read
       issues: write  # Required for actions/github-script to create issues on test failure
@@ -108,6 +109,7 @@ jobs:
     needs: build_test
     if: ${{ needs.build_test.result == 'success' }}
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       contents: write  # Required for git push of signed tag
     defaults:
@@ -169,12 +171,12 @@ jobs:
     if: ${{ needs.version_tag.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required for softprops/action-gh-release to create release
+      contents: write  # Required for gh release create
     steps:
       - name: Create GitHub release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
-        with:
-          tag_name: ${{ needs.version_tag.outputs.tag_version }}
+        env:
+          TAG_VERSION: ${{ needs.version_tag.outputs.tag_version }}
+        run: gh release create "$TAG_VERSION" --generate-notes
 
   build_dist:
     name: Build distributions

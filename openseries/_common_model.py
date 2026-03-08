@@ -824,7 +824,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
                 else None,
             )
         ]
-        self.tsdf = self.tsdf.reindex(labels=d_range, method=method, copy=False)
+        self.tsdf = self.tsdf.reindex(labels=d_range, method=method)
 
         return self
 

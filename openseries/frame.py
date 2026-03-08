@@ -663,13 +663,12 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         if not end_cut and where in ["after", "both"]:
             end_cut = self.last_indices.min()
         self.tsdf = self.tsdf.sort_index()
-        self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut, copy=False)
+        self.tsdf = self.tsdf.truncate(before=start_cut, after=end_cut)
 
         for xerie in self.constituents:
             xerie.tsdf = xerie.tsdf.truncate(
                 before=start_cut,
                 after=end_cut,
-                copy=False,
             )
         if len(set(self.first_indices)) != 1:
             msg = (

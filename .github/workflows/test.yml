@@ -20,6 +20,7 @@ jobs:
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
+    environment: codecov
     defaults:
       run:
         shell: bash
