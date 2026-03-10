@@ -1,5 +1,5 @@
 default_language_version:
-  python: python3.13
+  python: python3.14
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -59,7 +59,7 @@ repos:
       - id: fix-byte-order-marker
         exclude: ^docs/build/|^docs/_build/|docs/source/api/generated/
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.23.0
+    rev: v1.23.1
     hooks:
       - id: zizmor
   - repo: https://github.com/python-poetry/poetry

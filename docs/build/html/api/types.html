@@ -313,7 +313,7 @@ details.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountryStringType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -325,7 +325,7 @@ it to types is also the same.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountrySetType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -334,8 +334,9 @@ it to types is also the same.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesType</span></span></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]], <code class="xref py py-class docutils literal notranslate"><span class="pre">MinLen</span></code>(min_length=1)] | <code class="xref py py-class docutils literal notranslate"><span class="pre">Annotated</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.StringConstraints" title="(in Pydantic Validation v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConstraints</span></code></a>(strip_whitespace=True, to_upper=True, to_lower=<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, strict=True, min_length=2, max_length=2, pattern=^[A-Z]{2}$)]</p>
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CountriesType</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" title="(in Python v3.14)"><span class="pre">TypeAlias</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">typing.Annotated[set[typing.Annotated[str,</span> <span class="pre">StringConstraints(strip_whitespace=True,</span> <span class="pre">to_upper=True,</span> <span class="pre">to_lower=None,</span> <span class="pre">strict=True,</span> <span class="pre">min_length=2,</span> <span class="pre">max_length=2,</span> <span class="pre">pattern='^[A-Z]{2}$')]],</span> <span class="pre">MinLen(min_length=1)]</span> <span class="pre">|</span> <span class="pre">typing.Annotated[str,</span> <span class="pre">StringConstraints(strip_whitespace=True,</span> <span class="pre">to_upper=True,</span> <span class="pre">to_lower=None,</span> <span class="pre">strict=True,</span> <span class="pre">min_length=2,</span> <span class="pre">max_length=2,</span> <span class="pre">pattern='^[A-Z]{2}$')]</span></span></dt>
+<dd><p>Represent a union type</p>
+<p>E.g. for int | str</p>
 </dd></dl>
 
 <dl class="py data">
@@ -343,7 +344,7 @@ it to types is also the same.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">CurrencyStringType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -355,7 +356,7 @@ it to types is also the same.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateStringType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -367,7 +368,7 @@ it to types is also the same.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateListType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -379,7 +380,7 @@ it to types is also the same.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">ValueListType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -391,7 +392,7 @@ it to types is also the same.</p>
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DaysInYearType</span></span></dt>
 <dd><p>Runtime representation of an annotated type.</p>
 <p>At its core ‘Annotated[t, dec1, dec2, …]’ is an alias for the type ‘t’
-with extra annotations. The alias behaves like a normal typing alias.
+with extra metadata. The alias behaves like a normal typing alias.
 Instantiating is the same as instantiating the underlying type; binding
 it to types is also the same.</p>
 <p>The metadata itself is stored in a ‘__metadata__’ attribute as a tuple.</p>
@@ -401,7 +402,7 @@ it to types is also the same.</p>
 <dl class="py data">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">DateType</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">datetime.date</span> <span class="pre">|</span> <span class="pre">datetime.datetime</span> <span class="pre">|</span> <span class="pre">numpy.datetime64</span> <span class="pre">|</span> <span class="pre">pandas.Timestamp</span></span></dt>
-<dd><p>Represent a PEP 604 union type</p>
+<dd><p>Represent a union type</p>
 <p>E.g. for int | str</p>
 </dd></dl>
 
@@ -422,8 +423,9 @@ it to types is also the same.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralLinePlotMode</span></span></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘lines’, ‘markers’, ‘lines+markers’, ‘lines+text’, ‘markers+text’, ‘lines+markers+text’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralLinePlotMode</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">typing.Literal['lines',</span> <span class="pre">'markers',</span> <span class="pre">'lines+markers',</span> <span class="pre">'lines+text',</span> <span class="pre">'markers+text',</span> <span class="pre">'lines+markers+text']</span> <span class="pre">|</span> <span class="pre">None</span></span></dt>
+<dd><p>Represent a union type</p>
+<p>E.g. for int | str</p>
 </dd></dl>
 
 <dl class="py data">
@@ -446,8 +448,9 @@ it to types is also the same.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPandasReindexMethod</span></span></dt>
-<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘pad’, ‘ffill’, ‘backfill’, ‘bfill’, ‘nearest’] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+<span class="sig-prename descclassname"><span class="pre">openseries.owntypes.</span></span><span class="sig-name descname"><span class="pre">LiteralPandasReindexMethod</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">typing.Literal['pad',</span> <span class="pre">'ffill',</span> <span class="pre">'backfill',</span> <span class="pre">'bfill',</span> <span class="pre">'nearest']</span> <span class="pre">|</span> <span class="pre">None</span></span></dt>
+<dd><p>Represent a union type</p>
+<p>E.g. for int | str</p>
 </dd></dl>
 
 <dl class="py data">
