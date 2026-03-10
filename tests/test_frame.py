@@ -1406,10 +1406,15 @@ class TestOpenFrame:
         ]
 
         series_unique = [
+            "acf",
+            "autocorr",
             "ewma_vol_func",
             "ewma_var_func",
             "from_1d_rate_to_cumret",
+            "ljung_box",
+            "pacf",
             "pandas_df",
+            "partial_autocorr",
             "running_adjustment",
             "set_new_label",
         ]

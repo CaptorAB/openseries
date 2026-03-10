@@ -184,6 +184,8 @@ LiteralSeriesProps = Literal[
     "span_of_days",
     "yearfrac",
     "periods_in_a_year",
+    "autocorr",
+    "partial_autocorr",
 ]
 LiteralFrameProps = Literal[
     "value_ret",
@@ -273,6 +275,8 @@ class OpenTimeSeriesPropertiesList(PropertiesList):
         "span_of_days",
         "yearfrac",
         "periods_in_a_year",
+        "autocorr",
+        "partial_autocorr",
     }
 
     def __init__(

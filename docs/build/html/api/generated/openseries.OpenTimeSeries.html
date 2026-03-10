@@ -183,14 +183,20 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code>(**data)</p></td>
 <td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">align_index_to_local_cdays</span></code>([countries, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">acf</span></code>(lags, *[, squared])</p></td>
+<td><p>Calculate autocorrelation function for specified lags.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">align_index_to_local_cdays</span></code>([countries, ...])</p></td>
 <td><p>Align the index of <code class="docutils literal notranslate"><span class="pre">.tsdf</span></code> with local calendar business days.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_properties</span></code>([properties])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">all_properties</span></code>([properties])</p></td>
 <td><p>Calculate chosen properties.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arithmetic_ret_func</span></code>([months_from_last, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arithmetic_ret_func</span></code>([months_from_last, ...])</p></td>
 <td><p>Annualized arithmetic mean of returns.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocorr</span></code>([lag, squared])</p></td>
+<td><p>Calculate autocorrelation at a given lag.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_range</span></code>([months_offset, from_dt, to_dt])</p></td>
 <td><p>Create a user-defined date range aligned to index.</p></td>
@@ -240,50 +246,56 @@ validated to form a valid model.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kurtosis_func</span></code>([months_from_last, from_date, ...])</p></td>
 <td><p>Kurtosis of the return distribution.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_partial_moment_func</span></code>([...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ljung_box</span></code>(lags, *[, squared])</p></td>
+<td><p>Compute Ljung-Box test for autocorrelation.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_partial_moment_func</span></code>([...])</p></td>
 <td><p>Lower partial moment and downside deviation (order=2).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_drawdown_func</span></code>([months_from_last, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_drawdown_func</span></code>([months_from_last, ...])</p></td>
 <td><p>Maximum drawdown without any limit on date range.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_construct</span></code>([_fields_set])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_construct</span></code>([_fields_set])</p></td>
 <td><p>Creates a new instance of the <cite>Model</cite> class with validated data.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_copy</span></code>(*[, update, deep])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_copy</span></code>(*[, update, deep])</p></td>
 <td><p>!!! abstract &quot;Usage Documentation&quot;</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_dump</span></code>(*[, mode, include, exclude, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_dump</span></code>(*[, mode, include, exclude, ...])</p></td>
 <td><p>!!! abstract &quot;Usage Documentation&quot;</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_dump_json</span></code>(*[, indent, ensure_ascii, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_dump_json</span></code>(*[, indent, ensure_ascii, ...])</p></td>
 <td><p>!!! abstract &quot;Usage Documentation&quot;</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_json_schema</span></code>([by_alias, ref_template, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_json_schema</span></code>([by_alias, ref_template, ...])</p></td>
 <td><p>Generates a JSON schema for a model class.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_parametrized_name</span></code>(params)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_parametrized_name</span></code>(params)</p></td>
 <td><p>Compute the class name for parametrizations of generic classes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_post_init</span></code>(context, /)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_post_init</span></code>(context, /)</p></td>
 <td><p>Override this method to perform additional initialization after <cite>__init__</cite> and <cite>model_construct</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_rebuild</span></code>(*[, force, raise_errors, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_rebuild</span></code>(*[, force, raise_errors, ...])</p></td>
 <td><p>Try to rebuild the pydantic-core schema for the model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_validate</span></code>(obj, *[, strict, extra, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_validate</span></code>(obj, *[, strict, extra, ...])</p></td>
 <td><p>Validate a pydantic model instance.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_validate_json</span></code>(json_data, *[, strict, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_validate_json</span></code>(json_data, *[, strict, ...])</p></td>
 <td><p>!!! abstract &quot;Usage Documentation&quot;</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_validate_strings</span></code>(obj, *[, strict, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_validate_strings</span></code>(obj, *[, strict, ...])</p></td>
 <td><p>Validate the given object with string data against the Pydantic model.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega_ratio_func</span></code>([min_accepted_return, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">omega_ratio_func</span></code>([min_accepted_return, ...])</p></td>
 <td><p>Omega Ratio.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code>([threshold, months_from_last, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code>([threshold, months_from_last, ...])</p></td>
 <td><p>Detect outliers using z-score analysis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pacf</span></code>(lags, *[, squared])</p></td>
+<td><p>Calculate partial autocorrelation function for specified lags.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas_df</span></code>()</p></td>
 <td><p>Populate .tsdf Pandas DataFrame from the .dates and .values lists.</p></td>
@@ -297,112 +309,115 @@ validated to form a valid model.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_raw</span></code>(b, *[, content_type, encoding, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bars</span></code>([mode, title, tick_fmt, filename, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">partial_autocorr</span></code>([lag, squared])</p></td>
+<td><p>Calculate partial autocorrelation at a given lag.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bars</span></code>([mode, title, tick_fmt, filename, ...])</p></td>
 <td><p>Create a Plotly Bar Figure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_histogram</span></code>([plot_type, histnorm, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_histogram</span></code>([plot_type, histnorm, ...])</p></td>
 <td><p>Create a Plotly Histogram Figure.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_series</span></code>([mode, title, tick_fmt, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_series</span></code>([mode, title, tick_fmt, ...])</p></td>
 <td><p>Create a Plotly Scatter Figure.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_share_func</span></code>([months_from_last, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_share_func</span></code>([months_from_last, ...])</p></td>
 <td><p>Share of percentage changes greater than zero.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code>([freq])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code>([freq])</p></td>
 <td><p>Resamples the timeseries frequency.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_to_business_period_ends</span></code>([freq, method])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_to_business_period_ends</span></code>([freq, method])</p></td>
 <td><p>Resamples timeseries frequency to the business calendar month end dates.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ret_vol_ratio_func</span></code>([riskfree_rate, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ret_vol_ratio_func</span></code>([riskfree_rate, ...])</p></td>
 <td><p>Ratio between arithmetic mean of returns and annualized volatility.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">return_nan_handle</span></code>([method])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">return_nan_handle</span></code>([method])</p></td>
 <td><p>Handle missing values in a return series.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_cvar_down</span></code>([column, level, observations])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_cvar_down</span></code>([column, level, observations])</p></td>
 <td><p>Calculate rolling annualized downside CVaR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_return</span></code>([column, observations])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_return</span></code>([column, observations])</p></td>
 <td><p>Calculate rolling returns.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_var_down</span></code>([column, level, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_var_down</span></code>([column, level, ...])</p></td>
 <td><p>Calculate rolling annualized downside Value At Risk (VaR).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_vol</span></code>([column, observations, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rolling_vol</span></code>([column, observations, ...])</p></td>
 <td><p>Calculate rolling annualized volatilities.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">running_adjustment</span></code>(adjustment[, days_in_year])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">running_adjustment</span></code>(adjustment[, days_in_year])</p></td>
 <td><p>Add or subtract a fee from the timeseries return.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code>([by_alias, ref_template])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code>([by_alias, ref_template])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_json</span></code>(*[, by_alias, ref_template])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema_json</span></code>(*[, by_alias, ref_template])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_new_label</span></code>([lvl_zero, lvl_one, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_new_label</span></code>([lvl_zero, lvl_one, ...])</p></td>
 <td><p>Set the column labels of the .tsdf Pandas Dataframe.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skew_func</span></code>([months_from_last, from_date, to_date])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skew_func</span></code>([months_from_last, from_date, to_date])</p></td>
 <td><p>Skew of the return distribution.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortino_ratio_func</span></code>([riskfree_rate, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sortino_ratio_func</span></code>([riskfree_rate, ...])</p></td>
 <td><p>Sortino ratio or Kappa-3 ratio.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_weight_from_var</span></code>([target_vol, level, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_weight_from_var</span></code>([target_vol, level, ...])</p></td>
 <td><p>Target weight from VaR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_cumret</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_cumret</span></code>()</p></td>
 <td><p>Convert series of returns into cumulative series of values.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_drawdown_series</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_drawdown_series</span></code>()</p></td>
 <td><p>Convert timeseries into a drawdown series.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>(what_output, filename[, directory])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>(what_output, filename[, directory])</p></td>
 <td><p>Dump timeseries data into a JSON file.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xlsx</span></code>(filename[, sheet_title, directory, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_xlsx</span></code>(filename[, sheet_title, directory, ...])</p></td>
 <td><p>Save <code class="docutils literal notranslate"><span class="pre">.tsdf</span></code> DataFrame to an Excel spreadsheet file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_forward_refs</span></code>(**localns)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_forward_refs</span></code>(**localns)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>(value)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>(value)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_nan_handle</span></code>([method])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_nan_handle</span></code>([method])</p></td>
 <td><p>Handle missing values in a value series.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_ret_calendar_period</span></code>(year[, month])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_ret_calendar_period</span></code>(year[, month])</p></td>
 <td><p>Calculate simple return for a specific calendar period.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_ret_func</span></code>([months_from_last, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_ret_func</span></code>([months_from_last, ...])</p></td>
 <td><p>Calculate simple return.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_diff</span></code>([periods])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_diff</span></code>([periods])</p></td>
 <td><p>Convert series of values to series of their period differences.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_log</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_log</span></code>()</p></td>
 <td><p>Convert value series to log-weighted series.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_ret</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_to_ret</span></code>()</p></td>
 <td><p>Convert series of values into series of returns.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_down_func</span></code>([level, months_from_last, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">var_down_func</span></code>([level, months_from_last, ...])</p></td>
 <td><p>Downside Value At Risk (VaR).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vol_from_var_func</span></code>([level, months_from_last, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vol_from_var_func</span></code>([level, months_from_last, ...])</p></td>
 <td><p>Implied annualized volatility from downside VaR.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vol_func</span></code>([months_from_last, from_date, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">vol_func</span></code>([months_from_last, from_date, ...])</p></td>
 <td><p>Annualized volatility.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">worst_func</span></code>([observations, months_from_last, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">worst_func</span></code>([observations, months_from_last, ...])</p></td>
 <td><p>Most negative percentage change over a rolling window.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">z_score_func</span></code>([months_from_last, from_date, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">z_score_func</span></code>([months_from_last, from_date, ...])</p></td>
 <td><p>Z-score of the last return.</p></td>
 </tr>
 </tbody>
@@ -756,7 +771,7 @@ Defaults to True.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
+<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>, </em><em>'autocorr'</em><em>, </em><em>'partial_autocorr'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
 available. Optional.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
 </ul>
@@ -1000,6 +1015,119 @@ calendar year. Defaults to 365.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.autocorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate autocorrelation at a given lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Autocorrelation at the specified lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">acf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate autocorrelation function for specified lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, compute ACF from lag 0 to this value (inclusive).
+If list, compute ACF at lag 0 plus each lag in the list.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute ACF of squared returns. Defaults to False.</p></li>
+<li><p><strong>self</strong> (<em>Self</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series of autocorrelations indexed by lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">partial_autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.partial_autocorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate partial autocorrelation at a given lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute partial autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute partial autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Partial autocorrelation at the specified lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">pacf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.pacf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate partial autocorrelation function for specified lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, compute PACF from lag 0 to this value (inclusive).
+If list, compute PACF at lag 0 plus each lag in the list.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute PACF of squared returns. Defaults to False.</p></li>
+<li><p><strong>self</strong> (<em>Self</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series of partial autocorrelations indexed by lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ljung_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openseries/series.html#OpenTimeSeries.ljung_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Compute Ljung-Box test for autocorrelation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, use lags 1 through this value. If list, use the given
+lags (lag 0 excluded from test).</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, test autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of (statistic, pvalue, lags) where statistic is the Ljung-Box
+Q statistic, pvalue is the chi-squared p-value, and lags is the
+list of lags used.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>]]</p>
 </dd>
 </dl>
 </dd></dl>

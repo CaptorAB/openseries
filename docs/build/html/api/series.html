@@ -371,7 +371,7 @@ Defaults to True.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
+<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>, </em><em>'autocorr'</em><em>, </em><em>'partial_autocorr'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
 available. Optional.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
 </ul>
@@ -615,6 +615,119 @@ calendar year. Defaults to 365.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.autocorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate autocorrelation at a given lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Autocorrelation at the specified lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">acf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate autocorrelation function for specified lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, compute ACF from lag 0 to this value (inclusive).
+If list, compute ACF at lag 0 plus each lag in the list.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute ACF of squared returns. Defaults to False.</p></li>
+<li><p><strong>self</strong> (<em>Self</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series of autocorrelations indexed by lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">partial_autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.partial_autocorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate partial autocorrelation at a given lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute partial autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute partial autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Partial autocorrelation at the specified lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">pacf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.pacf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate partial autocorrelation function for specified lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, compute PACF from lag 0 to this value (inclusive).
+If list, compute PACF at lag 0 plus each lag in the list.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute PACF of squared returns. Defaults to False.</p></li>
+<li><p><strong>self</strong> (<em>Self</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series of partial autocorrelations indexed by lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ljung_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.ljung_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Compute Ljung-Box test for autocorrelation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, use lags 1 through this value. If list, use the given
+lags (lag 0 excluded from test).</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, test autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of (statistic, pvalue, lags) where statistic is the Ljung-Box
+Q statistic, pvalue is the chi-squared p-value, and lags is the
+list of lags used.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -917,7 +1030,7 @@ Defaults to True.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'first_idx'</em><em>, </em><em>'last_idx'</em><em>, </em><em>'length'</em><em>, </em><em>'span_of_days'</em><em>, </em><em>'yearfrac'</em><em>, </em><em>'periods_in_a_year'</em><em>, </em><em>'autocorr'</em><em>, </em><em>'partial_autocorr'</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1534,6 +1647,119 @@ is calculated. Defaults to 1.</p></li>
 </section>
 <section id="analysis-methods">
 <h3>Analysis Methods<a class="headerlink" href="#analysis-methods" title="Link to this heading"></a></h3>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.autocorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate autocorrelation at a given lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Autocorrelation at the specified lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">acf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.acf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate autocorrelation function for specified lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, compute ACF from lag 0 to this value (inclusive).
+If list, compute ACF at lag 0 plus each lag in the list.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute ACF of squared returns. Defaults to False.</p></li>
+<li><p><strong>self</strong> (<em>Self</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series of autocorrelations indexed by lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">partial_autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.partial_autocorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate partial autocorrelation at a given lag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute partial autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute partial autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Partial autocorrelation at the specified lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">pacf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.pacf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Calculate partial autocorrelation function for specified lags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, compute PACF from lag 0 to this value (inclusive).
+If list, compute PACF at lag 0 plus each lag in the list.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute PACF of squared returns. Defaults to False.</p></li>
+<li><p><strong>self</strong> (<em>Self</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series of partial autocorrelations indexed by lag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Series[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">ljung_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lags</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.ljung_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Compute Ljung-Box test for autocorrelation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – If int, use lags 1 through this value. If list, use the given
+lags (lag 0 excluded from test).</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, test autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of (statistic, pvalue, lags) where statistic is the Ljung-Box
+Q statistic, pvalue is the chi-squared p-value, and lags is the
+list of lags used.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenTimeSeries.</span></span><span class="sig-name descname"><span class="pre">ewma_vol_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.94</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">day_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlta_degr_freedms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months_from_last</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods_in_a_year_fixed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openseries/series.html#OpenTimeSeries.ewma_vol_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>

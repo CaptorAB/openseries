@@ -170,6 +170,16 @@ Transformations
 Analysis Methods
 ~~~~~~~~~~~~~~~~
 
+.. automethod:: OpenTimeSeries.autocorr
+   :no-index:
+.. automethod:: OpenTimeSeries.acf
+   :no-index:
+.. automethod:: OpenTimeSeries.partial_autocorr
+   :no-index:
+.. automethod:: OpenTimeSeries.pacf
+   :no-index:
+.. automethod:: OpenTimeSeries.ljung_box
+   :no-index:
 .. automethod:: OpenTimeSeries.ewma_vol_func
    :no-index:
 .. automethod:: OpenTimeSeries.value_ret_calendar_period
