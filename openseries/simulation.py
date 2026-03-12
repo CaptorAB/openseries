@@ -47,6 +47,35 @@ class _JumpParams(TypedDict, total=False):
     jumps_mu: float
 
 
+def _validate_ar1_coef(ar1_coef: float) -> None:
+    """Validate ar1_coef is in (-1, 1) for stationarity."""
+    if not -1.0 < ar1_coef < 1.0:
+        msg = f"ar1_coef must be in (-1, 1) for stationarity, got {ar1_coef}"
+        raise ValueError(msg)
+
+
+def _apply_ar1_filter(returns: DataFrame, ar1_coef: float) -> DataFrame:
+    """Apply AR(1) filter to returns to introduce lag-1 autocorrelation.
+
+    r_t = ar1_coef * r_{t-1} + sqrt(1 - ar1_coef**2) * innovation_t
+    Preserves mean and variance of the base process.
+
+    Args:
+        returns: DataFrame of shape (number_of_sims, trading_days).
+        ar1_coef: Lag-1 autocorrelation coefficient in (-1, 1).
+
+    Returns:
+        Filtered returns.
+    """
+    if ar1_coef == 0.0:
+        return returns
+    arr = returns.to_numpy(copy=True)
+    scale = sqrt(1.0 - ar1_coef * ar1_coef)
+    for t in range(1, arr.shape[1]):
+        arr[:, t] = ar1_coef * arr[:, t - 1] + scale * arr[:, t]
+    return DataFrame(data=arr, dtype="float64")
+
+
 def _random_generator(seed: int | None) -> Generator:
     """Make a Numpy Random Generator object.
 
@@ -183,6 +212,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
+        ar1_coef: float = 0.0,
     ) -> ReturnSimulation:
         """Create a Normal distribution simulation.
 
@@ -195,22 +225,29 @@ class ReturnSimulation(BaseModel):
                 Defaults to 252.
             seed: Seed for random process initiation.
             randomizer: Random process generator.
+            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce
+                autocorrelation. Defaults to 0.0 (i.i.d. returns).
 
         Returns:
             Normal distribution simulation.
         """
+        _validate_ar1_coef(ar1_coef)
         if not randomizer:
             randomizer = _random_generator(seed=seed)
 
-        returns = randomizer.normal(
-            loc=mean_annual_return / trading_days_in_year,
-            scale=mean_annual_vol / sqrt(trading_days_in_year),
-            size=(number_of_sims, trading_days),
+        returns_df = DataFrame(
+            data=randomizer.normal(
+                loc=mean_annual_return / trading_days_in_year,
+                scale=mean_annual_vol / sqrt(trading_days_in_year),
+                size=(number_of_sims, trading_days),
+            ),
+            dtype="float64",
         )
+        returns = _apply_ar1_filter(returns_df, ar1_coef)
 
         return _create_base_simulation(
             cls=cls,
-            returns=DataFrame(data=returns, dtype="float64"),
+            returns=returns,
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -229,6 +266,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
+        ar1_coef: float = 0.0,
     ) -> ReturnSimulation:
         """Create a Lognormal distribution simulation.
 
@@ -241,25 +279,32 @@ class ReturnSimulation(BaseModel):
                 Defaults to 252.
             seed: Seed for random process initiation.
             randomizer: Random process generator.
+            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce
+                autocorrelation. Defaults to 0.0 (i.i.d. returns).
 
         Returns:
             Lognormal distribution simulation.
         """
+        _validate_ar1_coef(ar1_coef)
         if not randomizer:
             randomizer = _random_generator(seed=seed)
 
-        returns = (
-            randomizer.lognormal(
-                mean=mean_annual_return / trading_days_in_year,
-                sigma=mean_annual_vol / sqrt(trading_days_in_year),
-                size=(number_of_sims, trading_days),
-            )
-            - 1
+        returns_df = DataFrame(
+            data=(
+                randomizer.lognormal(
+                    mean=mean_annual_return / trading_days_in_year,
+                    sigma=mean_annual_vol / sqrt(trading_days_in_year),
+                    size=(number_of_sims, trading_days),
+                )
+                - 1
+            ),
+            dtype="float64",
         )
+        returns = _apply_ar1_filter(returns_df, ar1_coef)
 
         return _create_base_simulation(
             cls=cls,
-            returns=DataFrame(data=returns, dtype="float64"),
+            returns=returns,
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -278,6 +323,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
+        ar1_coef: float = 0.0,
     ) -> ReturnSimulation:
         """Create a Geometric Brownian Motion simulation.
 
@@ -290,10 +336,13 @@ class ReturnSimulation(BaseModel):
                 Defaults to 252.
             seed: Seed for random process initiation.
             randomizer: Random process generator.
+            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce
+                autocorrelation. Defaults to 0.0 (i.i.d. returns).
 
         Returns:
             Geometric Brownian Motion simulation.
         """
+        _validate_ar1_coef(ar1_coef)
         if not randomizer:
             randomizer = _random_generator(seed=seed)
 
@@ -308,11 +357,12 @@ class ReturnSimulation(BaseModel):
             size=(number_of_sims, trading_days),
         )
 
-        returns = drift + wiener
+        returns_df = DataFrame(data=drift + wiener, dtype="float64")
+        returns = _apply_ar1_filter(returns_df, ar1_coef)
 
         return _create_base_simulation(
             cls=cls,
-            returns=DataFrame(data=returns, dtype="float64"),
+            returns=returns,
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
@@ -334,6 +384,7 @@ class ReturnSimulation(BaseModel):
         trading_days_in_year: DaysInYearType = 252,
         seed: int | None = None,
         randomizer: Generator | None = None,
+        ar1_coef: float = 0.0,
     ) -> ReturnSimulation:
         """Create a Merton Jump-Diffusion model simulation.
 
@@ -350,10 +401,13 @@ class ReturnSimulation(BaseModel):
                 Defaults to 252.
             seed: Seed for random process initiation.
             randomizer: Random process generator.
+            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce
+                autocorrelation. Defaults to 0.0 (i.i.d. returns).
 
         Returns:
             Merton Jump-Diffusion model simulation.
         """
+        _validate_ar1_coef(ar1_coef)
         if not randomizer:
             randomizer = _random_generator(seed=seed)
 
@@ -382,13 +436,15 @@ class ReturnSimulation(BaseModel):
             - jumps_lamda * (jumps_mu + jumps_sigma**2.0)
         ) * (1.0 / trading_days_in_year)
 
-        returns = poisson_jumps + drift + wiener
+        raw_returns = poisson_jumps + drift + wiener
+        raw_returns[:, 0] = 0.0
 
-        returns[:, 0] = 0.0
+        returns_df = DataFrame(data=raw_returns, dtype="float64")
+        returns = _apply_ar1_filter(returns_df, ar1_coef)
 
         return _create_base_simulation(
             cls=cls,
-            returns=DataFrame(data=returns, dtype="float64"),
+            returns=returns,
             number_of_sims=number_of_sims,
             trading_days=trading_days,
             trading_days_in_year=trading_days_in_year,
