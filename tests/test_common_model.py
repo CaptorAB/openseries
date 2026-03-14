@@ -11,9 +11,9 @@ from pandas import DataFrame, Series
 
 from openseries import OpenTimeSeries
 from openseries._common_model import _calculate_time_factor, _get_base_column_data
+from openseries.frame import OpenFrame
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openseries.frame import OpenFrame
     from openseries.owntypes import ValueType
     from openseries.simulation import ReturnSimulation
 
@@ -332,4 +332,36 @@ class TestCommonModel:
         outliers_with_nan = series_with_nan.outliers(threshold=1.0)
         msg = "Series with NaN should handle outliers correctly"
         if not isinstance(outliers_with_nan, Series):
+            raise CommonModelTestError(msg)
+
+    def test_autocorr_func_short_series(self: TestCommonModel) -> None:
+        """Test autocorr_func returns nan when return series is too short for lag."""
+        short_series = OpenTimeSeries.from_arrays(
+            dates=["2023-01-01", "2023-01-02"],
+            values=[100.0, 101.0],
+            name="Short",
+        )
+        ac = short_series.autocorr_func(lag=1)
+        msg = "autocorr_func on 2-point series (1 return) should return nan for lag=1"
+        if not (isinstance(ac, float) and np.isnan(ac)):
+            raise CommonModelTestError(msg)
+
+        short_series2 = OpenTimeSeries.from_arrays(
+            dates=["2023-01-01", "2023-01-02"],
+            values=[200.0, 198.0],
+            name="Short2",
+        )
+        frame_with_short = OpenFrame(
+            constituents=[
+                short_series.from_deepcopy(),
+                short_series2,
+            ],
+        )
+        ac_frame = frame_with_short.autocorr_func(lag=1)
+        msg = "OpenFrame autocorr_func with short columns should return nan"
+        expected_column_count = 2
+        if not isinstance(ac_frame, Series) or len(ac_frame) != expected_column_count:
+            raise CommonModelTestError(msg)
+        both_nan = np.isnan(ac_frame.iloc[0]) and np.isnan(ac_frame.iloc[1])
+        if not both_nan:
             raise CommonModelTestError(msg)

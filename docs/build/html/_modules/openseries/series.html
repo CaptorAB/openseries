@@ -144,7 +144,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">field_validator</span><span class="p">,</span> <span class="n">model_validator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">norm</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">._common_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">_calculate_time_factor</span><span class="p">,</span> <span class="n">_CommonModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._common_model</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_calculate_time_factor</span><span class="p">,</span>
+    <span class="n">_CommonModel</span><span class="p">,</span>
+    <span class="n">_demeaned_returns_for_autocorr</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.datefixer</span><span class="w"> </span><span class="kn">import</span> <span class="n">_do_resample_to_business_period_ends</span><span class="p">,</span> <span class="n">date_fix</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Countries</span><span class="p">,</span>
@@ -998,31 +1002,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_returns_series</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return demeaned return series for autocorrelation analysis.&quot;&quot;&quot;</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">:</span>
-            <span class="n">rets</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">rets</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-        <span class="n">rets</span> <span class="o">=</span> <span class="n">rets</span> <span class="o">-</span> <span class="n">rets</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">squared</span><span class="p">:</span>
-            <span class="n">rets</span> <span class="o">=</span> <span class="n">rets</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">return</span> <span class="n">rets</span>
-
-<div class="viewcode-block" id="OpenTimeSeries.autocorr">
-<a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.autocorr">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">autocorr</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">lag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate autocorrelation at a given lag.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            lag: The lag at which to compute autocorrelation. Defaults to 1.</span>
-<span class="sd">            squared: If True, compute autocorrelation of squared returns.</span>
-<span class="sd">                Defaults to False.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Autocorrelation at the specified lag.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns_series</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">rets</span><span class="o">.</span><span class="n">autocorr</span><span class="p">(</span><span class="n">lag</span><span class="o">=</span><span class="n">lag</span><span class="p">))</span></div>
-
+        <span class="k">return</span> <span class="n">_demeaned_returns_for_autocorr</span><span class="p">(</span>
+            <span class="n">series</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">valuetype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="n">squared</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="OpenTimeSeries.acf">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.acf">[docs]</a>

@@ -106,6 +106,8 @@ Financial Metrics
    :no-index:
 .. autoattribute:: OpenFrame.vol_from_var
    :no-index:
+.. autoattribute:: OpenFrame.autocorr
+   :no-index:
 .. autoattribute:: OpenFrame.skew
    :no-index:
 .. autoattribute:: OpenFrame.kurtosis
@@ -215,6 +217,12 @@ Transformations
 Analysis Methods
 ~~~~~~~~~~~~~~~~
 
+Autocorrelation analysis: ``autocorr`` (property) and ``autocorr_func`` return
+lag-N autocorrelation per column. For ACF, PACF, and Ljung-Box tests, use the
+constituent OpenTimeSeries objects.
+
+.. automethod:: OpenFrame.autocorr_func
+   :no-index:
 .. automethod:: OpenFrame.calc_range
    :no-index:
 .. automethod:: OpenFrame.outliers

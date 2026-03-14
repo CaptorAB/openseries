@@ -2101,24 +2101,24 @@ class TestOpenTimeSeries:
             raise OpenTimeSeriesTestError(msg)
 
     def test_autocorr(self: TestOpenTimeSeries) -> None:
-        """Test autocorr method."""
+        """Test autocorr property and autocorr_func method."""
         lseries = self.randomseries.from_deepcopy()
-        ac1 = lseries.autocorr(lag=1)
+        ac1 = lseries.autocorr
         if not isinstance(ac1, float) or ac1 < -1 or ac1 > 1:
-            msg = f"autocorr(lag=1) should return float in [-1,1], got {ac1!r}"
+            msg = f"autocorr should return float in [-1,1], got {ac1!r}"
             raise OpenTimeSeriesTestError(msg)
-        ac2 = lseries.autocorr(lag=2)
+        ac2 = lseries.autocorr_func(lag=2)
         if not isinstance(ac2, float) or ac2 < -1 or ac2 > 1:
-            msg = f"autocorr(lag=2) should return float in [-1,1], got {ac2!r}"
+            msg = f"autocorr_func(lag=2) should return float in [-1,1], got {ac2!r}"
             raise OpenTimeSeriesTestError(msg)
-        ac1_sq = lseries.autocorr(lag=1, squared=True)
+        ac1_sq = lseries.autocorr_func(lag=1, squared=True)
         if not isinstance(ac1_sq, float):
-            msg = f"autocorr(squared=True) should return float, got {ac1_sq!r}"
+            msg = f"autocorr_func(squared=True) should return float, got {ac1_sq!r}"
             raise OpenTimeSeriesTestError(msg)
         lseries.value_to_ret()
-        ac_ret = lseries.autocorr(lag=1)
+        ac_ret = lseries.autocorr
         if not isinstance(ac_ret, float):
-            msg = f"autocorr on return series should return float, got {ac_ret!r}"
+            msg = f"autocorr_func on return series should return float, got {ac_ret!r}"
             raise OpenTimeSeriesTestError(msg)
 
     def test_acf(self: TestOpenTimeSeries) -> None:

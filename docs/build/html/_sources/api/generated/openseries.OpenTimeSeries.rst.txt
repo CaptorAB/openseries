@@ -18,7 +18,7 @@
       ~OpenTimeSeries.align_index_to_local_cdays
       ~OpenTimeSeries.all_properties
       ~OpenTimeSeries.arithmetic_ret_func
-      ~OpenTimeSeries.autocorr
+      ~OpenTimeSeries.autocorr_func
       ~OpenTimeSeries.calc_range
       ~OpenTimeSeries.construct
       ~OpenTimeSeries.copy
@@ -103,6 +103,7 @@
    .. autosummary::
    
       ~OpenTimeSeries.arithmetic_ret
+      ~OpenTimeSeries.autocorr
       ~OpenTimeSeries.cvar_down
       ~OpenTimeSeries.downside_deviation
       ~OpenTimeSeries.first_idx

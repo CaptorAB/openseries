@@ -316,8 +316,8 @@ class TestSimulation:
             sim_ar.to_dataframe(name="Asset", end=dt.date(2019, 12, 31)),
             valuetype=ValueType.RTRN,
         )
-        ac_iid = ts_iid.autocorr(lag=1)
-        ac_ar = ts_ar.autocorr(lag=1)
+        ac_iid = ts_iid.autocorr
+        ac_ar = ts_ar.autocorr
         if ac_ar <= ac_iid:
             msg = (
                 f"ar1_coef=0.3 should yield higher autocorr than 0, got {ac_ar} vs "

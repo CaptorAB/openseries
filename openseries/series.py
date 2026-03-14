@@ -34,7 +34,11 @@ from pandas import (
 from pydantic import field_validator, model_validator
 from scipy.stats import chi2, norm
 
-from ._common_model import _calculate_time_factor, _CommonModel
+from ._common_model import (
+    _calculate_time_factor,
+    _CommonModel,
+    _demeaned_returns_for_autocorr,
+)
 from .datefixer import _do_resample_to_business_period_ends, date_fix
 from .owntypes import (
     Countries,
@@ -838,28 +842,9 @@ class OpenTimeSeries(_CommonModel[float]):
     def _returns_series(self: Self, *, squared: bool = False) -> Series[float]:
         """Return demeaned return series for autocorrelation analysis."""
         data: Series[float] = self.tsdf.iloc[:, 0]
-        if self.valuetype == ValueType.PRICE:
-            rets = data.ffill().pct_change().dropna()
-        else:
-            rets = data.ffill().dropna()
-        rets = rets - rets.mean()
-        if squared:
-            rets = rets**2
-        return rets
-
-    def autocorr(self: Self, lag: int = 1, *, squared: bool = False) -> float:
-        """Calculate autocorrelation at a given lag.
-
-        Args:
-            lag: The lag at which to compute autocorrelation. Defaults to 1.
-            squared: If True, compute autocorrelation of squared returns.
-                Defaults to False.
-
-        Returns:
-            Autocorrelation at the specified lag.
-        """
-        rets = self._returns_series(squared=squared)
-        return float(rets.autocorr(lag=lag))
+        return _demeaned_returns_for_autocorr(
+            series=data, valuetype=self.valuetype, squared=squared
+        )
 
     def acf(
         self: Self,

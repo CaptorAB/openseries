@@ -227,7 +227,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'first_indices'</em><em>, </em><em>'last_indices'</em><em>, </em><em>'lengths_of_items'</em><em>, </em><em>'span_of_days_all'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
+<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'autocorr'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'first_indices'</em><em>, </em><em>'last_indices'</em><em>, </em><em>'lengths_of_items'</em><em>, </em><em>'span_of_days_all'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – The properties to calculate. Defaults to calculating all
 available. Optional.</p></li>
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
 </ul>
@@ -236,7 +236,7 @@ available. Optional.</p></li>
 <dd class="field-even"><p>Properties of the constituent OpenTimeSeries.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -456,7 +456,7 @@ test cases and comparisons. Optional.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">correl_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><span class="pre">DataFrame</span></a></span></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">correl_matrix</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><span class="pre">DataFrame</span></a></span></dt>
 <dd><p>Correlation matrix.</p>
 <p>This property returns the correlation matrix of the time series
 in the frame.</p>
@@ -745,7 +745,7 @@ Defaults to 1.</p></li>
 <dd class="field-even"><p>A basket timeseries.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -775,7 +775,7 @@ test cases and comparisons. Optional.</p></li>
 <dd class="field-even"><p>Rolling Information Ratios.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -803,7 +803,7 @@ Defaults to 1.</p></li>
 <dd class="field-even"><p>Rolling Betas.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -830,7 +830,7 @@ observations. Defaults to 21.</p></li>
 <dd class="field-even"><p>Rolling Correlations.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1126,11 +1126,11 @@ items in the frame.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
-<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'first_indices'</em><em>, </em><em>'last_indices'</em><em>, </em><em>'lengths_of_items'</em><em>, </em><em>'span_of_days_all'</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'value_ret'</em><em>, </em><em>'geo_ret'</em><em>, </em><em>'arithmetic_ret'</em><em>, </em><em>'autocorr'</em><em>, </em><em>'vol'</em><em>, </em><em>'downside_deviation'</em><em>, </em><em>'ret_vol_ratio'</em><em>, </em><em>'sortino_ratio'</em><em>, </em><em>'kappa3_ratio'</em><em>, </em><em>'z_score'</em><em>, </em><em>'skew'</em><em>, </em><em>'kurtosis'</em><em>, </em><em>'positive_share'</em><em>, </em><em>'var_down'</em><em>, </em><em>'cvar_down'</em><em>, </em><em>'vol_from_var'</em><em>, </em><em>'worst'</em><em>, </em><em>'worst_month'</em><em>, </em><em>'max_drawdown'</em><em>, </em><em>'max_drawdown_date'</em><em>, </em><em>'max_drawdown_cal_year'</em><em>, </em><em>'first_indices'</em><em>, </em><em>'last_indices'</em><em>, </em><em>'lengths_of_items'</em><em>, </em><em>'span_of_days_all'</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1400,11 +1400,28 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">autocorr</span></span></dt>
+<dd><p>Autocorrelation at lag 1.</p>
+<p>Shorthand for <code class="docutils literal notranslate"><span class="pre">autocorr_func(lag=1)</span></code>. Returns the lag-1 autocorrelation
+of demeaned returns. For price series, returns are computed via
+<code class="docutils literal notranslate"><span class="pre">pct_change</span></code>; for return series, raw values are used after demeaning.</p>
+<section id="id18">
+<h4>Returns:<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>SeriesOrFloat_co</dt><dd><p>Autocorrelation at lag 1.
+Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">skew</span></span></dt>
 <dd><p>Skew of the return distribution.</p>
 <p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/s/skewness.asp">https://www.investopedia.com/terms/s/skewness.asp</a>.</p>
-<section id="id18">
-<h4>Returns:<a class="headerlink" href="#id18" title="Link to this heading"></a></h4>
+<section id="id19">
+<h4>Returns:<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Skew of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1418,8 +1435,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">kurtosis</span></span></dt>
 <dd><p>Kurtosis of the return distribution.</p>
 <p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/k/kurtosis.asp">https://www.investopedia.com/terms/k/kurtosis.asp</a>.</p>
-<section id="id19">
-<h4>Returns:<a class="headerlink" href="#id19" title="Link to this heading"></a></h4>
+<section id="id20">
+<h4>Returns:<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Kurtosis of the return distribution.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1433,8 +1450,8 @@ Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">z_score</span></span></dt>
 <dd><p>Z-score.</p>
 <p>Reference: <a class="reference external" href="https://www.investopedia.com/terms/z/zscore.asp">https://www.investopedia.com/terms/z/zscore.asp</a>.</p>
-<section id="id20">
-<h4>Returns:<a class="headerlink" href="#id20" title="Link to this heading"></a></h4>
+<section id="id21">
+<h4>Returns:<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>SeriesOrFloat_co</dt><dd><p>Z-score as (last return - mean return) / standard deviation of returns.
 Returns float for OpenTimeSeries, Series[float] for OpenFrame.</p>
@@ -1571,7 +1588,7 @@ to allow a volatility calculation. Defaults to True.</p></li>
 <dd class="field-even"><p>A basket timeseries.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1851,7 +1868,7 @@ test cases and comparisons. Optional.</p></li>
 <dd class="field-even"><p>Rolling Information Ratios.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1879,7 +1896,7 @@ Defaults to 1.</p></li>
 <dd class="field-even"><p>Rolling Betas.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1906,7 +1923,7 @@ observations. Defaults to 21.</p></li>
 <dd class="field-even"><p>Rolling Correlations.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1927,7 +1944,7 @@ observations. Defaults to 21.</p></li>
 <dd class="field-even"><p>DataFrame with rolling returns.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1996,7 +2013,7 @@ comparisons.</p></li>
 <dd class="field-even"><p>DataFrame with rolling annualized downside CVaR.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v3.0.1)"><em>DataFrame</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas)"><em>DataFrame</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2283,6 +2300,37 @@ difference is calculated. Defaults to 1.</p></li>
 </section>
 <section id="analysis-methods">
 <h3>Analysis Methods<a class="headerlink" href="#analysis-methods" title="Link to this heading"></a></h3>
+<p>Autocorrelation analysis: <code class="docutils literal notranslate"><span class="pre">autocorr</span></code> (property) and <code class="docutils literal notranslate"><span class="pre">autocorr_func</span></code> return
+lag-N autocorrelation per column. For ACF, PACF, and Ljung-Box tests, use the
+constituent OpenTimeSeries objects.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">autocorr_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Calculate autocorrelation at a given lag.</p>
+<p>Computes the autocorrelation of demeaned returns at the specified lag.
+For price series (ValueType.PRICE), returns are derived via <code class="docutils literal notranslate"><span class="pre">pct_change</span></code>;
+for return series (ValueType.RTRN), raw values are demeaned. Use
+<code class="docutils literal notranslate"><span class="pre">squared=True</span></code> for squared-return autocorrelation (e.g. volatility
+clustering). Returns <code class="docutils literal notranslate"><span class="pre">nan</span></code> when the series has too few observations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The lag at which to compute autocorrelation. Defaults to 1.</p></li>
+<li><p><strong>squared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute autocorrelation of squared returns.
+Defaults to False.</p></li>
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.14)"><em>Self</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Autocorrelation at the specified lag. Float for OpenTimeSeries,
+<code class="docutils literal notranslate"><span class="pre">Series[float]</span></code> for OpenFrame.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>SeriesOrFloat_co</em></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">OpenFrame.</span></span><span class="sig-name descname"><span class="pre">calc_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">months_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>

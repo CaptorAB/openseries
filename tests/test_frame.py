@@ -1208,6 +1208,7 @@ class TestOpenFrame:
 
         common_calc_props = [
             "arithmetic_ret",
+            "autocorr",
             "cvar_down",
             "downside_deviation",
             "geo_ret",
@@ -1264,6 +1265,7 @@ class TestOpenFrame:
         """Test that attributes are aligned between OpenFrame and OpenTimeSeries."""
         common_calc_props = [
             "arithmetic_ret",
+            "autocorr",
             "cvar_down",
             "downside_deviation",
             "geo_ret",
@@ -1359,6 +1361,7 @@ class TestOpenFrame:
 
         common_calc_methods = [
             "arithmetic_ret_func",
+            "autocorr_func",
             "cvar_down_func",
             "lower_partial_moment_func",
             "geo_ret_func",
@@ -1407,7 +1410,6 @@ class TestOpenFrame:
 
         series_unique = [
             "acf",
-            "autocorr",
             "ewma_vol_func",
             "ewma_var_func",
             "from_1d_rate_to_cumret",
@@ -2871,6 +2873,7 @@ class TestOpenFrame:
             "Simple return",
             "Geometric return",
             "Arithmetic return",
+            "Autocorrelation",
             "Volatility",
             "Downside deviation",
             "Return vol ratio",
@@ -2935,6 +2938,7 @@ class TestOpenFrame:
 
         expected_values = {
             "Arithmetic return": "0.0590548569",
+            "Autocorrelation": "0.0135345051",
             "CVaR 95.0%": "-0.0123803429",
             "Downside deviation": "0.0670357592",
             "Geometric return": "0.0512459835",

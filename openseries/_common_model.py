@@ -162,6 +162,30 @@ def _get_base_column_data(
     return data, item, label
 
 
+def _demeaned_returns_for_autocorr(
+    series: Series[float], valuetype: ValueType, *, squared: bool = False
+) -> Series[float]:
+    """Return demeaned return series for autocorrelation analysis.
+
+    Args:
+        series: Input series (prices or returns).
+        valuetype: ValueType.PRICE for price data (pct_change applied),
+            else use as returns.
+        squared: If True, square the demeaned returns.
+
+    Returns:
+        Demeaned return series (optionally squared).
+    """
+    if valuetype == ValueType.PRICE:
+        rets = series.ffill().pct_change().dropna()
+    else:
+        rets = series.ffill().dropna()
+    rets = rets - rets.mean()
+    if squared:
+        rets = rets**2
+    return rets
+
+
 def _calculate_time_factor(
     data: Series[float],
     earlier: dt.date,
@@ -353,6 +377,23 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
 
         """
         return self.vol_func()
+
+    @property
+    def autocorr(self: Self) -> SeriesOrFloat_co:
+        """Autocorrelation at lag 1.
+
+        Shorthand for ``autocorr_func(lag=1)``. Returns the lag-1 autocorrelation
+        of demeaned returns. For price series, returns are computed via
+        ``pct_change``; for return series, raw values are used after demeaning.
+
+        Returns:
+        --------
+        SeriesOrFloat_co
+            Autocorrelation at lag 1.
+            Returns float for OpenTimeSeries, Series[float] for OpenFrame.
+
+        """
+        return self.autocorr_func()
 
     @property
     def downside_deviation(self: Self) -> SeriesOrFloat_co:
@@ -1481,6 +1522,50 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         result = data.ffill().pct_change().std().mul(sqrt(time_factor))
 
         return self._coerce_result(result=result, name="Volatility")
+
+    def autocorr_func(
+        self: Self,
+        lag: int = 1,
+        *,
+        squared: bool = False,
+    ) -> SeriesOrFloat_co:
+        """Calculate autocorrelation at a given lag.
+
+        Computes the autocorrelation of demeaned returns at the specified lag.
+        For price series (ValueType.PRICE), returns are derived via ``pct_change``;
+        for return series (ValueType.RTRN), raw values are demeaned. Use
+        ``squared=True`` for squared-return autocorrelation (e.g. volatility
+        clustering). Returns ``nan`` when the series has too few observations.
+
+        Args:
+            lag: The lag at which to compute autocorrelation. Defaults to 1.
+            squared: If True, compute autocorrelation of squared returns.
+                Defaults to False.
+
+        Returns:
+            Autocorrelation at the specified lag. Float for OpenTimeSeries,
+            ``Series[float]`` for OpenFrame.
+        """
+        values: list[float] = []
+        vtypes = self.tsdf.columns.get_level_values(1)
+        for col_idx, col in enumerate(self.tsdf.columns):
+            valuetype = cast("ValueType", vtypes[col_idx])
+            rets = _demeaned_returns_for_autocorr(
+                series=self.tsdf[col],
+                valuetype=valuetype,
+                squared=squared,
+            )
+            if len(rets) > lag:
+                values.append(float(rets.autocorr(lag=lag)))
+            else:
+                values.append(float("nan"))
+        result = Series(
+            data=values,
+            index=self.tsdf.columns,
+            name="Autocorrelation",
+            dtype="float64",
+        )
+        return self._coerce_result(result=result, name="Autocorrelation")
 
     def vol_from_var_func(
         self: Self,

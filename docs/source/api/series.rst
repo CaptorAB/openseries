@@ -121,6 +121,8 @@ Financial Metrics
    :no-index:
 .. autoattribute:: OpenTimeSeries.vol_from_var
    :no-index:
+.. autoattribute:: OpenTimeSeries.autocorr
+   :no-index:
 .. autoattribute:: OpenTimeSeries.skew
    :no-index:
 .. autoattribute:: OpenTimeSeries.kurtosis
@@ -170,7 +172,13 @@ Transformations
 Analysis Methods
 ~~~~~~~~~~~~~~~~
 
-.. automethod:: OpenTimeSeries.autocorr
+Autocorrelation analysis: ``autocorr`` (property) and ``autocorr_func`` provide
+lag-N autocorrelation; ``acf``, ``pacf``, ``partial_autocorr``, and ``ljung_box``
+support full autocorrelation diagnostics. Available on both OpenTimeSeries and
+OpenFrame (except acf, pacf, partial_autocorr, ljung_box which are
+OpenTimeSeries-only).
+
+.. automethod:: OpenTimeSeries.autocorr_func
    :no-index:
 .. automethod:: OpenTimeSeries.acf
    :no-index:
