@@ -157,6 +157,35 @@
     <span class="n">jumps_mu</span><span class="p">:</span> <span class="nb">float</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_ar1_coef</span><span class="p">(</span><span class="n">ar1_coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate ar1_coef is in (-1, 1) for stationarity.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">&lt;</span> <span class="n">ar1_coef</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ar1_coef must be in (-1, 1) for stationarity, got </span><span class="si">{</span><span class="n">ar1_coef</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_ar1_filter</span><span class="p">(</span><span class="n">returns</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">ar1_coef</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply AR(1) filter to returns to introduce lag-1 autocorrelation.</span>
+
+<span class="sd">    r_t = ar1_coef * r_{t-1} + sqrt(1 - ar1_coef**2) * innovation_t</span>
+<span class="sd">    Preserves mean and variance of the base process.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        returns: DataFrame of shape (number_of_sims, trading_days).</span>
+<span class="sd">        ar1_coef: Lag-1 autocorrelation coefficient in (-1, 1).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Filtered returns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ar1_coef</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">returns</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">ar1_coef</span> <span class="o">*</span> <span class="n">ar1_coef</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">arr</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">ar1_coef</span> <span class="o">*</span> <span class="n">arr</span><span class="p">[:,</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">arr</span><span class="p">[:,</span> <span class="n">t</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a Numpy Random Generator object.</span>
 
@@ -300,6 +329,7 @@
         <span class="n">trading_days_in_year</span><span class="p">:</span> <span class="n">DaysInYearType</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">randomizer</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ar1_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Normal distribution simulation.</span>
 
@@ -312,22 +342,29 @@
 <span class="sd">                Defaults to 252.</span>
 <span class="sd">            seed: Seed for random process initiation.</span>
 <span class="sd">            randomizer: Random process generator.</span>
+<span class="sd">            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce</span>
+<span class="sd">                autocorrelation. Defaults to 0.0 (i.i.d. returns).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Normal distribution simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_ar1_coef</span><span class="p">(</span><span class="n">ar1_coef</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
-        <span class="n">returns</span> <span class="o">=</span> <span class="n">randomizer</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
-            <span class="n">loc</span><span class="o">=</span><span class="n">mean_annual_return</span> <span class="o">/</span> <span class="n">trading_days_in_year</span><span class="p">,</span>
-            <span class="n">scale</span><span class="o">=</span><span class="n">mean_annual_vol</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">trading_days_in_year</span><span class="p">),</span>
-            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">number_of_sims</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">),</span>
+        <span class="n">returns_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">randomizer</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                <span class="n">loc</span><span class="o">=</span><span class="n">mean_annual_return</span> <span class="o">/</span> <span class="n">trading_days_in_year</span><span class="p">,</span>
+                <span class="n">scale</span><span class="o">=</span><span class="n">mean_annual_vol</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">trading_days_in_year</span><span class="p">),</span>
+                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">number_of_sims</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="n">_apply_ar1_filter</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">ar1_coef</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_create_base_simulation</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
-            <span class="n">returns</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+            <span class="n">returns</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span>
             <span class="n">number_of_sims</span><span class="o">=</span><span class="n">number_of_sims</span><span class="p">,</span>
             <span class="n">trading_days</span><span class="o">=</span><span class="n">trading_days</span><span class="p">,</span>
             <span class="n">trading_days_in_year</span><span class="o">=</span><span class="n">trading_days_in_year</span><span class="p">,</span>
@@ -349,6 +386,7 @@
         <span class="n">trading_days_in_year</span><span class="p">:</span> <span class="n">DaysInYearType</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">randomizer</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ar1_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Lognormal distribution simulation.</span>
 
@@ -361,25 +399,32 @@
 <span class="sd">                Defaults to 252.</span>
 <span class="sd">            seed: Seed for random process initiation.</span>
 <span class="sd">            randomizer: Random process generator.</span>
+<span class="sd">            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce</span>
+<span class="sd">                autocorrelation. Defaults to 0.0 (i.i.d. returns).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Lognormal distribution simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_ar1_coef</span><span class="p">(</span><span class="n">ar1_coef</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
-        <span class="n">returns</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">randomizer</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span>
-                <span class="n">mean</span><span class="o">=</span><span class="n">mean_annual_return</span> <span class="o">/</span> <span class="n">trading_days_in_year</span><span class="p">,</span>
-                <span class="n">sigma</span><span class="o">=</span><span class="n">mean_annual_vol</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">trading_days_in_year</span><span class="p">),</span>
-                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">number_of_sims</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">),</span>
-            <span class="p">)</span>
-            <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">returns_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">randomizer</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span>
+                    <span class="n">mean</span><span class="o">=</span><span class="n">mean_annual_return</span> <span class="o">/</span> <span class="n">trading_days_in_year</span><span class="p">,</span>
+                    <span class="n">sigma</span><span class="o">=</span><span class="n">mean_annual_vol</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">trading_days_in_year</span><span class="p">),</span>
+                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">number_of_sims</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="o">-</span> <span class="mi">1</span>
+            <span class="p">),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="n">_apply_ar1_filter</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">ar1_coef</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_create_base_simulation</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
-            <span class="n">returns</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+            <span class="n">returns</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span>
             <span class="n">number_of_sims</span><span class="o">=</span><span class="n">number_of_sims</span><span class="p">,</span>
             <span class="n">trading_days</span><span class="o">=</span><span class="n">trading_days</span><span class="p">,</span>
             <span class="n">trading_days_in_year</span><span class="o">=</span><span class="n">trading_days_in_year</span><span class="p">,</span>
@@ -401,6 +446,7 @@
         <span class="n">trading_days_in_year</span><span class="p">:</span> <span class="n">DaysInYearType</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">randomizer</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ar1_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Geometric Brownian Motion simulation.</span>
 
@@ -413,10 +459,13 @@
 <span class="sd">                Defaults to 252.</span>
 <span class="sd">            seed: Seed for random process initiation.</span>
 <span class="sd">            randomizer: Random process generator.</span>
+<span class="sd">            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce</span>
+<span class="sd">                autocorrelation. Defaults to 0.0 (i.i.d. returns).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Geometric Brownian Motion simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_ar1_coef</span><span class="p">(</span><span class="n">ar1_coef</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
@@ -431,11 +480,12 @@
             <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">number_of_sims</span><span class="p">,</span> <span class="n">trading_days</span><span class="p">),</span>
         <span class="p">)</span>
 
-        <span class="n">returns</span> <span class="o">=</span> <span class="n">drift</span> <span class="o">+</span> <span class="n">wiener</span>
+        <span class="n">returns_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">drift</span> <span class="o">+</span> <span class="n">wiener</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="n">_apply_ar1_filter</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">ar1_coef</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_create_base_simulation</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
-            <span class="n">returns</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+            <span class="n">returns</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span>
             <span class="n">number_of_sims</span><span class="o">=</span><span class="n">number_of_sims</span><span class="p">,</span>
             <span class="n">trading_days</span><span class="o">=</span><span class="n">trading_days</span><span class="p">,</span>
             <span class="n">trading_days_in_year</span><span class="o">=</span><span class="n">trading_days_in_year</span><span class="p">,</span>
@@ -460,6 +510,7 @@
         <span class="n">trading_days_in_year</span><span class="p">:</span> <span class="n">DaysInYearType</span> <span class="o">=</span> <span class="mi">252</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">randomizer</span><span class="p">:</span> <span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ar1_coef</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReturnSimulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Merton Jump-Diffusion model simulation.</span>
 
@@ -476,10 +527,13 @@
 <span class="sd">                Defaults to 252.</span>
 <span class="sd">            seed: Seed for random process initiation.</span>
 <span class="sd">            randomizer: Random process generator.</span>
+<span class="sd">            ar1_coef: Lag-1 autoregressive coefficient in (-1, 1) to induce</span>
+<span class="sd">                autocorrelation. Defaults to 0.0 (i.i.d. returns).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Merton Jump-Diffusion model simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_ar1_coef</span><span class="p">(</span><span class="n">ar1_coef</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">randomizer</span><span class="p">:</span>
             <span class="n">randomizer</span> <span class="o">=</span> <span class="n">_random_generator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
@@ -508,13 +562,15 @@
             <span class="o">-</span> <span class="n">jumps_lamda</span> <span class="o">*</span> <span class="p">(</span><span class="n">jumps_mu</span> <span class="o">+</span> <span class="n">jumps_sigma</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
         <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">trading_days_in_year</span><span class="p">)</span>
 
-        <span class="n">returns</span> <span class="o">=</span> <span class="n">poisson_jumps</span> <span class="o">+</span> <span class="n">drift</span> <span class="o">+</span> <span class="n">wiener</span>
+        <span class="n">raw_returns</span> <span class="o">=</span> <span class="n">poisson_jumps</span> <span class="o">+</span> <span class="n">drift</span> <span class="o">+</span> <span class="n">wiener</span>
+        <span class="n">raw_returns</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-        <span class="n">returns</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">returns_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">raw_returns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="n">_apply_ar1_filter</span><span class="p">(</span><span class="n">returns_df</span><span class="p">,</span> <span class="n">ar1_coef</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_create_base_simulation</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span>
-            <span class="n">returns</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+            <span class="n">returns</span><span class="o">=</span><span class="n">returns</span><span class="p">,</span>
             <span class="n">number_of_sims</span><span class="o">=</span><span class="n">number_of_sims</span><span class="p">,</span>
             <span class="n">trading_days</span><span class="o">=</span><span class="n">trading_days</span><span class="p">,</span>
             <span class="n">trading_days_in_year</span><span class="o">=</span><span class="n">trading_days_in_year</span><span class="p">,</span>

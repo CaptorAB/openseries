@@ -184,11 +184,14 @@ LiteralSeriesProps = Literal[
     "span_of_days",
     "yearfrac",
     "periods_in_a_year",
+    "autocorr",
+    "partial_autocorr",
 ]
 LiteralFrameProps = Literal[
     "value_ret",
     "geo_ret",
     "arithmetic_ret",
+    "autocorr",
     "vol",
     "downside_deviation",
     "ret_vol_ratio",
@@ -273,6 +276,8 @@ class OpenTimeSeriesPropertiesList(PropertiesList):
         "span_of_days",
         "yearfrac",
         "periods_in_a_year",
+        "autocorr",
+        "partial_autocorr",
     }
 
     def __init__(
@@ -288,6 +293,7 @@ class OpenFramePropertiesList(PropertiesList):
     """Allowed property arguments for the OpenFrame class."""
 
     allowed_strings: ClassVar[set[str]] = PropertiesList.allowed_strings | {
+        "autocorr",
         "first_indices",
         "last_indices",
         "lengths_of_items",

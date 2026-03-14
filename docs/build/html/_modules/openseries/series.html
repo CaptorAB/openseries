@@ -142,9 +142,13 @@
     <span class="n">date_range</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">field_validator</span><span class="p">,</span> <span class="n">model_validator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">norm</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">._common_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">_calculate_time_factor</span><span class="p">,</span> <span class="n">_CommonModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._common_model</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_calculate_time_factor</span><span class="p">,</span>
+    <span class="n">_CommonModel</span><span class="p">,</span>
+    <span class="n">_demeaned_returns_for_autocorr</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.datefixer</span><span class="w"> </span><span class="kn">import</span> <span class="n">_do_resample_to_business_period_ends</span><span class="p">,</span> <span class="n">date_fix</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.owntypes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Countries</span><span class="p">,</span>
@@ -545,7 +549,18 @@
             <span class="p">)</span>
 
         <span class="n">props</span> <span class="o">=</span> <span class="n">OpenTimeSeriesPropertiesList</span><span class="p">(</span><span class="o">*</span><span class="n">properties</span><span class="p">)</span>
-        <span class="n">pdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="n">x</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">props</span><span class="p">},</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_prop_value</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
+                <span class="s2">&quot;float | int | dt.date | Series[float]&quot;</span><span class="p">,</span>
+                <span class="n">attr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">else</span> <span class="n">attr</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">pdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">_prop_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">props</span><span class="p">},</span>
+            <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">pdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span>
         <span class="k">return</span> <span class="n">pdf</span></div>
 
@@ -982,6 +997,159 @@
         <span class="k">if</span> <span class="n">delete_lvl_one</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_returns_series</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return demeaned return series for autocorrelation analysis.&quot;&quot;&quot;</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">_demeaned_returns_for_autocorr</span><span class="p">(</span>
+            <span class="n">series</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">valuetype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="n">squared</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="OpenTimeSeries.acf">
+<a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.acf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
+        <span class="n">lags</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate autocorrelation function for specified lags.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lags: If int, compute ACF from lag 0 to this value (inclusive).</span>
+<span class="sd">                If list, compute ACF at lag 0 plus each lag in the list.</span>
+<span class="sd">            squared: If True, compute ACF of squared returns. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Series of autocorrelations indexed by lag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns_series</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lags</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="mi">0</span><span class="p">}</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">lags</span><span class="p">))</span>
+        <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">lag_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">rets</span><span class="o">.</span><span class="n">autocorr</span><span class="p">(</span><span class="n">lag</span><span class="o">=</span><span class="n">lag</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">lag_list</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ACF&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OpenTimeSeries.partial_autocorr">
+<a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.partial_autocorr">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">partial_autocorr</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">lag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate partial autocorrelation at a given lag.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lag: The lag at which to compute partial autocorrelation. Defaults to 1.</span>
+<span class="sd">            squared: If True, compute partial autocorrelation of squared returns.</span>
+<span class="sd">                Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Partial autocorrelation at the specified lag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pacf_series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pacf</span><span class="p">(</span><span class="n">lags</span><span class="o">=</span><span class="n">lag</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">pacf_series</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lag</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="OpenTimeSeries.pacf">
+<a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.pacf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pacf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
+        <span class="n">lags</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate partial autocorrelation function for specified lags.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lags: If int, compute PACF from lag 0 to this value (inclusive).</span>
+<span class="sd">                If list, compute PACF at lag 0 plus each lag in the list.</span>
+<span class="sd">            squared: If True, compute PACF of squared returns. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Series of partial autocorrelations indexed by lag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lags</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="mi">0</span><span class="p">}</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">lags</span><span class="p">))</span>
+        <span class="n">max_lag</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lag_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">lag_list</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">acf_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">acf</span><span class="p">(</span><span class="n">lags</span><span class="o">=</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
+        <span class="n">acf_arr</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">acf_vals</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="n">pacf_values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+        <span class="n">phi</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">phi_kk</span> <span class="o">=</span> <span class="n">acf_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">numer</span> <span class="o">=</span> <span class="n">acf_arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">numer</span> <span class="o">-=</span> <span class="n">phi</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">acf_arr</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="n">denom</span> <span class="o">-=</span> <span class="n">phi</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">acf_arr</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">phi_kk</span> <span class="o">=</span> <span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span>
+            <span class="n">phi_row</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">k</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">phi_row</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">phi</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">phi_kk</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span><span class="p">][</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">phi_row</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">phi_kk</span>
+            <span class="n">phi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phi_row</span><span class="p">)</span>
+            <span class="n">pacf_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phi_kk</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">lag</span><span class="p">:</span> <span class="n">pacf_values</span><span class="p">[</span><span class="n">lag</span><span class="p">]</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">lag_list</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="n">lag</span><span class="p">]</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">lag_list</span><span class="p">],</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">lag_list</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PACF&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OpenTimeSeries.ljung_box">
+<a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.ljung_box">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ljung_box</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
+        <span class="n">lags</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute Ljung-Box test for autocorrelation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lags: If int, use lags 1 through this value. If list, use the given</span>
+<span class="sd">                lags (lag 0 excluded from test).</span>
+<span class="sd">            squared: If True, test autocorrelation of squared returns.</span>
+<span class="sd">                Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (statistic, pvalue, lags) where statistic is the Ljung-Box</span>
+<span class="sd">            Q statistic, pvalue is the chi-squared p-value, and lags is the</span>
+<span class="sd">            list of lags used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns_series</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rets</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">lags</span> <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lag_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="n">r_k_sq_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">lag_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">r_k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rets</span><span class="o">.</span><span class="n">autocorr</span><span class="p">(</span><span class="n">lag</span><span class="o">=</span><span class="n">k</span><span class="p">))</span>
+                <span class="n">r_k_sq_sum</span> <span class="o">+=</span> <span class="n">r_k</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">q_stat</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r_k_sq_sum</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lag_list</span><span class="p">)</span>
+        <span class="n">pval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">chi2</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">q_stat</span><span class="p">,</span> <span class="n">df</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">q_stat</span><span class="p">,</span> <span class="n">pval</span><span class="p">,</span> <span class="n">lag_list</span></div>
 </div>
 
 

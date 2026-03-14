@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~OpenTimeSeries.__init__
+      ~OpenTimeSeries.acf
       ~OpenTimeSeries.align_index_to_local_cdays
       ~OpenTimeSeries.all_properties
       ~OpenTimeSeries.arithmetic_ret_func
+      ~OpenTimeSeries.autocorr_func
       ~OpenTimeSeries.calc_range
       ~OpenTimeSeries.construct
       ~OpenTimeSeries.copy
@@ -33,6 +35,7 @@
       ~OpenTimeSeries.geo_ret_func
       ~OpenTimeSeries.json
       ~OpenTimeSeries.kurtosis_func
+      ~OpenTimeSeries.ljung_box
       ~OpenTimeSeries.lower_partial_moment_func
       ~OpenTimeSeries.max_drawdown_func
       ~OpenTimeSeries.model_construct
@@ -48,10 +51,12 @@
       ~OpenTimeSeries.model_validate_strings
       ~OpenTimeSeries.omega_ratio_func
       ~OpenTimeSeries.outliers
+      ~OpenTimeSeries.pacf
       ~OpenTimeSeries.pandas_df
       ~OpenTimeSeries.parse_file
       ~OpenTimeSeries.parse_obj
       ~OpenTimeSeries.parse_raw
+      ~OpenTimeSeries.partial_autocorr
       ~OpenTimeSeries.plot_bars
       ~OpenTimeSeries.plot_histogram
       ~OpenTimeSeries.plot_series
@@ -98,6 +103,7 @@
    .. autosummary::
    
       ~OpenTimeSeries.arithmetic_ret
+      ~OpenTimeSeries.autocorr
       ~OpenTimeSeries.cvar_down
       ~OpenTimeSeries.downside_deviation
       ~OpenTimeSeries.first_idx

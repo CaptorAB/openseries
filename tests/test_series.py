@@ -473,6 +473,11 @@ class TestOpenTimeSeries:
         if not isinstance(arrseries, OpenTimeSeries):
             raise TypeError(msg)
 
+        arrseries.pandas_df()
+        if list(arrseries.tsdf.to_numpy().flatten()) != arrseries.values:  # noqa: PD011
+            msg = "pandas_df() should repopulate tsdf from dates and values"
+            raise OpenTimeSeriesTestError(msg)
+
     def test_create_from_pd_dataframe(
         self: TestOpenTimeSeries, caplog: pytest.LogCaptureFixture
     ) -> None:
@@ -1046,11 +1051,18 @@ class TestOpenTimeSeries:
 
         gr_0 = cseries.vol_func(months_from_last=48)
 
-        cseries.model_config.update({"validate_assignment": False})
-        cseries.dates = cseries.dates[-1016:]
-        cseries.values = list(cseries.values)[-1016:]
-        cseries.pandas_df()
-        cseries.model_config.update({"validate_assignment": True})
+        trim_count = 1016
+        new_dates = cseries.dates[-trim_count:]
+        new_values = list(cseries.values)[-trim_count:]
+        new_tsdf = DataFrame(
+            data=new_values,
+            index=[d.date() for d in DatetimeIndex(new_dates)],
+            columns=[[cseries.label], [cseries.valuetype]],
+            dtype="float64",
+        )
+        cseries = cseries.model_copy(
+            update={"dates": new_dates, "values": new_values, "tsdf": new_tsdf},
+        )
         cseries.set_new_label(lvl_one=ValueType.RTRN)
         cseries.to_cumret()
 
@@ -1156,6 +1168,8 @@ class TestOpenTimeSeries:
             "var_down",
             "length",
             "span_of_days",
+            "autocorr",
+            "partial_autocorr",
         ]
         apseries = self.randomseries.from_deepcopy()
         apseries.to_cumret()
@@ -1188,6 +1202,7 @@ class TestOpenTimeSeries:
 
         expected_values = {
             "arithmetic_ret": "0.0590548569",
+            "autocorr": "0.0135345051",
             "cvar_down": "-0.0123803429",
             "downside_deviation": "0.0670357592",
             "first_idx": "2009-08-03",
@@ -1199,6 +1214,7 @@ class TestOpenTimeSeries:
             "max_drawdown_cal_year": "-0.1314808074",
             "max_drawdown_date": "2012-12-14",
             "omega_ratio": "1.0983709757",
+            "partial_autocorr": "0.0135345051",
             "periods_in_a_year": "253.7356194690",
             "positive_share": "0.5057745918",
             "ret_vol_ratio": "0.4181579749",
@@ -2082,4 +2098,147 @@ class TestOpenTimeSeries:
         lseries.set_new_label(delete_lvl_one=True)
         if lseries.tsdf.columns[0] != "two":
             msg = "Method set_new_label() base case not working as intended"
+            raise OpenTimeSeriesTestError(msg)
+
+    def test_autocorr(self: TestOpenTimeSeries) -> None:
+        """Test autocorr property and autocorr_func method."""
+        lseries = self.randomseries.from_deepcopy()
+        ac1 = lseries.autocorr
+        if not isinstance(ac1, float) or ac1 < -1 or ac1 > 1:
+            msg = f"autocorr should return float in [-1,1], got {ac1!r}"
+            raise OpenTimeSeriesTestError(msg)
+        ac2 = lseries.autocorr_func(lag=2)
+        if not isinstance(ac2, float) or ac2 < -1 or ac2 > 1:
+            msg = f"autocorr_func(lag=2) should return float in [-1,1], got {ac2!r}"
+            raise OpenTimeSeriesTestError(msg)
+        ac1_sq = lseries.autocorr_func(lag=1, squared=True)
+        if not isinstance(ac1_sq, float):
+            msg = f"autocorr_func(squared=True) should return float, got {ac1_sq!r}"
+            raise OpenTimeSeriesTestError(msg)
+        lseries.value_to_ret()
+        ac_ret = lseries.autocorr
+        if not isinstance(ac_ret, float):
+            msg = f"autocorr_func on return series should return float, got {ac_ret!r}"
+            raise OpenTimeSeriesTestError(msg)
+
+    def test_acf(self: TestOpenTimeSeries) -> None:
+        """Test acf method."""
+        lseries = self.randomseries.from_deepcopy()
+        acf_int = lseries.acf(lags=5)
+        expected_acf_len = 6
+        is_valid = (
+            isinstance(acf_int, Series)
+            and len(acf_int) == expected_acf_len
+            and acf_int.iloc[0] == 1.0
+        )
+        if not is_valid:
+            msg = f"acf(lags=5) should return Series with lag 0=1.0, got {acf_int!r}"
+            raise OpenTimeSeriesTestError(msg)
+        acf_list = lseries.acf(lags=[0, 1, 3, 5])
+        expected_lags = [0, 1, 3, 5]
+        if list(acf_list.index) != expected_lags or acf_list.iloc[0] != 1.0:
+            got = list(acf_list.index)
+            msg = f"acf(lags=[0,1,3,5]) should have index {expected_lags}, got {got!r}"
+            raise OpenTimeSeriesTestError(msg)
+        acf_sq = lseries.acf(lags=3, squared=True)
+        expected_acf_sq_len = 4
+        if len(acf_sq) != expected_acf_sq_len:
+            msg = f"acf(squared=True) should have 4 lags, got {len(acf_sq)}"
+            raise OpenTimeSeriesTestError(msg)
+
+    def test_partial_autocorr(self: TestOpenTimeSeries) -> None:
+        """Test partial_autocorr method."""
+        lseries = self.randomseries.from_deepcopy()
+        pac1 = lseries.partial_autocorr(lag=1)
+        if not isinstance(pac1, float) or pac1 < -1 or pac1 > 1:
+            msg = (
+                f"partial_autocorr(lag=1) should return float in [-1,1], got {pac1!r}"
+            )
+            raise OpenTimeSeriesTestError(msg)
+        pac2 = lseries.partial_autocorr(lag=2)
+        if not isinstance(pac2, float) or pac2 < -1 or pac2 > 1:
+            msg = (
+                f"partial_autocorr(lag=2) should return float in [-1,1], got {pac2!r}"
+            )
+            raise OpenTimeSeriesTestError(msg)
+        pac1_sq = lseries.partial_autocorr(lag=1, squared=True)
+        if not isinstance(pac1_sq, float):
+            msg = (
+                f"partial_autocorr(squared=True) should return float, got {pac1_sq!r}"
+            )
+            raise OpenTimeSeriesTestError(msg)
+
+    def test_pacf(self: TestOpenTimeSeries) -> None:
+        """Test pacf method."""
+        lseries = self.randomseries.from_deepcopy()
+        pacf_int = lseries.pacf(lags=5)
+        expected_pacf_len = 6
+        is_valid = (
+            isinstance(pacf_int, Series)
+            and len(pacf_int) == expected_pacf_len
+            and pacf_int.iloc[0] == 1.0
+        )
+        if not is_valid:
+            msg = f"pacf(lags=5) should return Series with lag 0=1.0, got {pacf_int!r}"
+            raise OpenTimeSeriesTestError(msg)
+        pacf_list = lseries.pacf(lags=[0, 1, 2, 4])
+        expected_lags = [0, 1, 2, 4]
+        if list(pacf_list.index) != expected_lags or pacf_list.iloc[0] != 1.0:
+            got = list(pacf_list.index)
+            msg = (
+                f"pacf(lags=[0,1,2,4]) should have index {expected_lags}, got {got!r}"
+            )
+            raise OpenTimeSeriesTestError(msg)
+        pacf_sq = lseries.pacf(lags=2, squared=True)
+        expected_pacf_sq_len = 3
+        if len(pacf_sq) != expected_pacf_sq_len:
+            msg = f"pacf(squared=True) should have 3 lags, got {len(pacf_sq)}"
+            raise OpenTimeSeriesTestError(msg)
+
+    def test_ljung_box(self: TestOpenTimeSeries) -> None:
+        """Test ljung_box method."""
+        lseries = self.randomseries.from_deepcopy()
+        stat, pval, lags = lseries.ljung_box(lags=5)
+        if not isinstance(stat, float) or not isinstance(pval, float):
+            types = (type(stat).__name__, type(pval).__name__)
+            msg = f"ljung_box should return (float, float, list), got {types}"
+            raise OpenTimeSeriesTestError(msg)
+        if lags != [1, 2, 3, 4, 5]:
+            msg = f"ljung_box(lags=5) should use lags [1,2,3,4,5], got {lags!r}"
+            raise OpenTimeSeriesTestError(msg)
+        if pval < 0 or pval > 1:
+            msg = f"ljung_box pvalue should be in [0,1], got {pval!r}"
+            raise OpenTimeSeriesTestError(msg)
+        _, _, lags2 = lseries.ljung_box(lags=[1, 3, 5])
+        if lags2 != [1, 3, 5]:
+            msg = f"ljung_box(lags=[1,3,5]) should use lags [1,3,5], got {lags2!r}"
+            raise OpenTimeSeriesTestError(msg)
+        stat_sq, _, _ = lseries.ljung_box(lags=3, squared=True)
+        if not isinstance(stat_sq, float):
+            msg = "ljung_box(squared=True) should return float statistic, got "
+            msg += f"{stat_sq!r}"
+            raise OpenTimeSeriesTestError(msg)
+
+        stat_empty, pval_empty, lags_empty = lseries.ljung_box(lags=[])
+        if (stat_empty, pval_empty, lags_empty) != (0.0, 1.0, []):
+            got = (stat_empty, pval_empty, lags_empty)
+            msg = f"ljung_box(lags=[]) should return (0, 1, []), got {got!r}"
+            raise OpenTimeSeriesTestError(msg)
+
+        short_dates = [
+            "2020-01-01",
+            "2020-01-02",
+            "2020-01-03",
+            "2020-01-06",
+            "2020-01-07",
+        ]
+        short_series = OpenTimeSeries.from_arrays(
+            name="Short",
+            dates=short_dates,
+            values=[1.0, 1.01, 0.99, 1.02, 1.005],
+        )
+        short_series.value_to_ret()
+        _, _, lb_lags = short_series.ljung_box(lags=[1, 100])
+        if lb_lags != [1, 100]:
+            msg = f"ljung_box lag>=n should return requested lags, got {lb_lags!r}"
             raise OpenTimeSeriesTestError(msg)

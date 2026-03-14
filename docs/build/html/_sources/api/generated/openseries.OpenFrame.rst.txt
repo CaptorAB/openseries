@@ -18,6 +18,7 @@
       ~OpenFrame.align_index_to_local_cdays
       ~OpenFrame.all_properties
       ~OpenFrame.arithmetic_ret_func
+      ~OpenFrame.autocorr_func
       ~OpenFrame.beta
       ~OpenFrame.calc_range
       ~OpenFrame.capture_ratio_func
@@ -107,6 +108,7 @@
    .. autosummary::
    
       ~OpenFrame.arithmetic_ret
+      ~OpenFrame.autocorr
       ~OpenFrame.columns_lvl_one
       ~OpenFrame.columns_lvl_zero
       ~OpenFrame.correl_matrix

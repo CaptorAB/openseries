@@ -5,6 +5,8 @@ from __future__ import annotations
 import datetime as dt
 from typing import TYPE_CHECKING
 
+import pytest
+
 from openseries.owntypes import ValueType
 from openseries.series import OpenTimeSeries
 from openseries.simulation import ReturnSimulation, _random_generator
@@ -273,4 +275,52 @@ class TestSimulation:
 
         if startseries.valuetype != ValueType.PRICE:
             msg = "Method to_dataframe() not working as intended"
+            raise SimulationTestError(msg)
+
+    def test_ar1_coef_validation(self: TestSimulation) -> None:
+        """Test that ar1_coef outside (-1, 1) raises ValueError."""
+        for invalid in (1.0, -1.0, 1.5, -2.0):
+            with pytest.raises(ValueError, match="ar1_coef must be in"):
+                ReturnSimulation.from_normal(
+                    number_of_sims=1,
+                    trading_days=252,
+                    mean_annual_return=0.05,
+                    mean_annual_vol=0.1,
+                    ar1_coef=invalid,
+                    seed=self.seed,
+                )
+
+    def test_ar1_coef_autocorrelation(self: TestSimulation) -> None:
+        """Test that ar1_coef > 0 produces higher lag-1 autocorrelation."""
+        sim_iid = ReturnSimulation.from_normal(
+            number_of_sims=1,
+            trading_days=2000,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            ar1_coef=0.0,
+            seed=self.seed,
+        )
+        sim_ar = ReturnSimulation.from_normal(
+            number_of_sims=1,
+            trading_days=2000,
+            mean_annual_return=0.05,
+            mean_annual_vol=0.1,
+            ar1_coef=0.3,
+            seed=self.seed,
+        )
+        ts_iid = OpenTimeSeries.from_df(
+            sim_iid.to_dataframe(name="Asset", end=dt.date(2019, 12, 31)),
+            valuetype=ValueType.RTRN,
+        )
+        ts_ar = OpenTimeSeries.from_df(
+            sim_ar.to_dataframe(name="Asset", end=dt.date(2019, 12, 31)),
+            valuetype=ValueType.RTRN,
+        )
+        ac_iid = ts_iid.autocorr
+        ac_ar = ts_ar.autocorr
+        if ac_ar <= ac_iid:
+            msg = (
+                f"ar1_coef=0.3 should yield higher autocorr than 0, got {ac_ar} vs "
+                f"{ac_iid}"
+            )
             raise SimulationTestError(msg)

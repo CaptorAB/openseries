@@ -32,9 +32,13 @@ from pandas import (
     date_range,
 )
 from pydantic import field_validator, model_validator
-from scipy.stats import norm
+from scipy.stats import chi2, norm
 
-from ._common_model import _calculate_time_factor, _CommonModel
+from ._common_model import (
+    _calculate_time_factor,
+    _CommonModel,
+    _demeaned_returns_for_autocorr,
+)
 from .datefixer import _do_resample_to_business_period_ends, date_fix
 from .owntypes import (
     Countries,
@@ -416,7 +420,18 @@ class OpenTimeSeries(_CommonModel[float]):
             )
 
         props = OpenTimeSeriesPropertiesList(*properties)
-        pdf = DataFrame.from_dict({x: getattr(self, x) for x in props}, orient="index")
+
+        def _prop_value(name: str) -> float | int | dt.date | Series[float]:
+            attr = getattr(self, name)
+            return cast(
+                "float | int | dt.date | Series[float]",
+                attr() if callable(attr) else attr,
+            )
+
+        pdf = DataFrame.from_dict(
+            {x: _prop_value(x) for x in props},
+            orient="index",
+        )
         pdf.columns = self.tsdf.columns
         return pdf
 
@@ -823,6 +838,147 @@ class OpenTimeSeries(_CommonModel[float]):
         if delete_lvl_one:
             self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
         return self
+
+    def _returns_series(self: Self, *, squared: bool = False) -> Series[float]:
+        """Return demeaned return series for autocorrelation analysis."""
+        data: Series[float] = self.tsdf.iloc[:, 0]
+        return _demeaned_returns_for_autocorr(
+            series=data, valuetype=self.valuetype, squared=squared
+        )
+
+    def acf(
+        self: Self,
+        lags: int | list[int],
+        *,
+        squared: bool = False,
+    ) -> Series[float]:
+        """Calculate autocorrelation function for specified lags.
+
+        Args:
+            lags: If int, compute ACF from lag 0 to this value (inclusive).
+                If list, compute ACF at lag 0 plus each lag in the list.
+            squared: If True, compute ACF of squared returns. Defaults to False.
+
+        Returns:
+            Series of autocorrelations indexed by lag.
+        """
+        rets = self._returns_series(squared=squared)
+        if isinstance(lags, int):
+            lag_list = list(range(lags + 1))
+        else:
+            lag_list = sorted({0} | set(lags))
+        values: list[float] = []
+        for lag in lag_list:
+            if lag == 0:
+                values.append(1.0)
+            else:
+                values.append(float(rets.autocorr(lag=lag)))
+        return Series(
+            data=values,
+            index=lag_list,
+            name="ACF",
+            dtype="float64",
+        )
+
+    def partial_autocorr(self: Self, lag: int = 1, *, squared: bool = False) -> float:
+        """Calculate partial autocorrelation at a given lag.
+
+        Args:
+            lag: The lag at which to compute partial autocorrelation. Defaults to 1.
+            squared: If True, compute partial autocorrelation of squared returns.
+                Defaults to False.
+
+        Returns:
+            Partial autocorrelation at the specified lag.
+        """
+        pacf_series = self.pacf(lags=lag, squared=squared)
+        return float(pacf_series.loc[lag])
+
+    def pacf(
+        self: Self,
+        lags: int | list[int],
+        *,
+        squared: bool = False,
+    ) -> Series[float]:
+        """Calculate partial autocorrelation function for specified lags.
+
+        Args:
+            lags: If int, compute PACF from lag 0 to this value (inclusive).
+                If list, compute PACF at lag 0 plus each lag in the list.
+            squared: If True, compute PACF of squared returns. Defaults to False.
+
+        Returns:
+            Series of partial autocorrelations indexed by lag.
+        """
+        if isinstance(lags, int):
+            lag_list = list(range(lags + 1))
+        else:
+            lag_list = sorted({0} | set(lags))
+        max_lag = max(lag_list) if lag_list else 0
+        acf_vals = self.acf(lags=max_lag, squared=squared)
+        acf_arr = array([acf_vals.loc[k] for k in range(max_lag + 1)])
+        pacf_values: list[float] = [1.0]
+        phi: list[list[float]] = []
+        for k in range(1, max_lag + 1):
+            if k == 1:
+                phi_kk = acf_arr[1]
+            else:
+                numer = acf_arr[k]
+                denom = 1.0
+                for j in range(k - 1):
+                    numer -= phi[k - 2][j] * acf_arr[k - 1 - j]
+                    denom -= phi[k - 2][j] * acf_arr[j + 1]
+                phi_kk = numer / denom
+            phi_row = [0.0] * k
+            for j in range(k - 1):
+                phi_row[j] = phi[k - 2][j] - phi_kk * phi[k - 2][k - 2 - j]
+            phi_row[k - 1] = phi_kk
+            phi.append(phi_row)
+            pacf_values.append(phi_kk)
+        result = {lag: pacf_values[lag] for lag in lag_list}
+        return Series(
+            data=[result[lag] for lag in lag_list],
+            index=lag_list,
+            name="PACF",
+            dtype="float64",
+        )
+
+    def ljung_box(
+        self: Self,
+        lags: int | list[int],
+        *,
+        squared: bool = False,
+    ) -> tuple[float, float, list[int]]:
+        """Compute Ljung-Box test for autocorrelation.
+
+        Args:
+            lags: If int, use lags 1 through this value. If list, use the given
+                lags (lag 0 excluded from test).
+            squared: If True, test autocorrelation of squared returns.
+                Defaults to False.
+
+        Returns:
+            Tuple of (statistic, pvalue, lags) where statistic is the Ljung-Box
+            Q statistic, pvalue is the chi-squared p-value, and lags is the
+            list of lags used.
+        """
+        rets = self._returns_series(squared=squared)
+        n = len(rets)
+        if isinstance(lags, int):
+            lag_list = list(range(1, lags + 1))
+        else:
+            lag_list = sorted({k for k in lags if k > 0})
+        if not lag_list:
+            return 0.0, 1.0, []
+        r_k_sq_sum = 0.0
+        for k in lag_list:
+            if k < n:
+                r_k = float(rets.autocorr(lag=k))
+                r_k_sq_sum += r_k**2 / (n - k)
+        q_stat = n * (n + 2) * r_k_sq_sum
+        df = len(lag_list)
+        pval = float(1.0 - chi2.cdf(q_stat, df))
+        return q_stat, pval, lag_list
 
 
 def timeseries_chain(
