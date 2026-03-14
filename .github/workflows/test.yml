@@ -4,6 +4,9 @@ permissions:
   contents: read
   actions: read  # Required for setup-python and other actions to read action metadata
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
   cancel-in-progress: true
