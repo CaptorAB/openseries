@@ -175,6 +175,7 @@ jobs:
     steps:
       - name: Create GitHub release
         env:
+          GH_TOKEN: ${{ github.token }}
           TAG_VERSION: ${{ needs.version_tag.outputs.tag_version }}
         run: gh release create "$TAG_VERSION" --generate-notes
 
