@@ -50,7 +50,8 @@ dependencies = [
     "python-dateutil>=2.8.2",
     "requests>=2.20.0",
     "scipy>=1.14.1",
-    "scikit-learn>=1.4.0"
+    "scikit-learn>=1.4.0",
+    "tzdata (>=2025.3)"
 ]
 
 [project.urls]
