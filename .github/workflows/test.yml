@@ -44,7 +44,7 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Manage Poetry cache
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         id: poetry-cache
         with:
           path: |
@@ -58,7 +58,7 @@ jobs:
           python -m venv venv
           . venv/bin/activate
           pip install --upgrade pip
-          pip install poetry==2.3.2
+          pip install poetry==2.3.3
 
       - name: Install dependencies with Poetry
         run: |
@@ -76,7 +76,7 @@ jobs:
           poetry run ruff format
 
       - name: Manage Mypy cache
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         id: mypy-cache
         with:
           path: .mypy_cache
@@ -121,7 +121,7 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ github.ref_name == 'master' }}
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: junit.xml
@@ -130,7 +130,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ github.ref_name == 'master' }}
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CaptorAB/openseries
