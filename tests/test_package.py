@@ -44,6 +44,25 @@ class TestPackage:
         ]
 
         for name, value in zip(attribute_names, expected_values, strict=True):
+            if name == "Requires-Python":
+                actual_specifiers = {
+                    part.strip() for part in package_metadata[name].split(",")
+                }
+                expected_specifiers = {">=3.11", "<3.15"}
+                if actual_specifiers != expected_specifiers:
+                    msg = (
+                        f"Package metadata {name} not as "
+                        f"expected: {package_metadata[name]}"
+                    )
+                    raise PackageTestError(msg)
+                continue
+            if name == "Project-URL":
+                project_urls = package_metadata.get_all("Project-URL") or []
+                expected_url = "Documentation, https://openseries.readthedocs.io/"
+                if expected_url not in project_urls:
+                    msg = f"Package metadata {name} not as expected: {project_urls}"
+                    raise PackageTestError(msg)
+                continue
             if match(value, package_metadata[name]) is None:
                 msg = (
                     f"Package metadata {name} not as "

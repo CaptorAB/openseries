@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Admin script for setting up, activating, testing, linting, and cleaning your project venv with Poetry.
+    Admin script for setting up, activating, testing, linting, and cleaning your project venv with uv.
 
 .PARAMETER task
     What to do: 'active', 'make', 'test', 'lint', 'builddocs', 'servedocs', or 'clean'.
@@ -13,9 +13,6 @@ param (
 )
 
 $ErrorActionPreference = 'Stop'
-
-# Pin your Poetry version here:
-[string]$poetryVersion = '2.3.3'
 
 # Ensure we run from repo root
 Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
@@ -85,29 +82,27 @@ switch ($task) {
 
         # install tooling & deps
         python -m pip install --upgrade pip
-        python -m pip install "poetry==$poetryVersion"
-        if (Test-Path 'poetry.lock') {
-            Remove-Item 'poetry.lock' -Force -ErrorAction SilentlyContinue
-        }
-        poetry install --with dev,docs
-        poetry run pre-commit install
+        python -m pip install uv
+        uv lock
+        uv pip install -e ".[dev,docs]"
+        pre-commit install
     }
 
     "test" {
-        poetry run pytest
+        pytest
     }
 
     "lint" {
-        poetry run ruff check . --fix --exit-non-zero-on-fix
-        poetry run ruff format
-        poetry run mypy .
+        ruff check . --fix --exit-non-zero-on-fix
+        ruff format
+        mypy .
     }
 
     "builddocs" {
         Write-Host "📚 Building documentation..." -ForegroundColor Cyan
         Push-Location docs
         try {
-            poetry run sphinx-build -b html source build/html
+            sphinx-build -b html source build/html
             Write-Host "✅ Documentation built in docs/build/html/" -ForegroundColor Green
         }
         catch {
@@ -125,7 +120,7 @@ switch ($task) {
         try {
             Write-Host "🌐 Documentation server will run at http://127.0.0.1:8000" -ForegroundColor Yellow
             Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
-            poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
+            sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
         }
         catch {
             Write-Host "❌ Failed to start documentation server: $_" -ForegroundColor Red
@@ -142,15 +137,12 @@ switch ($task) {
         if (Test-Path ".\docs\source\api\generated") { Remove-Item ".\docs\source\api\generated" -Recurse -Force }
 
         . .\venv\Scripts\Activate.ps1
-        poetry run pre-commit uninstall
+        pre-commit uninstall
         if ($env:VIRTUAL_ENV) {
             & "$env:VIRTUAL_ENV\Scripts\deactivate.bat" 2>$null
         }
         if (Test-Path .\venv) {
             Remove-Item .\venv -Recurse -Force
-        }
-        if (Test-Path 'poetry.lock') {
-            Remove-Item 'poetry.lock' -Force -ErrorAction SilentlyContinue
         }
         Write-Host "🧹 Clean complete." -ForegroundColor Green
     }
