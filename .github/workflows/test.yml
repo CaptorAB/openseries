@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         id: uv-cache
         with:
-          path: ~/.cache/uv
+          path: ${{ env.UV_CACHE_DIR }}
           key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
           restore-keys: uv-cache-${{ runner.os }}-
 
