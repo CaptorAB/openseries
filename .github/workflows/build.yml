@@ -45,13 +45,6 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
 
-      - name: Cache uv dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ env.UV_CACHE_DIR }}
-          key: uv-windows-${{ hashFiles('pyproject.toml') }}
-          restore-keys: uv-windows-
-
       - name: Create virtual environment and install dependencies
         run: |
           uv venv venv
@@ -134,13 +127,6 @@ jobs:
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
 
-      - name: Cache uv dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ env.UV_CACHE_DIR }}
-          key: uv-ubuntu-${{ hashFiles('pyproject.toml') }}
-          restore-keys: uv-ubuntu-
-
       - name: Create virtual environment and install dependencies
         run: |
           uv venv venv
@@ -222,13 +208,6 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-
-      - name: Cache uv dependencies
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ${{ env.UV_CACHE_DIR }}
-          key: uv-macos-${{ hashFiles('pyproject.toml') }}
-          restore-keys: uv-macos-
 
       - name: Create virtual environment and install dependencies
         run: |
