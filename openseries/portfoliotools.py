@@ -235,8 +235,8 @@ def _build_frontier_line(
 
     for possible_return in frontier_y:
         cons = cast(
-            "dict[str, str | Callable[[float, NDArray[float64]], float64]]",
-            (
+            "Any",
+            [
                 {"type": "eq", "fun": _check_sum},
                 {
                     "type": "eq",
@@ -247,10 +247,10 @@ def _build_frontier_line(
                         poss_return=poss_return,
                     ),
                 },
-            ),
+            ],
         )
 
-        result = minimize(  # type: ignore[call-overload]
+        result = minimize(
             fun=_minimize_volatility,
             x0=init_guess,
             method=minimize_method,
@@ -375,8 +375,8 @@ def _optimize_max_sharpe_portfolio(
     Returns:
         Tuple of (optimal metrics, optimal weights).
     """
-    constraints = {"type": "eq", "fun": _check_sum}
-    opt_results = minimize(  # type: ignore[call-overload]
+    constraints = cast("Any", [{"type": "eq", "fun": _check_sum}])
+    opt_results = minimize(
         fun=_neg_sharpe,
         x0=init_guess,
         method=minimize_method,
@@ -578,9 +578,18 @@ def prepare_plot_data(
         index=["ret", "stdev", "text"],
     )
     plotframe.columns = plotframe.columns.droplevel(level=1)
-    plotframe["Max Sharpe Portfolio"] = [optimized[0], optimized[1], opt_text]
+    plotframe["Max Sharpe Portfolio"] = Series(
+        data=[optimized[0], optimized[1], opt_text],
+        index=plotframe.index,
+        dtype=object,
+    )
     if current.label is not None:
-        plotframe[current.label] = [current.arithmetic_ret, current.vol, txt]  # type: ignore[assignment]
+        label = current.label
+        plotframe[label] = Series(
+            data=[current.arithmetic_ret, current.vol, txt],
+            index=plotframe.index,
+            dtype=object,
+        )
 
     return plotframe
 

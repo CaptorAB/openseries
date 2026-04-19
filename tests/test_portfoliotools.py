@@ -5,12 +5,16 @@ from __future__ import annotations
 from decimal import ROUND_HALF_UP, Decimal, localcontext
 from json import loads
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, TypedDict, Unpack, cast
 from unittest.mock import patch
 
 if TYPE_CHECKING:  # pragma: no cover
     import datetime as dt
     from collections.abc import Iterable
+
+    from numpy import float64
+    from numpy.typing import NDArray
+    from pandas import DataFrame
 
     from openseries.simulation import ReturnSimulation
 
@@ -34,6 +38,11 @@ from openseries.series import OpenTimeSeries
 
 class PortfoliotoolsTestError(Exception):
     """Custom exception used for signaling test failures."""
+
+
+class _SharpeplotDivKwargs(TypedDict, total=False):
+    title: bool
+    titletext: str
 
 
 class TestPortfoliotools:
@@ -400,7 +409,14 @@ class TestPortfoliotools:
         self: TestPortfoliotools,
         simulations: int = 100,
         points: int = 20,
-    ) -> tuple[OpenFrame, Any, Any, Any, Any, Any]:
+    ) -> tuple[
+        OpenFrame,
+        OpenTimeSeries,
+        DataFrame,
+        DataFrame,
+        NDArray[float64],
+        DataFrame,
+    ]:
         """Setup test data for sharpeplot tests.
 
         Args:
@@ -437,10 +453,10 @@ class TestPortfoliotools:
 
     def _create_sharpeplot_and_get_json(
         self: TestPortfoliotools,
-        simulated: Any,  # noqa: ANN401
-        frontier: Any,  # noqa: ANN401
-        plotframe: Any,  # noqa: ANN401
-        **kwargs: Any,  # noqa: ANN401
+        simulated: DataFrame,
+        frontier: DataFrame,
+        plotframe: DataFrame,
+        **kwargs: Unpack[_SharpeplotDivKwargs],
     ) -> dict[str, Any]:
         """Create sharpeplot and return JSON.
 
@@ -507,9 +523,9 @@ class TestPortfoliotools:
 
     def _verify_mock_path_exists(
         self: TestPortfoliotools,
-        simulated: Any,  # noqa: ANN401
-        frontier: Any,  # noqa: ANN401
-        plotframe: Any,  # noqa: ANN401
+        simulated: DataFrame,
+        frontier: DataFrame,
+        plotframe: DataFrame,
         *,
         return_value: bool,
     ) -> dict[str, Any]:

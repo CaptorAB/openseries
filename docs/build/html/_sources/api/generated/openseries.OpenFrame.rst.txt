@@ -149,7 +149,8 @@
       ~OpenFrame.yearfrac
       ~OpenFrame.z_score
       ~OpenFrame.constituents
-      ~OpenFrame.tsdf
       ~OpenFrame.weights
+      ~OpenFrame.markets
+      ~OpenFrame.tsdf
    
    

@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import MagicMock, patch
 from warnings import catch_warnings, filterwarnings
 
-from numpy import array, bool_, float64, nan
+from numpy import array, nan
 from pydantic import BaseModel
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -3681,14 +3681,7 @@ class TestOpenFrame:
             expected_exception=RatioInputError,
             match=r"ratio must be one of 'up', 'down' or 'both'.",
         ):
-            invalid_frame._calculate_capture_ratio_for_item(  # noqa: SLF001
-                ratio=invalid_ratio,
-                longdf_returns_np=array([0.01, -0.01, 0.01], dtype=float64),
-                shortdf_returns_np=array([0.0, 0.0, 0.0], dtype=float64),
-                up_mask=array([True, False, True], dtype=bool_),
-                down_mask=array([False, True, False], dtype=bool_),
-                time_factor=252.0,
-            )
+            invalid_frame.capture_ratio_func(ratio=invalid_ratio)
 
     def test_georet_exceptions(self: TestOpenFrame) -> None:
         """Test georet property raising exceptions on bad input data."""
