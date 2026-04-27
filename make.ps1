@@ -3,12 +3,12 @@
     Admin script for setting up, activating, testing, linting, and cleaning your project venv with uv.
 
 .PARAMETER task
-    What to do: 'active', 'make', 'test', 'lint', 'builddocs', 'servedocs', or 'clean'.
+    What to do: 'active', 'make', 'update', 'test', 'lint', 'builddocs', 'servedocs', or 'clean'.
     Defaults to 'active'.
 #>
 
 param (
-    [ValidateSet("active","make","test","lint","builddocs","servedocs","clean")]
+    [ValidateSet("active","make","update","test","lint","builddocs","servedocs","clean")]
     [string]$task = "active"
 )
 
@@ -84,8 +84,17 @@ switch ($task) {
         python -m pip install --upgrade pip
         python -m pip install uv
         uv lock
-        uv pip install -e ".[dev,docs]"
+        uv sync --active --extra dev --extra docs
         pre-commit install
+    }
+
+    "update" {
+        . .\venv\Scripts\Activate.ps1
+        Ensure-PythonPath
+        python -m pip install --upgrade pip
+        pip install --upgrade uv
+        uv lock --upgrade
+        uv sync --active --extra dev --extra docs
     }
 
     "test" {
@@ -148,7 +157,7 @@ switch ($task) {
     }
 
     default {
-        Write-Error "Invalid task '$task'. Use active, make, test, lint, builddocs, servedocs, or clean."
+        Write-Error "Invalid task '$task'. Use active, make, update, test, lint, builddocs, servedocs, or clean."
         exit 1
     }
 }

@@ -1,6 +1,6 @@
 .ONESHELL:
 
-.PHONY: all install test lint clean builddocs servedocs cleandocs
+.PHONY: all install update test lint clean builddocs servedocs cleandocs
 
 all: install
 
@@ -11,8 +11,15 @@ install:
 	venv/bin/pip install uv
 	@. venv/bin/activate && \
 	uv lock && \
-	uv pip install -e ".[dev,docs]" && \
+	uv sync --active --extra dev --extra docs && \
 	pre-commit install
+
+update:
+	@. venv/bin/activate && \
+	python -m pip install --upgrade pip && \
+	pip install --upgrade uv && \
+	uv lock --upgrade && \
+	uv sync --active --extra dev --extra docs
 
 test:
 	pytest
