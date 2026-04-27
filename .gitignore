@@ -12,6 +12,9 @@ junit.xml
 # Environments
 /venv/
 
+# Setuptools / editable-install metadata (regenerated on pip/uv install -e)
+*.egg-info/
+
 # Pycharm
 /.idea/
 

@@ -124,14 +124,13 @@ If you plan to contribute to openseries or need the development dependencies:
    git clone https://github.com/CaptorAB/openseries.git
    cd openseries
 
-   # Install Poetry (if not already installed)
-   pip install poetry
+   # Install uv (if not already installed)
+   pip install uv
 
-   # Install dependencies
-   poetry install
-
-   # Activate virtual environment
-   poetry shell
+   # Create a virtual environment and install dependencies
+   uv venv venv
+   source venv/bin/activate
+   uv pip install -e ".[dev]"
 
 This will install additional development dependencies including:
 

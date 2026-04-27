@@ -37,44 +37,40 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Create virtual environment
-        run: python -m venv venv
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
 
-      - name: Install Poetry
+      - name: Create virtual environment and install dependencies
         run: |
+          uv venv venv
           . venv/bin/activate
-          pip install poetry==2.3.3
-
-      - name: Install dependencies with Poetry
-        run: |
-          . venv/bin/activate
-          poetry install --with dev
-          poetry show -l
+          uv pip install -e ".[dev]"
+          uv pip list
 
       - name: Check and fix with Ruff
         run: |
           . venv/bin/activate
-          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+          ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
         run: |
           . venv/bin/activate
-          poetry run ruff format
+          ruff format
 
       - name: Type check with Mypy
         run: |
           . venv/bin/activate
-          poetry run mypy .
+          mypy .
 
       - name: Tests with Pytest
         id: pytest
         run: |
           . venv/bin/activate
-          PYTHONPATH=${PWD} poetry run pytest
+          PYTHONPATH=${PWD} pytest
 
       - name: Create GitHub issue on failure
         if: ${{ failure() }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_OWNER: ${{ github.repository_owner }}
           GH_REPO: ${{ github.event.repository.name }}
@@ -209,14 +205,11 @@ jobs:
 
       - name: Build distributions (sdist + wheel)
         run: |
-          python -m venv venv
-          . venv/bin/activate
-          pip install poetry==2.3.3
-          poetry build
-          poetry check
+          uv build
+          uvx twine check dist/*
 
       - name: Upload dist artifacts
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dist
           path: dist/*
@@ -279,7 +272,7 @@ jobs:
       actions: write  # Required for actions.createWorkflowDispatch to trigger docs workflow
     steps:
       - name: Trigger documentation update
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({

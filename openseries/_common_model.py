@@ -60,7 +60,7 @@ from pandas import (
 from pandas.tseries.offsets import CustomBusinessDay
 from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
-from pydantic import BaseModel, ConfigDict, DirectoryPath
+from pydantic import BaseModel, ConfigDict, DirectoryPath, Field
 from scipy.stats import (
     kurtosis,
     norm,
@@ -213,6 +213,10 @@ def _calculate_time_factor(
 class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     """Declare _CommonModel."""
 
+    constituents: list[Any] = Field(default_factory=list)
+    weights: list[float] | None = None
+    markets: list[str] | str | None = None
+
     tsdf: DataFrame = DataFrame(dtype="float64")
 
     model_config = ConfigDict(
@@ -222,18 +226,27 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     )
 
     def _coerce_result(
-        self: Self, result: Series[float], name: str
+        self: Self,
+        result: Series[float],
+        name: str,
     ) -> SeriesOrFloat_co:
         if self.tsdf.shape[1] == 1:
-            arr = float(asarray(a=result, dtype=float64).squeeze())
-            return cast("SeriesOrFloat_co", arr)  # type: ignore[redundant-cast]
-        series_result: SeriesOrFloat_co = Series(  # type: ignore[assignment]
-            data=result,
-            index=self.tsdf.columns,
-            name=name,
-            dtype="float64",
+            return cast(
+                "SeriesOrFloat_co",
+                cast("object", float(asarray(a=result, dtype=float64).squeeze())),
+            )
+        return cast(
+            "SeriesOrFloat_co",
+            cast(
+                "object",
+                Series(
+                    data=result,
+                    index=self.tsdf.columns,
+                    name=name,
+                    dtype="float64",
+                ),
+            ),
         )
-        return series_result
 
     @property
     def length(self: Self) -> int:
@@ -589,7 +602,7 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
         """
         method: LiteralPandasReindexMethod = "nearest"
 
-        if hasattr(self, "constituents"):
+        if self.constituents:
             countries = self.constituents[0].countries
             markets = self.constituents[0].markets
         else:
@@ -790,12 +803,20 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             if hasattr(self, "countries"):
                 self.countries = countries
             else:
-                for serie in self.constituents:  # type: ignore[attr-defined]
+                constituents = getattr(self, "constituents", None)
+                if not constituents:
+                    msg = "Cannot set countries without constituents."
+                    raise TypeError(msg)
+                for serie in constituents:
                     serie.countries = countries
         elif hasattr(self, "countries"):
             countries = self.countries
         else:
-            countries = self.constituents[0].countries  # type: ignore[attr-defined]
+            constituents = getattr(self, "constituents", None)
+            if not constituents:
+                msg = "Cannot get countries without constituents."
+                raise TypeError(msg)
+            countries = constituents[0].countries
 
         return countries
 
@@ -811,15 +832,14 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             The markets value after getting or setting.
         """
         if markets:
-            if hasattr(self, "markets"):
-                self.markets = markets
-            else:
-                for serie in self.constituents:  # type: ignore[attr-defined]
+            constituents = getattr(self, "constituents", None)
+            if constituents:
+                for serie in constituents:
                     serie.markets = markets
-        elif hasattr(self, "markets"):
-            markets = self.markets
+            self.markets = markets
         else:
-            markets = self.constituents[0].markets  # type: ignore[attr-defined]
+            constituents = getattr(self, "constituents", None)
+            markets = constituents[0].markets if constituents else self.markets
 
         return markets
 
@@ -931,8 +951,8 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
     def to_json(
         self: Self,
         what_output: LiteralJsonOutput,
-        filename: str,
-        directory: DirectoryPath | None = None,
+        filename: str | Path,
+        directory: DirectoryPath | Path | str | None = None,
     ) -> list[dict[str, str | bool | ValueType | list[str] | list[float]]]:
         """Dump timeseries data into a JSON file.
 
@@ -979,7 +999,8 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
                 itemdata.update({"values": values})
                 output.append(dict(itemdata))
 
-        with dirpath.joinpath(filename).open(mode="w", encoding="utf-8") as jsonfile:
+        plotfile = dirpath.joinpath(Path(filename).name)
+        with plotfile.open(mode="w", encoding="utf-8") as jsonfile:
             dump(obj=output, fp=jsonfile, indent=2, sort_keys=False)
 
         return output

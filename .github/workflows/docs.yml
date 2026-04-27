@@ -51,26 +51,14 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Manage Poetry cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-        with:
-          path: |
-            ~/.cache/pypoetry/cache
-            ~/.cache/pypoetry/artifacts
-          key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-cache-${{ runner.os }}-
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
 
-      - name: Create virtual environment and install Poetry
+      - name: Create virtual environment and install dependencies
         run: |
-          python -m venv venv
+          uv venv venv
           . venv/bin/activate
-          pip install --upgrade pip
-          pip install poetry==2.3.3
-
-      - name: Install dependencies with Poetry
-        run: |
-          . venv/bin/activate
-          poetry install --with docs
+          uv pip install -e ".[docs]"
 
       - name: Build documentation
         run: |
@@ -93,7 +81,7 @@ jobs:
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: docs/build/html
 

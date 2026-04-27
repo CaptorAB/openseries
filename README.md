@@ -11,7 +11,7 @@
 [![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
 [![codecov](https://img.shields.io/codecov/c/gh/CaptorAB/openseries?logo=codecov)](https://codecov.io/gh/CaptorAB/openseries/branch/master)
 [![Documentation Status](https://readthedocs.org/projects/openseries/badge/?version=latest)](https://captorab.github.io/openseries/)
-[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
+[![uv](https://img.shields.io/badge/package%20manager-uv-blueviolet)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![GitHub License](https://img.shields.io/github/license/CaptorAB/openseries)](https://github.com/CaptorAB/openseries/blob/master/LICENSE.md)
 [![Code Sample](https://img.shields.io/badge/-Code%20Sample-blue)](https://nbviewer.org/github/karrmagadgeteer2/NoteBook/blob/master/openseriesnotebook.ipynb)

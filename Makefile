@@ -1,6 +1,6 @@
 .ONESHELL:
 
-.PHONY: all install test lint clean builddocs servedocs cleandocs
+.PHONY: all install update test lint clean builddocs servedocs cleandocs
 
 all: install
 
@@ -8,33 +8,40 @@ install:
 	python -m venv ./venv
 	venv/bin/python --version
 	venv/bin/python -m pip install --upgrade pip
-	venv/bin/pip install poetry==2.3.3
+	venv/bin/pip install uv
 	@. venv/bin/activate && \
-	poetry install --with dev,docs && \
-	poetry run pre-commit install
+	uv lock && \
+	uv sync --active --extra dev --extra docs && \
+	pre-commit install
+
+update:
+	@. venv/bin/activate && \
+	python -m pip install --upgrade pip && \
+	pip install --upgrade uv && \
+	uv lock --upgrade && \
+	uv sync --active --extra dev --extra docs
 
 test:
-	poetry run pytest
+	pytest
 
 lint:
-	poetry run ruff check . --fix --exit-non-zero-on-fix
-	poetry run ruff format
-	poetry run mypy .
+	ruff check . --fix --exit-non-zero-on-fix
+	ruff format
+	mypy .
 
 clean:
 	@. venv/bin/activate && \
 	pre-commit uninstall && \
-	rm -rf venv && \
-	rm -f poetry.lock
+	rm -rf venv
 
 builddocs:
 	@echo "📚 Building documentation..."
-	cd docs && poetry run sphinx-build -b html source build/html
+	cd docs && sphinx-build -b html source build/html
 	@echo "✅ Documentation built in docs/build/html/"
 
 servedocs:
 	@echo "📚 Starting live documentation server..."
-	cd docs && poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
+	cd docs && sphinx-autobuild source build/html --host 127.0.0.1 --port 8000 --re-ignore ".*\..*"
 	@echo "🌐 Documentation server running at http://127.0.0.1:8000"
 
 cleandocs:

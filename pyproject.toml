@@ -3,10 +3,10 @@ name = "openseries"
 version = "2.1.7"
 description = "Tools for analyzing financial timeseries."
 authors = [
-    { name = "Martin Karrin", email = "martin.karrin@captor.se" },
+    { name = "Martin Karrin" },
 ]
 maintainers = [
-    { name = "Martin Karrin", email = "martin.karrin@captor.se" },
+    { name = "Martin Karrin" },
 ]
 license = "BSD-3-Clause"
 license-files = ["LICENSE.md"]
@@ -61,37 +61,33 @@ dependencies = [
 "Issue Tracker" = "https://github.com/CaptorAB/openseries/issues"
 "Release Notes" = "https://github.com/CaptorAB/openseries/releases"
 
-[tool.poetry.group.dev.dependencies]
-mypy = "1.20.0"
-pandas-stubs = ">=2.1.2"
-pre-commit = ">=4.5.1"
-pytest = ">=9.0.3"
-pytest-cov = ">=7.1.0"
-pytest-xdist = ">=3.8.0"
-ruff = "0.15.9"
-types-openpyxl = ">=3.1.2"
-scipy-stubs = ">=1.14.1.0"
-types-python-dateutil = ">=2.8.2"
-types-requests = ">=2.20.0"
-
-[tool.poetry.group.docs.dependencies]
-sphinx = ">=9.0.4"
-sphinx-autobuild = ">=2025.8.25"
-sphinx-autodoc-typehints = ">=3.6.0"
-sphinx-rtd-theme = ">=3.1.0rc1"
+[project.optional-dependencies]
+dev = [
+    "mypy==1.20.2",
+    "pandas-stubs>=2.1.2",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-xdist>=3.8.0",
+    "ruff==0.15.12",
+    "types-openpyxl>=3.1.2",
+    "scipy-stubs>=1.14.1.0",
+    "types-python-dateutil>=2.8.2",
+    "types-requests>=2.20.0",
+]
+docs = [
+    "sphinx>=9.0.4",
+    "sphinx-autobuild>=2025.8.25",
+    "sphinx-autodoc-typehints>=3.6.0",
+    "sphinx-rtd-theme>=3.1.0rc1",
+]
 
 [build-system]
-requires = ["poetry-core>=2.3.2"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
 openseries = ["py.typed"]
-
-packages = [
-  { include = "openseries" }
-]
-
-include = [{ path = "openseries/py.typed", format = ["sdist", "wheel"] }]
 
 [tool.mypy]
 python_version = "3.11"
