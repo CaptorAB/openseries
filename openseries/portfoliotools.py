@@ -695,9 +695,14 @@ def _add_point_frame_traces(
         "dict[str, str | int | float | bool | list[str]]",
         fig["layout"],
     )
-    colorway = cast("list[str]", layout_dict.get("colorway", []))[
-        : len(point_frame.columns)
-    ]
+    base_colorway = cast("list[str]", layout_dict.get("colorway", []))
+    if len(base_colorway) < len(point_frame.columns) and base_colorway:
+        repeats = (len(point_frame.columns) + len(base_colorway) - 1) // len(
+            base_colorway
+        )
+        colorway = (base_colorway * repeats)[: len(point_frame.columns)]
+    else:
+        colorway = base_colorway[: len(point_frame.columns)]
     for col, clr in zip(point_frame.columns, colorway, strict=True):
         returns.extend([cast("float", point_frame.loc["ret", col])])
         risk.extend([cast("float", point_frame.loc["stdev", col])])
