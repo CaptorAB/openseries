@@ -814,3 +814,39 @@ class TestPortfoliotools:
         if plotframe.shape[0] != expected_rows:
             msg = f"plotframe should have {expected_rows} rows (ret, stdev, text)"
             raise PortfoliotoolsTestError(msg)
+
+    def test_sharpeplot_extends_colorway_for_point_frame(
+        self: TestPortfoliotools,
+    ) -> None:
+        """Test point_frame traces repeat layout colorway when columns exceed it."""
+        _, _, _frontier, _simulated, _optimum, plotframe = (
+            self._setup_sharpeplot_test_data()
+        )
+
+        base_fig, logo = load_plotly_dict()
+        short_colorway = ["#66725B", "#D0C0B1"]
+        layout = cast("dict[str, list[str]]", base_fig["layout"])
+        layout["colorway"] = short_colorway
+        repeats = (len(plotframe.columns) + len(short_colorway) - 1) // len(
+            short_colorway
+        )
+        expected_colorway = (short_colorway * repeats)[: len(plotframe.columns)]
+
+        with patch(
+            "openseries.portfoliotools.load_plotly_dict",
+            return_value=(base_fig, logo),
+        ):
+            figure, _ = sharpeplot(
+                point_frame=plotframe,
+                auto_open=False,
+                output_type="div",
+            )
+
+        fig_json = loads(cast("str", figure.to_json()))
+        marker_colors = [trace["marker"]["color"] for trace in fig_json["data"]]
+        if marker_colors != expected_colorway:
+            msg = (
+                "sharpeplot should extend colorway for point_frame columns\n"
+                f"{marker_colors}\n{expected_colorway}"
+            )
+            raise PortfoliotoolsTestError(msg)

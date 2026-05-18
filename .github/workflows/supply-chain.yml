@@ -1,0 +1,83 @@
+name: supply-chain.yml
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.8"
+  UV_PROJECT_ENVIRONMENT: venv
+  PIP_AUDIT_VERSION: "2.9.14"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lockfile:
+    name: Verify lockfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Check uv.lock is up to date
+        run: uv lock --check
+
+  osv-scanner:
+    name: OSV dependency scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Run OSV-Scanner
+        uses: google/osv-scanner-action/osv-scanner-action@e92b5d07338d4f0ba0981dffed17c48976ca4730 # v2.2.3
+        with:
+          scan-args: --lockfile=uv.lock
+
+  pip-audit:
+    name: pip-audit dependency scan
+    needs: lockfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version-file: .python-version
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra dev
+
+      - name: Export requirements for pip-audit
+        run: uv export --locked --extra dev --no-emit-project -o requirements-audit.txt
+
+      - name: Run pip-audit
+        run: uvx pip-audit==${{ env.PIP_AUDIT_VERSION }} -r requirements-audit.txt

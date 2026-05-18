@@ -8,7 +8,7 @@
 #>
 
 param (
-    [ValidateSet("active","make","update","test","lint","builddocs","servedocs","clean")]
+    [ValidateSet("active","make","update","test","lint","audit","builddocs","servedocs","clean")]
     [string]$task = "active"
 )
 
@@ -84,7 +84,7 @@ switch ($task) {
         python -m pip install --upgrade pip
         python -m pip install uv
         uv lock
-        uv sync --active --extra dev --extra docs
+        uv sync --active --locked --extra dev --extra docs
         pre-commit install
     }
 
@@ -94,7 +94,16 @@ switch ($task) {
         python -m pip install --upgrade pip
         pip install --upgrade uv
         uv lock --upgrade
-        uv sync --active --extra dev --extra docs
+        uv sync --active --locked --extra dev --extra docs
+    }
+
+    "audit" {
+        . .\venv\Scripts\Activate.ps1
+        Ensure-PythonPath
+        uv lock --check
+        uv export --locked --extra dev --no-emit-project -o requirements-audit.txt
+        uvx pip-audit -r requirements-audit.txt
+        Remove-Item -Force requirements-audit.txt
     }
 
     "test" {
@@ -157,7 +166,7 @@ switch ($task) {
     }
 
     default {
-        Write-Error "Invalid task '$task'. Use active, make, update, test, lint, builddocs, servedocs, or clean."
+        Write-Error "Invalid task '$task'. Use active, make, update, test, lint, audit, builddocs, servedocs, or clean."
         exit 1
     }
 }

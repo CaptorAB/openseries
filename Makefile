@@ -1,6 +1,6 @@
 .ONESHELL:
 
-.PHONY: all install update test lint clean builddocs servedocs cleandocs
+.PHONY: all install update test lint audit clean builddocs servedocs cleandocs
 
 all: install
 
@@ -11,7 +11,7 @@ install:
 	venv/bin/pip install uv
 	@. venv/bin/activate && \
 	uv lock && \
-	uv sync --active --extra dev --extra docs && \
+	uv sync --active --locked --extra dev --extra docs && \
 	pre-commit install
 
 update:
@@ -19,7 +19,7 @@ update:
 	python -m pip install --upgrade pip && \
 	pip install --upgrade uv && \
 	uv lock --upgrade && \
-	uv sync --active --extra dev --extra docs
+	uv sync --active --locked --extra dev --extra docs
 
 test:
 	pytest
@@ -28,6 +28,13 @@ lint:
 	ruff check . --fix --exit-non-zero-on-fix
 	ruff format
 	mypy .
+
+audit:
+	@. venv/bin/activate && \
+	uv lock --check && \
+	uv export --locked --extra dev --no-emit-project -o requirements-audit.txt && \
+	uvx pip-audit -r requirements-audit.txt && \
+	rm -f requirements-audit.txt
 
 clean:
 	@. venv/bin/activate && \

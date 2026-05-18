@@ -6,6 +6,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.8"
+  ZIZMOR_VERSION: "1.24.1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -14,7 +16,9 @@ concurrency:
 on:
   workflow_dispatch: {}
   push:
-    branches: ["master"]
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   zizmor:
@@ -30,13 +34,13 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.sha }}
           persist-credentials: false
 
-      - name: Install the latest version of uv
+      - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          version: "latest"
+          version: ${{ env.UV_VERSION }}
 
       - name: Run zizmor
-        run: uvx zizmor --format=sarif . > results.sarif
+        run: uvx zizmor==${{ env.ZIZMOR_VERSION }} --format=sarif . > results.sarif
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

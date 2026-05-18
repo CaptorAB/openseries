@@ -5,6 +5,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.8"
+  UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -39,34 +41,26 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.UV_VERSION }}
 
-      - name: Create virtual environment and install dependencies
-        run: |
-          uv venv venv
-          . venv/bin/activate
-          uv pip install -e ".[dev]"
-          uv pip list
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra dev
 
       - name: Check and fix with Ruff
-        run: |
-          . venv/bin/activate
-          ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+        run: uv run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
-        run: |
-          . venv/bin/activate
-          ruff format
+        run: uv run ruff format
 
       - name: Type check with Mypy
-        run: |
-          . venv/bin/activate
-          mypy .
+        run: uv run mypy .
 
       - name: Tests with Pytest
         id: pytest
-        run: |
-          . venv/bin/activate
-          PYTHONPATH=${PWD} pytest
+        run: uv run pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Create GitHub issue on failure
         if: ${{ failure() }}
@@ -168,6 +162,8 @@ jobs:
     needs: version_tag
     if: ${{ needs.version_tag.result == 'success' }}
     runs-on: ubuntu-latest
+    outputs:
+      tag_version: ${{ needs.version_tag.outputs.tag_version }}
     permissions:
       contents: write  # Required for gh release create
     steps:
@@ -193,26 +189,37 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Check out repository
+      - name: Check out release tag
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          ref: refs/tags/${{ needs.release.outputs.tag_version }}
           persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version-file: '.python-version'
+          python-version-file: .python-version
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Verify lockfile
+        run: uv lock --check
 
       - name: Build distributions (sdist + wheel)
         run: |
+          set -euo pipefail
           uv build
           uvx twine check dist/*
+          (cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS && cat SHA256SUMS)
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dist
-          path: dist/*
+          path: dist/
           if-no-files-found: error
 
   publish_testpypi:
@@ -232,6 +239,12 @@ jobs:
         with:
           name: dist
           path: dist
+
+      - name: Verify distribution checksums
+        run: |
+          set -euo pipefail
+          cd dist
+          sha256sum -c SHA256SUMS
 
       - name: Publish distributions to TestPyPI (OIDC)
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
@@ -256,6 +269,12 @@ jobs:
         with:
           name: dist
           path: dist
+
+      - name: Verify distribution checksums
+        run: |
+          set -euo pipefail
+          cd dist
+          sha256sum -c SHA256SUMS
 
       - name: Publish distributions to PyPI (OIDC)
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0

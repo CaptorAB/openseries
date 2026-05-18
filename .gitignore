@@ -11,6 +11,7 @@ junit.xml
 
 # Environments
 /venv/
+requirements-audit.txt
 
 # Setuptools / editable-install metadata (regenerated on pip/uv install -e)
 *.egg-info/

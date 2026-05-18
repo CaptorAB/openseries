@@ -5,6 +5,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.8"
+  UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -53,25 +55,18 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: ${{ env.UV_VERSION }}
 
-      - name: Create virtual environment and install dependencies
-        run: |
-          uv venv venv
-          . venv/bin/activate
-          uv pip install -e ".[docs]"
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra docs
 
       - name: Build documentation
-        run: |
-          . venv/bin/activate
-          cd docs
-          make builddocs
+        run: uv run --directory docs make builddocs
 
       - name: Check for documentation warnings
         run: |
-          . venv/bin/activate
-          cd docs
-          # Build with warnings as errors to catch issues
-          make strict || {
+          uv run --directory docs make strict || {
             echo "Documentation build failed with warnings/errors:"
             echo "This indicates potential issues that should be fixed."
             exit 1
