@@ -8,7 +8,7 @@ from json import load
 from logging import WARNING
 from pathlib import Path
 from pprint import pformat
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 import pytest
 from numpy import array
@@ -138,6 +138,19 @@ def test_opentimeseries_invalid_domestic(domestic: str) -> None:
         match=r"type=string_too_short|type=string_type",
     ):
         serie.domestic = domestic
+
+
+def test_opentimeseries_valid_domestic_assignment() -> None:
+    """Valid ``domestic`` updates run the field validator success path."""
+    serie = OpenTimeSeries.from_arrays(
+        name="Asset",
+        dates=["2023-01-01", "2023-01-02"],
+        values=[1.0, 1.1],
+    )
+    serie.domestic = "USD"
+    if serie.domestic != "USD":
+        msg = "Expected domestic currency to update after valid assignment"
+        raise AssertionError(msg)
 
 
 @pytest.mark.parametrize(
@@ -445,7 +458,7 @@ class TestOpenTimeSeries:
         serie_data: OpenTimeSeriesInput = {"tsdf": cast("DataFrame", serie), **data}
 
         df_obj = OpenTimeSeries(**df_data)
-        if list(df_obj.tsdf.to_numpy()) != df_obj.values:  # noqa: PD011
+        if list(df_obj.tsdf.to_numpy()) != data["values"]:
             msg = "Raw values and DataFrame values not matching"
             raise OpenTimeSeriesTestError(msg)
 
@@ -457,6 +470,7 @@ class TestOpenTimeSeries:
 
     def test_create_from_arrays(self: TestOpenTimeSeries) -> None:
         """Test from_arrays construct method."""
+        expected_values = [1.0, 1.01, 0.99, 1.015, 1.003]
         arrseries = OpenTimeSeries.from_arrays(
             name="arrseries",
             dates=[
@@ -466,7 +480,7 @@ class TestOpenTimeSeries:
                 "2019-06-27",
                 "2019-06-28",
             ],
-            values=[1.0, 1.01, 0.99, 1.015, 1.003],
+            values=expected_values,
         )
 
         msg = "Method from_arrays() not working as intended"
@@ -474,7 +488,7 @@ class TestOpenTimeSeries:
             raise TypeError(msg)
 
         arrseries.pandas_df()
-        if list(arrseries.tsdf.to_numpy().flatten()) != arrseries.values:  # noqa: PD011
+        if list(arrseries.tsdf.to_numpy().flatten()) != expected_values:
             msg = "pandas_df() should repopulate tsdf from dates and values"
             raise OpenTimeSeriesTestError(msg)
 
@@ -630,7 +644,7 @@ class TestOpenTimeSeries:
             match=r"Argument dframe must be pandas Series or DataFrame.",
         ):
             _ = OpenTimeSeries.from_df(
-                dframe=wrongtype,  # type: ignore[arg-type]
+                dframe=wrongtype,
             )
 
     def test_check_if_none(self: TestOpenTimeSeries) -> None:
@@ -656,7 +670,7 @@ class TestOpenTimeSeries:
             msg = "test_to_json test case setup failed."
             raise FileExistsError(msg)
 
-        kwargs = [
+        kwargs: list[dict[str, Any]] = [
             {
                 "what_output": "values",
                 "filename": str(seriesfile),
@@ -673,7 +687,7 @@ class TestOpenTimeSeries:
         ]
 
         for kwarg in kwargs:
-            data = self.randomseries.to_json(**kwarg)  # type: ignore[arg-type]
+            data = self.randomseries.to_json(**kwarg)
             if [item.get("name") for item in data] != ["Asset_0"]:
                 msg = "Unexpected data from json"
                 raise OpenTimeSeriesTestError(msg)
@@ -708,12 +722,12 @@ class TestOpenTimeSeries:
 
         series_one = next(
             OpenTimeSeries.from_arrays(
-                name=item["name"],  # type: ignore[arg-type]
-                dates=item["dates"],  # type: ignore[arg-type]
-                values=item["values"],  # type: ignore[arg-type]
+                name=cast("str", item["name"]),
+                dates=cast("list[str]", item["dates"]),
+                values=cast("list[float]", item["values"]),
                 valuetype=ValueType.RTRN,
-                baseccy=item["currency"],  # type: ignore[arg-type]
-                local_ccy=item["local_ccy"],  # type: ignore[arg-type]
+                baseccy=cast("str", item["currency"]),
+                local_ccy=cast("bool", item["local_ccy"]),
             ).to_cumret()
             for item in data
         )
@@ -777,12 +791,12 @@ class TestOpenTimeSeries:
 
         series_one = next(
             OpenTimeSeries.from_arrays(
-                name=item["name"],  # type: ignore[arg-type]
-                dates=item["dates"],  # type: ignore[arg-type]
-                values=item["values"],  # type: ignore[arg-type]
-                valuetype=item["valuetype"],  # type: ignore[arg-type]
-                baseccy=item["currency"],  # type: ignore[arg-type]
-                local_ccy=item["local_ccy"],  # type: ignore[arg-type]
+                name=cast("str", item["name"]),
+                dates=cast("list[str]", item["dates"]),
+                values=cast("list[float]", item["values"]),
+                valuetype=cast("ValueType", item["valuetype"]),
+                baseccy=cast("str", item["currency"]),
+                local_ccy=cast("bool", item["local_ccy"]),
             ).to_cumret()
             for item in data
         )
@@ -1469,7 +1483,7 @@ class TestOpenTimeSeries:
 
         base_series_one = self.randomseries.from_deepcopy()
 
-        sub_series_one = NewTimeSeries.from_arrays(
+        sub_series_one: NewTimeSeries = NewTimeSeries.from_arrays(
             name="sub_series_one",
             dates=base_series_one.dates,
             values=Series(base_series_one.tsdf.iloc[:, 0]).tolist(),
@@ -1487,7 +1501,7 @@ class TestOpenTimeSeries:
                 1.011,
             ],
         )
-        sub_series_two = NewTimeSeries.from_arrays(
+        sub_series_two: NewTimeSeries = NewTimeSeries.from_arrays(
             name="sub_series_two",
             dates=[
                 "2019-06-28",
@@ -1500,10 +1514,7 @@ class TestOpenTimeSeries:
                 1.011,
             ],
         )
-        if (
-            sub_series_one.extra_info  # type: ignore[attr-defined, unused-ignore]
-            != "cool"
-        ):
+        if sub_series_one.extra_info != "cool":
             raise OpenTimeSeriesTestError(msg)
 
         new_base = timeseries_chain(front=base_series_one, back=base_series_two)
@@ -1524,7 +1535,9 @@ class TestOpenTimeSeries:
         if new_base.dates != new_sub.dates:
             raise OpenTimeSeriesTestError(msg)
 
-        if new_base.values != new_sub.values:  # noqa: PD011
+        if list(new_base.tsdf.to_numpy().flatten()) != list(
+            new_sub.tsdf.to_numpy().flatten(),
+        ):
             raise OpenTimeSeriesTestError(msg)
 
     def test_chained_methods_newclass(self: TestOpenTimeSeries) -> None:
@@ -1791,20 +1804,21 @@ class TestOpenTimeSeries:
             expected_exception=ValueError,
             match=r"'order' must be 2 or 3, got 4.",
         ):
-            _ = self.randomseries.sortino_ratio_func(order=4)  # type: ignore[arg-type]
+            _ = self.randomseries.sortino_ratio_func(order=cast("Any", 4))
 
     def test_validations(self: TestOpenTimeSeries) -> None:
         """Test input validations."""
         msg = "Validations base case setup failed"
+        expected_values = [100.0]
         basecase = OpenTimeSeries.from_arrays(
             name="asset",
             dates=["2017-05-29"],
-            values=[100.0],
+            values=expected_values,
         )
         if basecase.dates != ["2017-05-29"]:
             raise OpenTimeSeriesTestError(msg)
 
-        if basecase.values != [100.0]:  # noqa: PD011
+        if list(basecase.tsdf.to_numpy().flatten()) != expected_values:
             raise OpenTimeSeriesTestError(msg)
 
         basecase.countries = cast("set[str]", ["SE", "US"])

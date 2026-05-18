@@ -6,6 +6,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.8"
+  UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -42,52 +44,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          path: |
-            ~/AppData/Local/pypoetry/Cache/cache
-            ~/AppData/Local/pypoetry/Cache/artifacts
-          key: poetry-windows-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-windows-
+          version: ${{ env.UV_VERSION }}
 
-      - name: Create virtual environment and install Poetry
-        run: |
-          python -m venv venv
-          . venv/Scripts/activate
-          python.exe -m pip install --upgrade pip
-          pip install poetry==2.3.3
-
-      - name: Install dependencies with Poetry
-        run: |
-          . venv/Scripts/activate
-          poetry install --with dev
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra dev
 
       - name: Check and fix with Ruff
-        run: |
-          . venv/Scripts/activate
-          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+        run: uv run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
-        run: |
-          . venv/Scripts/activate
-          poetry run ruff format
+        run: uv run ruff format
 
       - name: Type check with Mypy
-        run: |
-          . venv/Scripts/activate
-          poetry run mypy .
+        run: uv run mypy .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
-        run: |
-          . venv/Scripts/activate
-          PYTHONPATH=${PWD} poetry run pytest
+        run: uv run pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_OWNER: ${{ github.repository_owner }}
           GH_REPO: ${{ github.event.repository.name }}
@@ -108,9 +91,8 @@ jobs:
 
       - name: Package and check
         run: |
-          . venv/Scripts/activate
-          poetry build
-          poetry check
+          uv build
+          uvx twine check dist/*
 
   ubuntu:
     name: Build on Ubuntu
@@ -136,52 +118,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          path: |
-            ~/.cache/pypoetry/cache
-            ~/.cache/pypoetry/artifacts
-          key: poetry-ubuntu-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-ubuntu-
+          version: ${{ env.UV_VERSION }}
 
-      - name: Create virtual environment and install Poetry
-        run: |
-          python -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install poetry==2.3.3
-
-      - name: Install dependencies with Poetry
-        run: |
-          . venv/bin/activate
-          poetry install --with dev
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra dev
 
       - name: Check and fix with Ruff
-        run: |
-          . venv/bin/activate
-          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+        run: uv run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
-        run: |
-          . venv/bin/activate
-          poetry run ruff format
+        run: uv run ruff format
 
       - name: Type check with Mypy
-        run: |
-          . venv/bin/activate
-          poetry run mypy .
+        run: uv run mypy .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
-        run: |
-          . venv/bin/activate
-          PYTHONPATH=${PWD} poetry run pytest
+        run: uv run pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_OWNER: ${{ github.repository_owner }}
           GH_REPO: ${{ github.event.repository.name }}
@@ -202,9 +165,8 @@ jobs:
 
       - name: Package and check
         run: |
-          . venv/bin/activate
-          poetry build
-          poetry check
+          uv build
+          uvx twine check dist/*
 
   macos:
     name: Build on macOS
@@ -230,52 +192,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          path: |
-            ~/Library/Caches/pypoetry/cache
-            ~/Library/Caches/pypoetry/artifacts
-          key: poetry-macos-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-macos-
+          version: ${{ env.UV_VERSION }}
 
-      - name: Create virtual environment and install Poetry
-        run: |
-          python -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install poetry==2.3.3
-
-      - name: Install dependencies with Poetry
-        run: |
-          . venv/bin/activate
-          poetry install --with dev
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra dev
 
       - name: Check and fix with Ruff
-        run: |
-          . venv/bin/activate
-          poetry run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
+        run: uv run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
 
       - name: Format with Ruff
-        run: |
-          . venv/bin/activate
-          poetry run ruff format
+        run: uv run ruff format
 
       - name: Type check with Mypy
-        run: |
-          . venv/bin/activate
-          poetry run mypy .
+        run: uv run mypy .
 
       - name: Tests with Pytest
         id: pytest
         continue-on-error: true
-        run: |
-          . venv/bin/activate
-          PYTHONPATH=${PWD} poetry run pytest
+        run: uv run pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Create GitHub issue on failure
         if: ${{ steps.pytest.outcome == 'failure' }}
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_OWNER: ${{ github.repository_owner }}
           GH_REPO: ${{ github.event.repository.name }}
@@ -296,6 +239,5 @@ jobs:
 
       - name: Package and check
         run: |
-          . venv/bin/activate
-          poetry build
-          poetry check
+          uv build
+          uvx twine check dist/*

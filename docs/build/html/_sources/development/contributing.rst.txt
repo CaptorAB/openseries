@@ -17,25 +17,21 @@ Development Setup
    git clone https://github.com/yourusername/openseries.git
    cd openseries
 
-3. Install Poetry (if not already installed):
+3. Install uv (if not already installed):
 
 .. code-block:: bash
 
-   curl -sSL https://install.python-poetry.org | python3 -
+   pip install uv
 
-4. Install dependencies:
-
-.. code-block:: bash
-
-   poetry install
-
-5. Activate the virtual environment:
+4. Create a virtual environment and install dependencies:
 
 .. code-block:: bash
 
-   poetry shell
+   uv venv venv
+   source venv/bin/activate
+   uv pip install -e ".[dev,docs]"
 
-6. Install pre-commit hooks:
+5. Install pre-commit hooks:
 
 .. code-block:: bash
 

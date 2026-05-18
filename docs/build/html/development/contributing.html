@@ -172,24 +172,20 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li><p>Install Poetry (if not already installed):</p></li>
+<li><p>Install uv (if not already installed):</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>uv
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
-<li><p>Install dependencies:</p></li>
+<li><p>Create a virtual environment and install dependencies:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev,docs]&quot;</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="5">
-<li><p>Activate the virtual environment:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>shell
-</pre></div>
-</div>
-<ol class="arabic simple" start="6">
 <li><p>Install pre-commit hooks:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install

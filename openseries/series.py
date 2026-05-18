@@ -14,6 +14,7 @@ if TYPE_CHECKING:  # pragma: no cover
 from numpy import (
     append,
     array,
+    asarray,
     cumprod,
     diff,
     float64,
@@ -107,7 +108,6 @@ class OpenTimeSeries(_CommonModel[float]):
     currency: CurrencyStringType
     domestic: CurrencyStringType = "SEK"
     countries: CountriesType = "SE"
-    markets: list[str] | str | None = None  # type: ignore[assignment]
     isin: str | None = None
     label: str | None = None
 
@@ -173,6 +173,14 @@ class OpenTimeSeries(_CommonModel[float]):
             raise ValueError(msg)
         return self
 
+    def _coerce_result(
+        self: Self,
+        result: Series[float],
+        name: str,
+    ) -> float:
+        _ = name
+        return float(asarray(a=result, dtype=float64).squeeze())
+
     @classmethod
     def from_arrays(
         cls,
@@ -228,7 +236,7 @@ class OpenTimeSeries(_CommonModel[float]):
     @classmethod
     def from_df(
         cls,
-        dframe: Series[float] | DataFrame,
+        dframe: Series | DataFrame | object,
         column_nmbr: int = 0,
         valuetype: ValueType = ValueType.PRICE,
         baseccy: CurrencyStringType = "SEK",
@@ -255,13 +263,16 @@ class OpenTimeSeries(_CommonModel[float]):
         """
         msg = "Argument dframe must be pandas Series or DataFrame."
         values: list[float]
+        pandas_obj: Series | DataFrame
         if isinstance(dframe, Series):
+            pandas_obj = dframe
             if isinstance(dframe.name, tuple):
                 label, _ = dframe.name
             else:
                 label = dframe.name
             values = dframe.to_numpy().tolist()
         elif isinstance(dframe, DataFrame):
+            pandas_obj = dframe
             values = dframe.iloc[:, column_nmbr].to_list()
             if isinstance(dframe.columns, MultiIndex):
                 if _check_if_none(
@@ -287,7 +298,7 @@ class OpenTimeSeries(_CommonModel[float]):
         else:
             raise TypeError(msg)
 
-        dates = [date_fix(d).strftime("%Y-%m-%d") for d in dframe.index]
+        dates = [date_fix(d).strftime("%Y-%m-%d") for d in pandas_obj.index]
 
         return cls(
             timeseries_id="",
@@ -444,10 +455,8 @@ class OpenTimeSeries(_CommonModel[float]):
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         self.valuetype = ValueType.RTRN
-        arrays = [[self.label], [self.valuetype]]
-        returns.columns = MultiIndex.from_arrays(
-            arrays=arrays,  # type: ignore[arg-type]
-        )
+        arrays = cast("Any", [[self.label], [self.valuetype]])
+        returns.columns = MultiIndex.from_arrays(arrays)
         self.tsdf = returns.copy()
         return self
 
@@ -1045,7 +1054,7 @@ def timeseries_chain(
     )
 
 
-def _check_if_none(item: Any) -> bool:  # noqa: ANN401
+def _check_if_none(item: object) -> bool:
     """Check if a variable is None or equivalent.
 
     Args:
@@ -1054,9 +1063,10 @@ def _check_if_none(item: Any) -> bool:  # noqa: ANN401
     Returns:
         Answer to whether the variable is None or equivalent.
     """
+    if item is None:
+        return True
+
     try:
-        return cast("bool", isnan(item))
-    except TypeError:
-        if item is None:
-            return True
+        return cast("bool", isnan(cast("float", item)))
+    except (TypeError, ValueError):
         return len(str(item)) == 0

@@ -6,10 +6,10 @@ This directory contains the documentation for the openseries project, built usin
 
 ### Prerequisites
 
-Install the documentation dependencies using Poetry:
+Install the documentation dependencies using uv:
 
 ```bash
-poetry install --with docs
+uv pip install -e ".[docs]"
 ```
 
 ### Building HTML Documentation
@@ -18,8 +18,8 @@ To build the HTML documentation:
 
 ```bash
 make builddocs
-# or directly with Poetry:
-poetry run sphinx-build -b html source build/html
+# or directly:
+sphinx-build -b html source build/html
 ```
 
 The built documentation will be available in `build/html/index.html`.
@@ -37,15 +37,15 @@ For development with auto-reload:
 
 ```bash
 make servedocs
-# or directly with Poetry:
-poetry run sphinx-autobuild source build/html --host 127.0.0.1 --port 8000
+# or directly:
+sphinx-autobuild source build/html --host 127.0.0.1 --port 8000
 ```
 
 This will start a local server at `http://localhost:8000` that automatically rebuilds when files change.
 
 ## Documentation Structure
 
-```
+```text
 docs/
 ├── source/
 │   ├── index.rst                 # Main documentation index
@@ -85,8 +85,8 @@ docs/
 This documentation is configured for [ReadTheDocs](https://readthedocs.org/) hosting:
 
 - Configuration: `.readthedocs.yaml` in the project root
-- Dependencies: Managed through Poetry in `pyproject.toml` docs group
-- Build process: Automated on ReadTheDocs using Poetry
+- Dependencies: Managed through `pyproject.toml` optional docs dependencies
+- Build process: Automated on ReadTheDocs
 
 ## Writing Documentation
 
@@ -192,8 +192,8 @@ When contributing to documentation:
 
 **Missing modules:**
 
-- Install missing dependencies: `poetry install --with docs`
-- For ReadTheDocs builds, dependencies are managed through Poetry in `pyproject.toml`
+- Install missing dependencies: `uv pip install -e ".[docs]"`
+- For ReadTheDocs builds, dependencies are managed through `pyproject.toml`
 
 **Broken links:**
 
