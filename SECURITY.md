@@ -24,9 +24,10 @@ vulnerabilities.
   and verify checksums before publish.
 - **`pull_request_target` is not used**; PR CI runs on `pull_request` with
   read-only defaults and fork guards on cache restore and issue creation.
-- **Release and publish** are isolated in separate reusable workflows
-  (`release-tag.yml`, `release-publish.yml`); `deploy.yml` is the only manual
-  entry point and requires the `master` branch.
+- **Release tagging** is isolated in a reusable workflow (`release-tag.yml`);
+  build and PyPI publish run in `deploy.yml` because PyPI Trusted Publishing
+  does not support reusable workflows. `deploy.yml` is the only manual entry
+  point and requires the `master` branch.
 - **Runners** are GitHub-hosted (`ubuntu-latest`, `windows-latest`,
   `macos-latest`); each job gets a fresh ephemeral VM with no persistent state.
 - **OIDC** (`id-token: write`) is granted only on GitHub Pages and PyPI publish
