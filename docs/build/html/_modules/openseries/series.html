@@ -124,6 +124,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">append</span><span class="p">,</span>
     <span class="n">array</span><span class="p">,</span>
+    <span class="n">asarray</span><span class="p">,</span>
     <span class="n">cumprod</span><span class="p">,</span>
     <span class="n">diff</span><span class="p">,</span>
     <span class="n">float64</span><span class="p">,</span>
@@ -219,7 +220,6 @@
     <span class="n">currency</span><span class="p">:</span> <span class="n">CurrencyStringType</span>
     <span class="n">domestic</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">&quot;SEK&quot;</span>
     <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span>
-    <span class="n">markets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore[assignment]</span>
     <span class="n">isin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -285,6 +285,14 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_coerce_result</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+
 <div class="viewcode-block" id="OpenTimeSeries.from_arrays">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.from_arrays">[docs]</a>
     <span class="nd">@classmethod</span>
@@ -345,7 +353,7 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_df</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
-        <span class="n">dframe</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">dframe</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="nb">object</span><span class="p">,</span>
         <span class="n">column_nmbr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">valuetype</span><span class="p">:</span> <span class="n">ValueType</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
         <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">&quot;SEK&quot;</span><span class="p">,</span>
@@ -372,13 +380,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Argument dframe must be pandas Series or DataFrame.&quot;</span>
         <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+        <span class="n">pandas_obj</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dframe</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
+            <span class="n">pandas_obj</span> <span class="o">=</span> <span class="n">dframe</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dframe</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="n">label</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">name</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">label</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">name</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dframe</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">pandas_obj</span> <span class="o">=</span> <span class="n">dframe</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">column_nmbr</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">_check_if_none</span><span class="p">(</span>
@@ -404,7 +415,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">date_fix</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dframe</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">date_fix</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">pandas_obj</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">timeseries_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -576,10 +587,8 @@
         <span class="n">returns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
         <span class="n">returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
-        <span class="n">arrays</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]]</span>
-        <span class="n">returns</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-            <span class="n">arrays</span><span class="o">=</span><span class="n">arrays</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
-        <span class="p">)</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]])</span>
+        <span class="n">returns</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -1221,7 +1230,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_check_if_none</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: ANN401</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_if_none</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a variable is None or equivalent.</span>
 
 <span class="sd">    Args:</span>
@@ -1230,11 +1239,12 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Answer to whether the variable is None or equivalent.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">isnan</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">isnan</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">item</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 

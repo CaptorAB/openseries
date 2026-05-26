@@ -1,4 +1,5 @@
 . venv/bin/activate
+export UV_PROJECT_ENVIRONMENT=venv
 echo ""
 if [[ ":$PYTHONPATH:" != *":$PWD:"* ]]; then
     export PYTHONPATH=${PWD}:$PYTHONPATH

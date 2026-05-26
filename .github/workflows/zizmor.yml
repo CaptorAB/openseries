@@ -6,6 +6,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.16"
+  ZIZMOR_VERSION: "1.25.2"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -14,7 +16,9 @@ concurrency:
 on:
   workflow_dispatch: {}
   push:
-    branches: ["master"]
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   zizmor:
@@ -30,18 +34,19 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.sha }}
           persist-credentials: false
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          version: "latest"
+          version: ${{ env.UV_VERSION }}
 
       - name: Run zizmor
-        run: uvx zizmor --format=sarif . > results.sarif
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZIZMOR_VERSION: ${{ env.ZIZMOR_VERSION }}
+        run: uvx zizmor==${ZIZMOR_VERSION} --strict-collection --pedantic --format=sarif . > results.sarif
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
         with:
           sarif_file: results.sarif
           category: zizmor

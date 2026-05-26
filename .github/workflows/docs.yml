@@ -5,6 +5,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  UV_VERSION: "0.11.16"
+  UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
@@ -51,39 +53,20 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Manage Poetry cache
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          path: |
-            ~/.cache/pypoetry/cache
-            ~/.cache/pypoetry/artifacts
-          key: poetry-cache-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-          restore-keys: poetry-cache-${{ runner.os }}-
+          version: ${{ env.UV_VERSION }}
 
-      - name: Create virtual environment and install Poetry
-        run: |
-          python -m venv venv
-          . venv/bin/activate
-          pip install --upgrade pip
-          pip install poetry==2.3.3
-
-      - name: Install dependencies with Poetry
-        run: |
-          . venv/bin/activate
-          poetry install --with docs
+      - name: Sync dependencies (locked)
+        run: uv sync --locked --extra docs
 
       - name: Build documentation
-        run: |
-          . venv/bin/activate
-          cd docs
-          make builddocs
+        run: uv run --directory docs make builddocs
 
       - name: Check for documentation warnings
         run: |
-          . venv/bin/activate
-          cd docs
-          # Build with warnings as errors to catch issues
-          make strict || {
+          uv run --directory docs make strict || {
             echo "Documentation build failed with warnings/errors:"
             echo "This indicates potential issues that should be fixed."
             exit 1
@@ -93,7 +76,7 @@ jobs:
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: docs/build/html
 

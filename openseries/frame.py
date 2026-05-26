@@ -91,13 +91,10 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         weights: List of weights in float format. Optional.
     """
 
-    constituents: list[OpenTimeSeries]
-    tsdf: DataFrame = DataFrame(dtype="float64")
-    weights: list[float] | None = None
-
     @field_validator("constituents")
+    @classmethod
     def _check_labels_unique(
-        cls: type[OpenFrame],  # noqa: N805
+        cls: type[OpenFrame],
         tseries: list[OpenTimeSeries],
     ) -> list[OpenTimeSeries]:
         """Pydantic validator ensuring that OpenFrame labels are unique."""
@@ -122,7 +119,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         """
         copied_constituents = [ts.from_deepcopy() for ts in constituents]
 
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             constituents=copied_constituents,
             weights=weights,
         )
@@ -139,6 +136,18 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 )
         else:
             logger.warning("OpenFrame() was passed an empty list.")
+
+    def _coerce_result(
+        self: Self,
+        result: Series[float],
+        name: str,
+    ) -> SeriesFloat:
+        return Series(
+            data=result,
+            index=self.tsdf.columns,
+            name=name,
+            dtype="float64",
+        )
 
     def from_deepcopy(self: Self) -> Self:
         """Create copy of the OpenFrame object.
@@ -309,11 +318,14 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         returns = self.tsdf.ffill().pct_change()
         returns.iloc[0] = 0
         new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
-        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
-            self.tsdf.columns.get_level_values(0),
-            new_labels,
-        ]
-        returns.columns = MultiIndex.from_arrays(arrays=arrays)
+        arrays = cast(
+            "Any",
+            [
+                self.tsdf.columns.get_level_values(0),
+                new_labels,
+            ],
+        )
+        returns.columns = MultiIndex.from_arrays(arrays)
         self.tsdf = returns.copy()
         return self
 
@@ -330,10 +342,13 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         self.tsdf = self.tsdf.diff(periods=periods)
         self.tsdf.iloc[0] = 0
         new_labels: list[ValueType] = [ValueType.RTRN] * self.item_count
-        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
-            self.tsdf.columns.get_level_values(0),
-            new_labels,
-        ]
+        arrays = cast(
+            "Any",
+            [
+                self.tsdf.columns.get_level_values(0),
+                new_labels,
+            ],
+        )
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 
@@ -358,10 +373,13 @@ class OpenFrame(_CommonModel[SeriesFloat]):
         self.tsdf = returns.cumprod(axis=0) / returns.iloc[0]
 
         new_labels: list[ValueType] = [ValueType.PRICE] * self.item_count
-        arrays: list[Index[Any], list[ValueType]] = [  # type: ignore[type-arg]
-            self.tsdf.columns.get_level_values(0),
-            new_labels,
-        ]
+        arrays = cast(
+            "Any",
+            [
+                self.tsdf.columns.get_level_values(0),
+                new_labels,
+            ],
+        )
         self.tsdf.columns = MultiIndex.from_arrays(arrays)
         return self
 

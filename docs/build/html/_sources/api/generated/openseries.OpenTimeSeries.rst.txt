@@ -146,8 +146,10 @@
       ~OpenTimeSeries.currency
       ~OpenTimeSeries.domestic
       ~OpenTimeSeries.countries
-      ~OpenTimeSeries.markets
       ~OpenTimeSeries.isin
       ~OpenTimeSeries.label
+      ~OpenTimeSeries.constituents
+      ~OpenTimeSeries.weights
+      ~OpenTimeSeries.markets
    
    

@@ -536,7 +536,7 @@ def report_html(
     *,
     auto_open: bool = False,
     add_logo: bool = True,
-    vertical_legend: bool = True,  # noqa: ARG001
+    vertical_legend: bool = True,
 ) -> tuple[Figure, str]:
     """Generate a responsive HTML report page with line and bar plots and a table."""
     copied = data.from_deepcopy()
@@ -649,6 +649,8 @@ def report_html(
         "config": config,
     }
 
+    if not vertical_legend:
+        logger.debug("Horizontal legend layout requested.")
     legend_html = _get_legend_html(line_traces=line_traces, colorway=colorway)
 
     html = _generate_html(

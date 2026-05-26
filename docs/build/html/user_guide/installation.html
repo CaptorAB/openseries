@@ -250,14 +250,13 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/CaptorAB/openseries.git
 <span class="nb">cd</span><span class="w"> </span>openseries
 
-<span class="c1"># Install Poetry (if not already installed)</span>
-pip<span class="w"> </span>install<span class="w"> </span>poetry
+<span class="c1"># Install uv (if not already installed)</span>
+pip<span class="w"> </span>install<span class="w"> </span>uv
 
-<span class="c1"># Install dependencies</span>
-poetry<span class="w"> </span>install
-
-<span class="c1"># Activate virtual environment</span>
-poetry<span class="w"> </span>shell
+<span class="c1"># Create a virtual environment and install dependencies</span>
+uv<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
 </pre></div>
 </div>
 <p>This will install additional development dependencies including:</p>
