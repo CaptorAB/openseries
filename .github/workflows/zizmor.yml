@@ -6,8 +6,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  UV_VERSION: "0.11.8"
-  ZIZMOR_VERSION: "1.24.1"
+  UV_VERSION: "0.11.16"
+  ZIZMOR_VERSION: "1.25.2"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
