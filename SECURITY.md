@@ -22,6 +22,38 @@ vulnerabilities.
   supply-chain scans (`supply-chain.yml`).
 - **Releases** build from the signed git tag, record `SHA256SUMS` for artifacts,
   and verify checksums before publish.
+- **`pull_request_target` is not used**; PR CI runs on `pull_request` with
+  read-only defaults and fork guards on cache restore and issue creation.
+- **Release and publish** are isolated in separate reusable workflows
+  (`release-tag.yml`, `release-publish.yml`); `deploy.yml` is the only manual
+  entry point and requires the `master` branch.
+- **Runners** are GitHub-hosted (`ubuntu-latest`, `windows-latest`,
+  `macos-latest`); each job gets a fresh ephemeral VM with no persistent state.
+- **OIDC** (`id-token: write`) is granted only on GitHub Pages and PyPI publish
+  jobs; all other workflows omit it.
+
+## Organization and repository settings checklist
+
+These settings require org/repo admin access and cannot be enforced from workflow
+YAML alone:
+
+1. **Actions → General → Workflow permissions**: set default to *Read repository
+   contents and packages permissions* (read-only).
+2. **Actions → General → Fork pull request workflows**: require approval for
+   outside collaborators (or all first-time contributors) before running
+   workflows from forks.
+3. **Environments** (`release`, `testpypi`, `pypi`, `github-pages`, `codecov`):
+   - Required reviewers before deployment
+   - Restrict deployment branches to `master`
+   - Do not expose secrets to fork PR workflows
+4. **Branch protection on `master`**:
+   - Require status checks from `tests.yml`, `supply-chain.yml`, `zizmor.yml`,
+     and CodeQL before merge
+   - Require review for changes under `.github/workflows/`
+5. **Dependabot**: keep weekly updates with cooldown enabled (see
+   `.github/dependabot.yml`).
+6. **Audit log**: periodically review GitHub audit log for workflow or secret
+   changes, especially around releases.
 
 ## Maintainer release checklist
 

@@ -2,7 +2,7 @@ name: codeql.yml
 
 permissions:
   contents: read
-  actions: read
+  actions: read  # Required for setup-python and other actions to read action metadata
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
+      security-events: write  # Required for github/codeql-action/analyze to upload results
     steps:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

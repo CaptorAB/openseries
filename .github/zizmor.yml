@@ -3,6 +3,7 @@ rules:
   unpinned-uses:
     config:
       policies:
+        "*": hash-pin
         actions/*: hash-pin
         astral-sh/*: hash-pin
         google/*: hash-pin
@@ -31,3 +32,7 @@ rules:
         - astral-sh/setup-uv
         - codecov/codecov-action
         - google/osv-scanner-action/osv-scanner-action
+
+  dependabot-cooldown:
+    config:
+      days: 7
