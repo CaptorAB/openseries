@@ -1,4 +1,4 @@
-name: deploy.yml
+name: release-publish.yml
 
 permissions:
   contents: read
@@ -8,123 +8,16 @@ env:
   UV_VERSION: "0.11.16"
   UV_PROJECT_ENVIRONMENT: venv
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 on:
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      tag_version:
+        required: true
+        type: string
 
 jobs:
-  gate:
-    name: Verify release branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Require master branch
-        env:
-          REF: ${{ github.ref }}
-        run: |
-          if [ "$REF" != "refs/heads/master" ]; then
-            echo "::error::Deploy workflow must be run from the master branch."
-            exit 1
-          fi
-
-  build_test:
-    name: Build and test
-    needs: gate
-    runs-on: ubuntu-latest
-    environment: codecov
-    permissions:
-      contents: read
-      issues: write  # Required for actions/github-script to create issues on test failure
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        id: setup_python
-        with:
-          python-version-file: '.python-version'
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-        with:
-          version: ${{ env.UV_VERSION }}
-
-      - name: Sync dependencies (locked)
-        run: uv sync --locked --extra dev
-
-      - name: Check and fix with Ruff
-        run: uv run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
-
-      - name: Format with Ruff
-        run: uv run ruff format
-
-      - name: Type check with Mypy
-        run: uv run mypy .
-
-      - name: Tests with Pytest
-        id: pytest
-        run: uv run pytest
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-
-      - name: Create GitHub issue on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        env:
-          GH_OWNER: ${{ github.repository_owner }}
-          GH_REPO: ${{ github.event.repository.name }}
-          GH_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        with:
-          script: |
-            const { GH_OWNER, GH_REPO, GH_RUN_URL } = process.env;
-            await github.rest.issues.create({
-              owner: GH_OWNER,
-              repo: GH_REPO,
-              title: `Tests failed on ${new Date().toDateString()}`,
-              body: `See the full logs here: ${GH_RUN_URL}`,
-            });
-
-      - name: Upload test results to Codecov
-        if: ${{ github.ref_name == 'master' && success() }}
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          report_type: test_results
-          files: junit.xml
-          verbose: true
-
-      - name: Upload coverage to Codecov
-        if: ${{ github.ref_name == 'master' && success() }}
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: CaptorAB/openseries
-          files: coverage.xml
-          verbose: true
-
-  tag_and_release:
-    name: Tag and create release
-    needs: build_test
-    if: ${{ needs.build_test.result == 'success' }}
-    permissions:
-      contents: write  # Required for release-tag reusable workflow to push signed tags
-    uses: ./.github/workflows/release-tag.yml
-    secrets:
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-
   build_dist:
     name: Build distributions
-    needs: tag_and_release
-    if: ${{ needs.tag_and_release.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -135,7 +28,7 @@ jobs:
       - name: Check out release tag
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: refs/tags/${{ needs.tag_and_release.outputs.tag_version }}
+          ref: refs/tags/${{ inputs.tag_version }}
           persist-credentials: false
 
       - name: Set up Python
