@@ -53,9 +53,9 @@ def load_plotly_dict(
         and logo is the Captor logo dict (may be empty if the remote logo is
         unavailable).
     """
-    project_root = Path(__file__).parent.parent
-    layoutfile = project_root.joinpath("openseries").joinpath("plotly_layouts.json")
-    logofile = project_root.joinpath("openseries").joinpath("plotly_captor_logo.json")
+    package_dir = Path(__file__).parent
+    layoutfile = package_dir / "plotly_layouts.json"
+    logofile = package_dir / "plotly_captor_logo.json"
 
     with layoutfile.open(mode="r", encoding="utf-8") as layout_file:
         fig = load(layout_file)

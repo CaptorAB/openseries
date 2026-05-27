@@ -1,6 +1,6 @@
 """openseries package initialization."""
 
-__version__ = "2.1.0"
+__version__ = "2.1.9"
 
 from .datefixer import (
     date_fix,

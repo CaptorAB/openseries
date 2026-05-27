@@ -804,7 +804,7 @@ wheels = [
 
 [[package]]
 name = "openseries"
-version = "2.1.8"
+version = "2.1.9"
 source = { editable = "." }
 dependencies = [
     { name = "exchange-calendars" },
