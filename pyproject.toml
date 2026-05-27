@@ -1,6 +1,6 @@
 [project]
 name = "openseries"
-version = "2.1.8"
+version = "2.1.9"
 description = "Tools for analyzing financial timeseries."
 authors = [
     { name = "Martin Karrin" },
@@ -83,11 +83,18 @@ docs = [
 ]
 
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools>=82", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["openseries"]
+
 [tool.setuptools.package-data]
-openseries = ["py.typed"]
+openseries = [
+    "py.typed",
+    "plotly_layouts.json",
+    "plotly_captor_logo.json",
+]
 
 [tool.mypy]
 python_version = "3.11"
