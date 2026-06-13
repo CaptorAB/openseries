@@ -845,7 +845,7 @@ class OpenTimeSeries(_CommonModel[float]):
             self.tsdf.columns = MultiIndex.from_arrays([[lvl_zero], [lvl_one]])
             self.label, self.valuetype = lvl_zero, cast("ValueType", lvl_one)
         if delete_lvl_one:
-            self.tsdf.columns = self.tsdf.columns.droplevel(level=1)
+            self.tsdf.columns = self.tsdf.columns.get_level_values(0)
         return self
 
     def _returns_series(self: Self, *, squared: bool = False) -> Series[float]:

@@ -87,7 +87,7 @@ def simulate_portfolios(
         msg = "Mix of series types will give inconsistent results"
         raise MixedValuetypesError(msg)
 
-    log_ret.columns = log_ret.columns.droplevel(level=1)
+    log_ret.columns = log_ret.columns.get_level_values(0)
 
     cov_matrix = log_ret.cov() * simframe.periods_in_a_year
     mean_returns = log_ret.mean() * simframe.periods_in_a_year
@@ -138,7 +138,7 @@ def _prepare_returns_for_frontier(eframe: OpenFrame) -> tuple[DataFrame, OpenFra
         msg = "Mix of series types will give inconsistent results"
         raise MixedValuetypesError(msg)
 
-    log_ret.columns = log_ret.columns.droplevel(level=1)
+    log_ret.columns = log_ret.columns.get_level_values(0)
     return log_ret, copi
 
 
@@ -157,7 +157,8 @@ def _calculate_frontier_bounds(
     Returns:
         Tuple of (min_return, max_return).
     """
-    frontier_min = float(simulated.loc[simulated["stdev"].idxmin()]["ret"])
+    min_stdev_idx = simulated["stdev"].idxmin()
+    frontier_min = cast("float", simulated.loc[min_stdev_idx, "ret"])
 
     arithmetic_means = array(log_ret.mean() * periods_in_a_year)
     cleaned_arithmetic_means = arithmetic_means[~isnan(arithmetic_means)]
@@ -577,7 +578,7 @@ def prepare_plot_data(
         ],
         index=["ret", "stdev", "text"],
     )
-    plotframe.columns = plotframe.columns.droplevel(level=1)
+    plotframe.columns = plotframe.columns.get_level_values(0)
     plotframe["Max Sharpe Portfolio"] = Series(
         data=[optimized[0], optimized[1], opt_text],
         index=plotframe.index,

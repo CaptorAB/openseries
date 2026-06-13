@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>openseries.load_plotly &mdash; openseries 2.1.7 documentation</title>
+  <title>openseries.load_plotly &mdash; openseries 2.1.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ebebaa27"></script>
+      <script src="../../_static/documentation_options.js?v=a7898dfc"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -165,9 +165,9 @@
 <span class="sd">        and logo is the Captor logo dict (may be empty if the remote logo is</span>
 <span class="sd">        unavailable).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">project_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
-    <span class="n">layoutfile</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;openseries&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;plotly_layouts.json&quot;</span><span class="p">)</span>
-    <span class="n">logofile</span> <span class="o">=</span> <span class="n">project_root</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;openseries&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;plotly_captor_logo.json&quot;</span><span class="p">)</span>
+    <span class="n">package_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">layoutfile</span> <span class="o">=</span> <span class="n">package_dir</span> <span class="o">/</span> <span class="s2">&quot;plotly_layouts.json&quot;</span>
+    <span class="n">logofile</span> <span class="o">=</span> <span class="n">package_dir</span> <span class="o">/</span> <span class="s2">&quot;plotly_captor_logo.json&quot;</span>
 
     <span class="k">with</span> <span class="n">layoutfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">layout_file</span><span class="p">:</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">layout_file</span><span class="p">)</span>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>openseries.series &mdash; openseries 2.1.7 documentation</title>
+  <title>openseries.series &mdash; openseries 2.1.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b36c5fd4" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ebebaa27"></script>
+      <script src="../../_static/documentation_options.js?v=a7898dfc"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -1004,7 +1004,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">([[</span><span class="n">lvl_zero</span><span class="p">],</span> <span class="p">[</span><span class="n">lvl_one</span><span class="p">]])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">lvl_zero</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ValueType&quot;</span><span class="p">,</span> <span class="n">lvl_one</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">delete_lvl_one</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
