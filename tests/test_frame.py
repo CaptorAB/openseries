@@ -1800,7 +1800,7 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
 
         _, divstring = plotframe.plot_series(auto_open=False, output_type="div")
-        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+        if not divstring.startswith("<div") or not divstring.endswith("</div>"):
             msg = "Html div section not created"
             raise OpenFrameTestError(msg)
 
@@ -2009,7 +2009,7 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
 
         _, divstring = plotframe.plot_bars(auto_open=False, output_type="div")
-        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+        if not divstring.startswith("<div") or not divstring.endswith("</div>"):
             msg = "Html div section not created"
             raise OpenFrameTestError(msg)
 
@@ -2320,7 +2320,7 @@ class TestOpenFrame:
             raise OpenFrameTestError(msg)
 
         _, divstring = plotframe.plot_histogram(auto_open=False, output_type="div")
-        if not (divstring.startswith("<div>") and divstring.endswith("</div>")):
+        if not divstring.startswith("<div") or not divstring.endswith("</div>"):
             msg = "Html div section not created"
             raise OpenFrameTestError(msg)
 

@@ -160,8 +160,9 @@ class TestPortfoliotools:
                 Decimal(cast("float", frontier.loc[:, "sharpe"].max())),
                 6,
             )
+            max_sharpe_idx = frontier["sharpe"].idxmax()
             frt_return_where_most_sharpe = round(
-                Decimal(float(frontier.loc[frontier["sharpe"].idxmax()]["ret"])),
+                Decimal(cast("float", frontier.loc[max_sharpe_idx, "ret"])),
                 6,
             )
 
@@ -179,8 +180,9 @@ class TestPortfoliotools:
                 Decimal(cast("float", result.loc[:, "stdev"].min())),
                 6,
             )
+            min_stdev_idx = result["stdev"].idxmin()
             sim_return_where_least_vol = round(
-                Decimal(float(result.loc[result["stdev"].idxmin()]["ret"])),
+                Decimal(cast("float", result.loc[min_stdev_idx, "ret"])),
                 6,
             )
 
@@ -517,7 +519,7 @@ class TestPortfoliotools:
         Raises:
             PortfoliotoolsTestError: If div format is incorrect.
         """
-        if divstring[:5] != "<div>" or divstring[-6:] != "</div>":
+        if not divstring.startswith("<div") or not divstring.endswith("</div>"):
             msg = "Html div section not created"
             raise PortfoliotoolsTestError(msg)
 

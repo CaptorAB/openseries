@@ -614,8 +614,8 @@ class OpenFrame(_CommonModel[SeriesFloat]):
                 min_periods=1,
             )
         )
-        corr_matrix.columns = corr_matrix.columns.droplevel(level=1)
-        corr_matrix.index = corr_matrix.index.droplevel(level=1)
+        corr_matrix.columns = corr_matrix.columns.get_level_values(0)
+        corr_matrix.index = corr_matrix.index.get_level_values(0)
         corr_matrix.index.name = "Correlation"
         return corr_matrix
 
@@ -1521,7 +1521,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
             level=1,
         )
         rollbeta = rollbetaseries.to_frame()
-        rollbeta.index = rollbeta.index.droplevel(level=1)
+        rollbeta.index = rollbeta.index.get_level_values(0)
         rollbeta.columns = MultiIndex.from_arrays([[beta_label], ["Beta"]])
 
         return rollbeta
@@ -1608,7 +1608,7 @@ class OpenFrame(_CommonModel[SeriesFloat]):
 
         dependent = self.tsdf[dependent_column]
         factors = self.tsdf.drop(columns=[dependent_column])
-        indx = ["R-square", "Intercept", *factors.columns.droplevel(level=1)]
+        indx = ["R-square", "Intercept", *factors.columns.get_level_values(0)]
 
         model = LinearRegression()
         model.fit(factors, dependent)
