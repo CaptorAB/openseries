@@ -1,5 +1,8 @@
 .ONESHELL:
 
+UV_VERSION ?= 0.11.21
+PIP_AUDIT_VERSION ?= 2.10.0
+
 .PHONY: all install update test lint audit clean builddocs servedocs cleandocs
 
 all: install
@@ -8,7 +11,7 @@ install:
 	python -m venv ./venv
 	venv/bin/python --version
 	venv/bin/python -m pip install --upgrade pip
-	venv/bin/pip install uv
+	venv/bin/pip install uv==$(UV_VERSION)
 	@. venv/bin/activate && \
 	uv lock && \
 	uv sync --active --locked --extra dev --extra docs && \
@@ -17,7 +20,7 @@ install:
 update:
 	@. venv/bin/activate && \
 	python -m pip install --upgrade pip && \
-	pip install --upgrade uv && \
+	pip install --upgrade uv==$(UV_VERSION) && \
 	uv lock --upgrade && \
 	uv sync --active --locked --extra dev --extra docs
 
@@ -33,7 +36,7 @@ audit:
 	@. venv/bin/activate && \
 	uv lock --check && \
 	uv export --locked --extra dev --no-emit-project -o requirements-audit.txt && \
-	uvx pip-audit -r requirements-audit.txt && \
+	uvx pip-audit==$(PIP_AUDIT_VERSION) -r requirements-audit.txt && \
 	rm -f requirements-audit.txt
 
 clean:
