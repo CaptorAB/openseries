@@ -14,6 +14,9 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
+$UV_VERSION = "0.11.21"
+$PIP_AUDIT_VERSION = "2.10.0"
+
 # Ensure we run from repo root
 Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 
@@ -82,7 +85,7 @@ switch ($task) {
 
         # install tooling & deps
         python -m pip install --upgrade pip
-        python -m pip install uv
+        python -m pip install "uv==$UV_VERSION"
         uv lock
         uv sync --active --locked --extra dev --extra docs
         pre-commit install
@@ -92,7 +95,7 @@ switch ($task) {
         . .\venv\Scripts\Activate.ps1
         Ensure-PythonPath
         python -m pip install --upgrade pip
-        pip install --upgrade uv
+        pip install --upgrade "uv==$UV_VERSION"
         uv lock --upgrade
         uv sync --active --locked --extra dev --extra docs
     }
@@ -102,7 +105,7 @@ switch ($task) {
         Ensure-PythonPath
         uv lock --check
         uv export --locked --extra dev --no-emit-project -o requirements-audit.txt
-        uvx pip-audit -r requirements-audit.txt
+        uvx "pip-audit==$PIP_AUDIT_VERSION" -r requirements-audit.txt
         Remove-Item -Force requirements-audit.txt
     }
 
