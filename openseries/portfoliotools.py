@@ -791,7 +791,6 @@ def _generate_sharpeplot_output(
             filename=str(plotfile),
             auto_open=auto_open,
             auto_play=False,
-            link_text="",
             include_plotlyjs=include_plotlyjs,
             config=fig["config"],
             output_type=output_type,

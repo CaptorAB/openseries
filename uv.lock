@@ -937,7 +937,7 @@ wheels = [
 
 [[package]]
 name = "openseries"
-version = "2.1.9"
+version = "2.1.10"
 source = { editable = "." }
 dependencies = [
     { name = "exchange-calendars" },
@@ -1004,7 +1004,7 @@ requires-dist = [
     { name = "sphinx", marker = "extra == 'docs'", specifier = ">=9.0.4" },
     { name = "sphinx-autobuild", marker = "extra == 'docs'", specifier = ">=2025.8.25" },
     { name = "sphinx-autodoc-typehints", marker = "extra == 'docs'", specifier = ">=3.6.0" },
-    { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = ">=3.1.0rc1" },
+    { name = "sphinx-rtd-theme", marker = "extra == 'docs'", specifier = ">=3.1.0" },
     { name = "types-openpyxl", marker = "extra == 'dev'", specifier = ">=3.1.2" },
     { name = "types-python-dateutil", marker = "extra == 'dev'", specifier = ">=2.8.2" },
     { name = "types-requests", marker = "extra == 'dev'", specifier = ">=2.20.0" },

@@ -6,11 +6,14 @@ This directory contains the documentation for the openseries project, built usin
 
 ### Prerequisites
 
-Install the documentation dependencies using uv:
+From the repository root, install the documentation dependencies from the
+lockfile (requires the pinned uv version used in `Makefile` / CI):
 
 ```bash
-uv pip install -e ".[docs]"
+uv sync --locked --extra docs
 ```
+
+Alternatively, `make install` installs the `dev` and `docs` extras together.
 
 ### Building HTML Documentation
 
@@ -192,8 +195,8 @@ When contributing to documentation:
 
 **Missing modules:**
 
-- Install missing dependencies: `uv pip install -e ".[docs]"`
-- For ReadTheDocs builds, dependencies are managed through `pyproject.toml`
+- Install missing dependencies: `uv sync --locked --extra docs`
+- For ReadTheDocs builds, `docs/requirements.txt` must match the `docs` extra in `pyproject.toml`
 
 **Broken links:**
 

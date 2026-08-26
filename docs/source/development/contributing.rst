@@ -17,25 +17,19 @@ Development Setup
    git clone https://github.com/yourusername/openseries.git
    cd openseries
 
-3. Install uv (if not already installed):
+3. Create the development environment. This installs the pinned uv version
+   (``uv==0.11.21``), syncs locked ``dev`` and ``docs`` dependencies from
+   ``uv.lock``, and installs pre-commit hooks:
 
 .. code-block:: bash
 
-   pip install uv
+   make install
 
-4. Create a virtual environment and install dependencies:
+On Windows:
 
-.. code-block:: bash
+.. code-block:: powershell
 
-   uv venv venv
-   source venv/bin/activate
-   uv pip install -e ".[dev,docs]"
-
-5. Install pre-commit hooks:
-
-.. code-block:: bash
-
-   pre-commit install
+   .\make.ps1 make
 
 Development Workflow
 ~~~~~~~~~~~~~~~~~~~~
@@ -377,7 +371,7 @@ Recommended settings in ``.vscode/settings.json``:
 .. code-block:: json
 
    {
-       "python.defaultInterpreterPath": ".venv/bin/python",
+       "python.defaultInterpreterPath": "venv/bin/python",
        "python.linting.enabled": true,
        "python.linting.ruffEnabled": true,
        "python.formatting.provider": "ruff",
