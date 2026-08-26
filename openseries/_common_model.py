@@ -14,7 +14,7 @@ from secrets import choice
 from string import ascii_letters
 from typing import TYPE_CHECKING, Any, Generic, Literal, Self, cast
 
-from numpy import asarray, float64, inf, isnan, log, maximum, sqrt
+from numpy import asarray, float64, inf, isnan, linspace, log, maximum, sqrt
 
 from .owntypes import (
     CaptorLogoType,
@@ -58,10 +58,10 @@ from pandas import (
     to_datetime,
 )
 from pandas.tseries.offsets import CustomBusinessDay
-from plotly.figure_factory import create_distplot  # type: ignore[import-untyped]
 from plotly.graph_objs import Figure  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict, DirectoryPath, Field
 from scipy.stats import (
+    gaussian_kde,
     kurtosis,
     norm,
     skew,
@@ -208,6 +208,111 @@ def _calculate_time_factor(
 
     fraction = (later - earlier).days / 365.25
     return data.count() / fraction
+
+
+_DISTPLOT_COLORS = (
+    "rgb(31, 119, 180)",
+    "rgb(255, 127, 14)",
+    "rgb(44, 160, 44)",
+    "rgb(214, 39, 40)",
+    "rgb(148, 103, 189)",
+    "rgb(140, 86, 75)",
+    "rgb(227, 119, 194)",
+    "rgb(127, 127, 127)",
+    "rgb(188, 189, 34)",
+    "rgb(23, 190, 207)",
+)
+_DISTPLOT_CURVE_POINTS = 500
+_DISTPLOT_BIN_SIZE = 1.0
+
+
+def _create_distplot(
+    hist_data: list[Series[float]],
+    group_labels: list[str],
+    curve_type: LiteralPlotlyHistogramCurveType,
+    histnorm: LiteralPlotlyHistogramHistNorm,
+    *,
+    show_rug: bool,
+) -> Figure:
+    """Create a distribution curve figure compatible with Plotly 6 and 7.
+
+    Replaces ``plotly.figure_factory.create_distplot``, which was removed in
+    Plotly 7, for the ``plot_histogram(..., plot_type="lines")`` path.
+
+    Args:
+        hist_data: One series of observations per trace.
+        group_labels: Legend names aligned with ``hist_data``.
+        curve_type: ``"kde"`` or ``"normal"`` overlay.
+        histnorm: Histogram normalization; ``"probability"`` scales the curve
+            by the default bin size as ``create_distplot`` did.
+        show_rug: If True, add a rug plot on a secondary y-axis.
+
+    Returns:
+        A Plotly Figure of scatter line traces (and optional rug traces).
+    """
+    curve_traces: list[dict[str, Any]] = []
+    rug_traces: list[dict[str, Any]] = []
+    for index, series in enumerate(hist_data):
+        values = asarray(series, dtype=float64)
+        start = float(min(series))
+        end = float(max(series))
+        curve_x = linspace(start, end, _DISTPLOT_CURVE_POINTS, endpoint=False)
+        if curve_type == "normal":
+            loc, scale = norm.fit(values)
+            curve_y = norm.pdf(curve_x, loc=loc, scale=scale)
+        else:
+            curve_y = gaussian_kde(values)(curve_x)
+        if histnorm == "probability":
+            curve_y = curve_y * _DISTPLOT_BIN_SIZE
+        color = _DISTPLOT_COLORS[index % len(_DISTPLOT_COLORS)]
+        label = group_labels[index]
+        curve_traces.append(
+            {
+                "type": "scatter",
+                "x": curve_x,
+                "y": curve_y,
+                "xaxis": "x1",
+                "yaxis": "y1",
+                "mode": "lines",
+                "name": label,
+                "legendgroup": label,
+                "showlegend": True,
+                "marker": {"color": color},
+            },
+        )
+        if show_rug:
+            rug_traces.append(
+                {
+                    "type": "scatter",
+                    "x": values,
+                    "y": [label] * len(values),
+                    "xaxis": "x1",
+                    "yaxis": "y2",
+                    "mode": "markers",
+                    "name": label,
+                    "legendgroup": label,
+                    "showlegend": False,
+                    "marker": {"color": color, "symbol": "line-ns-open"},
+                },
+            )
+
+    layout: dict[str, Any] = {
+        "barmode": "overlay",
+        "hovermode": "closest",
+        "legend": {"traceorder": "reversed"},
+        "xaxis1": {"domain": [0.0, 1.0], "anchor": "y2", "zeroline": False},
+        "yaxis1": {"domain": [0.0, 1], "anchor": "free", "position": 0.0},
+    }
+    if show_rug:
+        layout["yaxis1"] = {"domain": [0.35, 1], "anchor": "free", "position": 0.0}
+        layout["yaxis2"] = {
+            "domain": [0, 0.25],
+            "anchor": "x1",
+            "dtick": 1,
+            "showticklabels": False,
+        }
+
+    return Figure(data=curve_traces + rug_traces, layout=layout)
 
 
 class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
@@ -1437,13 +1542,12 @@ class _CommonModel(BaseModel, Generic[SeriesOrFloat_co]):
             )
         elif plot_type == "lines":
             hist_data = [self.tsdf[col] for col in self.tsdf.columns]
-            figure = create_distplot(
+            figure = _create_distplot(
                 hist_data=hist_data,
-                curve_type=curve_type,
                 group_labels=labels,
-                show_hist=False,
-                show_rug=show_rug,
+                curve_type=curve_type,
                 histnorm=histnorm,
+                show_rug=show_rug,
             )
             figure.update_layout(dict1=fig_dict["layout"])
         else:

@@ -108,7 +108,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for openseries.report</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Functions related to HTML reports.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Functions related to HTML reports."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -143,29 +143,29 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;report_html&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"report_html"</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">calendar_period_returns</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
-    <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">&quot;BYE&quot;</span><span class="p">,</span>
+    <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">"BYE"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">relabel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a table of returns with appropriate table labels.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Generate a table of returns with appropriate table labels."""</span>
     <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
     <span class="n">copied</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span>
     <span class="n">copied</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
     <span class="n">cldr</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">relabel</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;BYE&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"BYE"</span><span class="p">:</span>
             <span class="n">cldr</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">year</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cldr</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;BQE&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"BQE"</span><span class="p">:</span>
             <span class="n">cldr</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;Q%q %Y&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cldr</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="s2">"Q"</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"Q%q %Y"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cldr</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">cldr</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%b %y&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cldr</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+            <span class="n">cldr</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%b %y"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">cldr</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">cldr</span>
 
 
@@ -174,100 +174,100 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_fmt_dates</span><span class="p">(</span><span class="n">idx</span><span class="p">:</span> <span class="n">Index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_metrics_table_html</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">],</span> <span class="n">border</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="p">[</span><span class="s2">"metrics"</span><span class="p">],</span> <span class="n">border</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_report_properties_and_labels</span><span class="p">(</span>
     <span class="n">yearfrac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get properties and labels based on yearfrac.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get properties and labels based on yearfrac."""</span>
     <span class="k">if</span> <span class="n">yearfrac</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;geo_ret&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;vol&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ret_vol_ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;sortino_ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;worst_month&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;first_indices&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;last_indices&quot;</span><span class="p">,</span>
+            <span class="s2">"geo_ret"</span><span class="p">,</span>
+            <span class="s2">"vol"</span><span class="p">,</span>
+            <span class="s2">"ret_vol_ratio"</span><span class="p">,</span>
+            <span class="s2">"sortino_ratio"</span><span class="p">,</span>
+            <span class="s2">"worst_month"</span><span class="p">,</span>
+            <span class="s2">"first_indices"</span><span class="p">,</span>
+            <span class="s2">"last_indices"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">labels_init</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;Return (CAGR)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Volatility&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sharpe Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sortino Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Worst Month&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison Start&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison End&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Information Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Capture Ratio (monthly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">,</span>
+            <span class="s2">"Return (CAGR)"</span><span class="p">,</span>
+            <span class="s2">"Volatility"</span><span class="p">,</span>
+            <span class="s2">"Sharpe Ratio"</span><span class="p">,</span>
+            <span class="s2">"Sortino Ratio"</span><span class="p">,</span>
+            <span class="s2">"Worst Month"</span><span class="p">,</span>
+            <span class="s2">"Comparison Start"</span><span class="p">,</span>
+            <span class="s2">"Comparison End"</span><span class="p">,</span>
+            <span class="s2">"Jensen's Alpha"</span><span class="p">,</span>
+            <span class="s2">"Information Ratio"</span><span class="p">,</span>
+            <span class="s2">"Tracking Error (weekly)"</span><span class="p">,</span>
+            <span class="s2">"Capture Ratio (monthly)"</span><span class="p">,</span>
+            <span class="s2">"Index Beta (weekly)"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">labels_final</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;Return (CAGR)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Year-to-Date&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Month-to-Date&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Volatility&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sharpe Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sortino Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Information Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Capture Ratio (monthly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Worst Month&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison Start&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison End&quot;</span><span class="p">,</span>
+            <span class="s2">"Return (CAGR)"</span><span class="p">,</span>
+            <span class="s2">"Year-to-Date"</span><span class="p">,</span>
+            <span class="s2">"Month-to-Date"</span><span class="p">,</span>
+            <span class="s2">"Volatility"</span><span class="p">,</span>
+            <span class="s2">"Sharpe Ratio"</span><span class="p">,</span>
+            <span class="s2">"Sortino Ratio"</span><span class="p">,</span>
+            <span class="s2">"Jensen's Alpha"</span><span class="p">,</span>
+            <span class="s2">"Information Ratio"</span><span class="p">,</span>
+            <span class="s2">"Tracking Error (weekly)"</span><span class="p">,</span>
+            <span class="s2">"Index Beta (weekly)"</span><span class="p">,</span>
+            <span class="s2">"Capture Ratio (monthly)"</span><span class="p">,</span>
+            <span class="s2">"Worst Month"</span><span class="p">,</span>
+            <span class="s2">"Comparison Start"</span><span class="p">,</span>
+            <span class="s2">"Comparison End"</span><span class="p">,</span>
         <span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">properties</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;value_ret&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;vol&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ret_vol_ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;sortino_ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;worst&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;first_indices&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;last_indices&quot;</span><span class="p">,</span>
+            <span class="s2">"value_ret"</span><span class="p">,</span>
+            <span class="s2">"vol"</span><span class="p">,</span>
+            <span class="s2">"ret_vol_ratio"</span><span class="p">,</span>
+            <span class="s2">"sortino_ratio"</span><span class="p">,</span>
+            <span class="s2">"worst"</span><span class="p">,</span>
+            <span class="s2">"first_indices"</span><span class="p">,</span>
+            <span class="s2">"last_indices"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">labels_init</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;Return (simple)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Volatility&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sharpe Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sortino Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Worst Day&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison Start&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison End&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Information Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">,</span>
+            <span class="s2">"Return (simple)"</span><span class="p">,</span>
+            <span class="s2">"Volatility"</span><span class="p">,</span>
+            <span class="s2">"Sharpe Ratio"</span><span class="p">,</span>
+            <span class="s2">"Sortino Ratio"</span><span class="p">,</span>
+            <span class="s2">"Worst Day"</span><span class="p">,</span>
+            <span class="s2">"Comparison Start"</span><span class="p">,</span>
+            <span class="s2">"Comparison End"</span><span class="p">,</span>
+            <span class="s2">"Jensen's Alpha"</span><span class="p">,</span>
+            <span class="s2">"Information Ratio"</span><span class="p">,</span>
+            <span class="s2">"Tracking Error (weekly)"</span><span class="p">,</span>
+            <span class="s2">"Index Beta (weekly)"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">labels_final</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;Return (simple)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Year-to-Date&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Month-to-Date&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Volatility&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sharpe Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Sortino Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Information Ratio&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Worst Day&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison Start&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;Comparison End&quot;</span><span class="p">,</span>
+            <span class="s2">"Return (simple)"</span><span class="p">,</span>
+            <span class="s2">"Year-to-Date"</span><span class="p">,</span>
+            <span class="s2">"Month-to-Date"</span><span class="p">,</span>
+            <span class="s2">"Volatility"</span><span class="p">,</span>
+            <span class="s2">"Sharpe Ratio"</span><span class="p">,</span>
+            <span class="s2">"Sortino Ratio"</span><span class="p">,</span>
+            <span class="s2">"Jensen's Alpha"</span><span class="p">,</span>
+            <span class="s2">"Information Ratio"</span><span class="p">,</span>
+            <span class="s2">"Tracking Error (weekly)"</span><span class="p">,</span>
+            <span class="s2">"Index Beta (weekly)"</span><span class="p">,</span>
+            <span class="s2">"Worst Day"</span><span class="p">,</span>
+            <span class="s2">"Comparison Start"</span><span class="p">,</span>
+            <span class="s2">"Comparison End"</span><span class="p">,</span>
         <span class="p">]</span>
     <span class="k">return</span> <span class="n">properties</span><span class="p">,</span> <span class="n">labels_init</span><span class="p">,</span> <span class="n">labels_final</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_create_line_traces</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Scatter</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create line traces for the plot.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Create line traces for the plot."""</span>
     <span class="n">x_line</span> <span class="o">=</span> <span class="n">_fmt_dates</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="n">line_traces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Scatter</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">):</span>
@@ -275,9 +275,9 @@
             <span class="n">Scatter</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">x_line</span><span class="p">,</span>
                 <span class="n">y</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-                <span class="n">hovertemplate</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lbl</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">y:.2%</span><span class="se">}}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">&lt;extra&gt;&lt;/extra&gt;&quot;</span><span class="p">,</span>
-                <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">},</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
+                <span class="n">hovertemplate</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">lbl</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">y:.2%</span><span class="se">}}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+                <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">"dash"</span><span class="p">:</span> <span class="s2">"solid"</span><span class="p">},</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">lbl</span><span class="p">,</span>
                 <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">),</span>
@@ -289,7 +289,7 @@
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
     <span class="n">bar_freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Bar</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create bar traces for the plot.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Create bar traces for the plot."""</span>
     <span class="n">quarter_of_year</span> <span class="o">=</span> <span class="mf">0.25</span>
     <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">yearfrac</span> <span class="o">&lt;</span> <span class="n">quarter_of_year</span><span class="p">:</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
@@ -300,12 +300,12 @@
     <span class="n">x_bar</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bdf</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
     <span class="n">bar_traces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Bar</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">item_count</span><span class="p">):</span>
-        <span class="n">col_name</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;tuple[str, ValueType]&quot;</span><span class="p">,</span> <span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"tuple[str, ValueType]"</span><span class="p">,</span> <span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="n">bar_traces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">Bar</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">=</span><span class="n">x_bar</span><span class="p">,</span>
                 <span class="n">y</span><span class="o">=</span><span class="n">bdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-                <span class="n">hovertemplate</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">y:.2%</span><span class="se">}}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">&lt;extra&gt;&lt;/extra&gt;&quot;</span><span class="p">,</span>
+                <span class="n">hovertemplate</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">y:.2%</span><span class="se">}}</span><span class="s2">&lt;br&gt;%</span><span class="se">{{</span><span class="s2">x</span><span class="se">}}</span><span class="s2">&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="n">col_name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                 <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">),</span>
@@ -317,11 +317,11 @@
     <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Jensen&#39;s Alpha to the report dataframe.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Add Jensen's Alpha to the report dataframe."""</span>
     <span class="n">alpha_frame</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
     <span class="n">alpha_frame</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
         <span class="n">alphas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">alpha_frame</span><span class="o">.</span><span class="n">jensen_alpha</span><span class="p">(</span>
                 <span class="n">asset</span><span class="o">=</span><span class="p">(</span><span class="n">aname</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">),</span>
@@ -330,11 +330,11 @@
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">aname</span> <span class="ow">in</span> <span class="n">alpha_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="p">]</span>
-    <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
     <span class="n">ar</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
         <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">],</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Jensen's Alpha"</span><span class="p">],</span>
     <span class="p">)</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ar</span><span class="p">])</span>
 
@@ -343,9 +343,9 @@
     <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Information Ratio to the report dataframe.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Add Information Ratio to the report dataframe."""</span>
     <span class="n">ir</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">info_ratio_func</span><span class="p">()</span>
-    <span class="n">ir</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Information Ratio&quot;</span>
+    <span class="n">ir</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Information Ratio"</span>
     <span class="n">ir</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ir_df</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ir_df</span><span class="p">])</span>
@@ -355,21 +355,21 @@
     <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Tracking Error to the report dataframe.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Add Tracking Error to the report dataframe."""</span>
     <span class="n">te_frame</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">te_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span>
+    <span class="n">te_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">"7D"</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
         <span class="n">te</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">tracking_error_func</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">te</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
         <span class="n">te</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">]</span> <span class="o">*</span> <span class="n">te_frame</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="n">te_frame</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"Tracking Error (weekly)"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">te</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">te</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Tracking Error (weekly)&quot;</span>
+        <span class="n">te</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Tracking Error (weekly)"</span>
     <span class="n">te_df</span> <span class="o">=</span> <span class="n">te</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">te_df</span><span class="p">])</span>
 
@@ -379,27 +379,27 @@
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
     <span class="n">formats</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Capture Ratio to the report dataframe.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Add Capture Ratio to the report dataframe."""</span>
     <span class="n">crm</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">crm</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;ME&quot;</span><span class="p">)</span>
+    <span class="n">crm</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">"ME"</span><span class="p">)</span>
     <span class="n">cru_save</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">crm</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">]</span> <span class="o">*</span> <span class="n">crm</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
         <span class="n">index</span><span class="o">=</span><span class="n">crm</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Capture Ratio (monthly)&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Capture Ratio (monthly)"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">cru</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">crm</span><span class="o">.</span><span class="n">capture_ratio_func</span><span class="p">(</span><span class="n">ratio</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+            <span class="n">cru</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">crm</span><span class="o">.</span><span class="n">capture_ratio_func</span><span class="p">(</span><span class="n">ratio</span><span class="o">=</span><span class="s2">"both"</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ZeroDivisionError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Capture ratio calculation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">&quot;</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Capture ratio calculation error: </span><span class="si">{</span><span class="n">exc</span><span class="si">!s}</span><span class="s2">"</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">if</span> <span class="n">cru</span><span class="o">.</span><span class="n">hasnans</span><span class="p">:</span>
         <span class="n">cru</span> <span class="o">=</span> <span class="n">cru_save</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cru</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">cru</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Capture Ratio (monthly)&quot;</span>
+        <span class="n">cru</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Capture Ratio (monthly)"</span>
     <span class="n">cru_df</span> <span class="o">=</span> <span class="n">cru</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">cru_df</span><span class="p">]),</span> <span class="n">formats</span>
 
@@ -408,9 +408,9 @@
     <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Index Beta to the report dataframe.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Add Index Beta to the report dataframe."""</span>
     <span class="n">beta_frame</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
-    <span class="n">beta_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">&quot;7D&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+    <span class="n">beta_frame</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s2">"7D"</span><span class="p">)</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">(</span><span class="s2">"drop"</span><span class="p">)</span>
     <span class="n">beta_frame</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
     <span class="n">betas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">beta_frame</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span>
@@ -419,11 +419,11 @@
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">bname</span> <span class="ow">in</span> <span class="n">beta_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="p">]</span>
-    <span class="n">betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">betas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
     <span class="n">br</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">betas</span><span class="p">,</span>
         <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">],</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Index Beta (weekly)"</span><span class="p">],</span>
     <span class="p">)</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">br</span><span class="p">])</span>
 
@@ -432,26 +432,26 @@
     <span class="n">rpt_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Year-to-Date and Month-to-Date to the report dataframe.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Add Year-to-Date and Month-to-Date to the report dataframe."""</span>
     <span class="n">this_year</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">last_idx</span><span class="o">.</span><span class="n">year</span>
     <span class="n">this_month</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">last_idx</span><span class="o">.</span><span class="n">month</span>
-    <span class="n">ytd</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
-    <span class="n">ytd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Year-to-Date&quot;</span>
+    <span class="n">ytd</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+    <span class="n">ytd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Year-to-Date"</span>
     <span class="n">mtd</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">this_year</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">this_month</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-        <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+        <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">mtd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Month-to-Date&quot;</span>
+    <span class="n">mtd</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Month-to-Date"</span>
     <span class="n">ytd_df</span> <span class="o">=</span> <span class="n">ytd</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
     <span class="n">mtd_df</span> <span class="o">=</span> <span class="n">mtd</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">concat</span><span class="p">([</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">ytd_df</span><span class="p">,</span> <span class="n">mtd_df</span><span class="p">])</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_output_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine the output directory.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Determine the output directory."""</span>
     <span class="k">if</span> <span class="n">directory</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;Documents&quot;</span>
+    <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">"Documents"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"Documents"</span>
     <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 
 
@@ -460,26 +460,26 @@
     <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">item_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get line and bar layouts for plotly.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get line and bar layouts for plotly."""</span>
     <span class="n">line_layout</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout_theme</span><span class="p">)</span>
     <span class="n">line_layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;colorway&quot;</span><span class="p">:</span> <span class="n">colorway</span><span class="p">[:</span><span class="n">item_count</span><span class="p">]</span> <span class="k">if</span> <span class="n">colorway</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
-            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gridcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="s2">&quot;automargin&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;tickangle&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">45</span><span class="p">},</span>
-            <span class="s2">&quot;yaxis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;tickformat&quot;</span><span class="p">:</span> <span class="s2">&quot;.2%&quot;</span><span class="p">,</span> <span class="s2">&quot;gridcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="s2">&quot;automargin&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"colorway"</span><span class="p">:</span> <span class="n">colorway</span><span class="p">[:</span><span class="n">item_count</span><span class="p">]</span> <span class="k">if</span> <span class="n">colorway</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
+            <span class="s2">"xaxis"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"gridcolor"</span><span class="p">:</span> <span class="s2">"#EEEEEE"</span><span class="p">,</span> <span class="s2">"automargin"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"tickangle"</span><span class="p">:</span> <span class="o">-</span><span class="mi">45</span><span class="p">},</span>
+            <span class="s2">"yaxis"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"tickformat"</span><span class="p">:</span> <span class="s2">".2%"</span><span class="p">,</span> <span class="s2">"gridcolor"</span><span class="p">:</span> <span class="s2">"#EEEEEE"</span><span class="p">,</span> <span class="s2">"automargin"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">)</span>
 
     <span class="n">bar_layout</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout_theme</span><span class="p">)</span>
     <span class="n">bar_layout</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;barmode&quot;</span><span class="p">:</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;l&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
-            <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;gridcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="s2">&quot;automargin&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;tickangle&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">45</span><span class="p">},</span>
-            <span class="s2">&quot;yaxis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;tickformat&quot;</span><span class="p">:</span> <span class="s2">&quot;.2%&quot;</span><span class="p">,</span> <span class="s2">&quot;gridcolor&quot;</span><span class="p">:</span> <span class="s2">&quot;#EEEEEE&quot;</span><span class="p">,</span> <span class="s2">&quot;automargin&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-            <span class="s2">&quot;showlegend&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"barmode"</span><span class="p">:</span> <span class="s2">"group"</span><span class="p">,</span>
+            <span class="s2">"margin"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"l"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">80</span><span class="p">},</span>
+            <span class="s2">"xaxis"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"gridcolor"</span><span class="p">:</span> <span class="s2">"#EEEEEE"</span><span class="p">,</span> <span class="s2">"automargin"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"tickangle"</span><span class="p">:</span> <span class="o">-</span><span class="mi">45</span><span class="p">},</span>
+            <span class="s2">"yaxis"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"tickformat"</span><span class="p">:</span> <span class="s2">".2%"</span><span class="p">,</span> <span class="s2">"gridcolor"</span><span class="p">:</span> <span class="s2">"#EEEEEE"</span><span class="p">,</span> <span class="s2">"automargin"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="s2">"showlegend"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">)</span>
 
@@ -487,47 +487,47 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_logo_html</span><span class="p">(</span><span class="n">logo</span><span class="p">:</span> <span class="n">CaptorLogoType</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get logo HTML.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get logo HTML."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">add_logo</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">""</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, Any]&quot;</span><span class="p">,</span> <span class="n">logo</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"dict[str, Any]"</span><span class="p">,</span> <span class="n">logo</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="k">if</span> <span class="n">src</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">&quot; alt=&quot;Captor&quot; style=&quot;height:68px;&quot; /&gt;&#39;</span>
-    <span class="k">return</span> <span class="s2">&quot;CAPTOR&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'&lt;img src="</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">" alt="Captor" style="height:68px;" /&gt;'</span>
+    <span class="k">return</span> <span class="s2">"CAPTOR"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_legend_html</span><span class="p">(</span><span class="n">line_traces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Scatter</span><span class="p">],</span> <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate HTML for the legend at the bottom of the page.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Generate HTML for the legend at the bottom of the page."""</span>
     <span class="n">legend_items</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">color_cycle</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">colorway</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;#66725B&quot;</span><span class="p">])</span>
+    <span class="n">color_cycle</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">colorway</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">"#66725B"</span><span class="p">])</span>
     <span class="k">for</span> <span class="n">trace</span> <span class="ow">in</span> <span class="n">line_traces</span><span class="p">:</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="s2">""</span>
         <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">)</span>
         <span class="n">legend_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;&lt;div class=&quot;legend-item&quot;&gt;&#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;&lt;div class=&quot;legend-color&quot; style=&quot;background-color:</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">;&quot;&gt;&lt;/div&gt;&#39;</span>
-            <span class="sa">f</span><span class="s2">&quot;&lt;span&gt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;&lt;/div&gt;&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s1">'&lt;div class="legend-item"&gt;'</span>
+            <span class="sa">f</span><span class="s1">'&lt;div class="legend-color" style="background-color:</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s1">;"&gt;&lt;/div&gt;'</span>
+            <span class="sa">f</span><span class="s2">"&lt;span&gt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&lt;/span&gt;"</span>
+            <span class="sa">f</span><span class="s2">"&lt;/div&gt;"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">legend_items</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;div class=&quot;legend-container&quot;&gt;</span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">legend_items</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/div&gt;&#39;</span>
-    <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">'&lt;div class="legend-container"&gt;</span><span class="si">{</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">legend_items</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/div&gt;'</span>
+    <span class="k">return</span> <span class="s2">""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_css</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get CSS styles for the HTML report.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Get CSS styles for the HTML report."""</span>
     <span class="n">base_css</span> <span class="o">=</span> <span class="n">_get_base_css</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">base_css</span>
-        <span class="o">+</span> <span class="s2">&quot;&quot;&quot;</span>
+        <span class="o">+</span> <span class="s2">"""</span>
 <span class="s2">    .header{display:grid;grid-template-columns:140px 1fr 140px;gap:12px;</span>
 <span class="s2">    align-items:start;}</span>
 <span class="s2">    h1{margin:0;text-align:center;font-size:45px;font-weight:800;}</span>
 <span class="s2">    .layout{display:grid;grid-template-columns:1.2fr .9fr;</span>
-<span class="s2">    grid-template-areas:&quot;charts table&quot;;gap:22px;align-items:start;margin-top:12px;}</span>
+<span class="s2">    grid-template-areas:"charts table";gap:22px;align-items:start;margin-top:12px;}</span>
 <span class="s2">    .charts{grid-area:charts;display:grid;grid-template-rows:auto auto;gap:18px;}</span>
 <span class="s2">    .table{grid-area:table;}</span>
 <span class="s2">    .plot{width:100%;height:380px;}</span>
@@ -536,7 +536,7 @@
 <span class="s2">      .page{padding:24px;padding-bottom:24px;}</span>
 <span class="s2">      .header{grid-template-columns:120px 1fr;}</span>
 <span class="s2">      h1{font-size:36px;}</span>
-<span class="s2">      .layout{grid-template-columns:1fr;grid-template-areas:&quot;table&quot; &quot;charts&quot;;gap:16px;}</span>
+<span class="s2">      .layout{grid-template-columns:1fr;grid-template-areas:"table" "charts";gap:16px;}</span>
 <span class="s2">      .plot{height:380px;}</span>
 <span class="s2">      .plot.bar{height:300px;}</span>
 <span class="s2">      table.metrics{table-layout:fixed;width:auto;}</span>
@@ -563,7 +563,7 @@
 <span class="s2">    @media (min-width:981px){</span>
 <span class="s2">      html,body{overflow-y:auto;}</span>
 <span class="s2">    }</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+<span class="s2">    """</span>
     <span class="p">)</span>
 
 
@@ -573,14 +573,14 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write HTML file and optionally open it.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Write HTML file and optionally open it."""</span>
     <span class="n">plotfile</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">plotfile</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">plotfile</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">auto_open</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">webbrowser_open</span><span class="p">(</span><span class="n">plotfile</span><span class="o">.</span><span class="n">as_uri</span><span class="p">())</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to open browser: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Failed to open browser: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
 
 
@@ -594,63 +594,63 @@
     <span class="n">bar_payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">legend_html</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate the HTML string.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;!doctype html&gt;</span>
-<span class="s2">&lt;html lang=&quot;sv&quot;&gt;</span>
+<span class="w">    </span><span class="sd">"""Generate the HTML string."""</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"""&lt;!doctype html&gt;</span>
+<span class="s2">&lt;html lang="sv"&gt;</span>
 <span class="s2">&lt;head&gt;</span>
-<span class="s2">&lt;meta charset=&quot;utf-8&quot; /&gt;</span>
-<span class="s2">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot; /&gt;</span>
-<span class="s2">&lt;title&gt;</span><span class="si">{</span><span class="n">title</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="si">}</span><span class="s2">&lt;/title&gt;</span>
+<span class="s2">&lt;meta charset="utf-8" /&gt;</span>
+<span class="s2">&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</span>
+<span class="s2">&lt;title&gt;</span><span class="si">{</span><span class="n">title</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="s2">&lt;/title&gt;</span>
 <span class="s2">&lt;style&gt;</span><span class="si">{</span><span class="n">css</span><span class="si">}</span><span class="s2">&lt;/style&gt;</span>
 <span class="si">{</span><span class="n">plotly_script</span><span class="si">}</span>
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
-<span class="s2">&lt;div class=&quot;page&quot;&gt;</span>
-<span class="s2">  &lt;div class=&quot;header&quot;&gt;</span>
+<span class="s2">&lt;div class="page"&gt;</span>
+<span class="s2">  &lt;div class="header"&gt;</span>
 <span class="s2">    &lt;div&gt;</span><span class="si">{</span><span class="n">logo_html</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
-<span class="s2">    &lt;div&gt;&lt;h1&gt;</span><span class="si">{</span><span class="n">title</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="si">}</span><span class="s2">&lt;/h1&gt;&lt;/div&gt;</span>
+<span class="s2">    &lt;div&gt;&lt;h1&gt;</span><span class="si">{</span><span class="n">title</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">""</span><span class="si">}</span><span class="s2">&lt;/h1&gt;&lt;/div&gt;</span>
 <span class="s2">    &lt;div&gt;&lt;/div&gt;</span>
 <span class="s2">  &lt;/div&gt;</span>
-<span class="s2">  &lt;div class=&quot;layout&quot;&gt;</span>
-<span class="s2">    &lt;div class=&quot;charts&quot;&gt;</span>
-<span class="s2">      &lt;div id=&quot;lineplot&quot; class=&quot;plot&quot;&gt;&lt;/div&gt;</span>
-<span class="s2">      &lt;div id=&quot;barplot&quot; class=&quot;plot bar&quot;&gt;&lt;/div&gt;</span>
+<span class="s2">  &lt;div class="layout"&gt;</span>
+<span class="s2">    &lt;div class="charts"&gt;</span>
+<span class="s2">      &lt;div id="lineplot" class="plot"&gt;&lt;/div&gt;</span>
+<span class="s2">      &lt;div id="barplot" class="plot bar"&gt;&lt;/div&gt;</span>
 <span class="s2">    &lt;/div&gt;</span>
-<span class="s2">    &lt;div class=&quot;table&quot;&gt;</span><span class="si">{</span><span class="n">table_html</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
+<span class="s2">    &lt;div class="table"&gt;</span><span class="si">{</span><span class="n">table_html</span><span class="si">}</span><span class="s2">&lt;/div&gt;</span>
 <span class="s2">  &lt;/div&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">legend_html</span><span class="si">}</span>
 <span class="s2">&lt;/div&gt;</span>
 <span class="s2">&lt;script&gt;</span>
 <span class="s2">const line = </span><span class="si">{</span><span class="n">_dumps_plotly</span><span class="p">(</span><span class="n">line_payload</span><span class="p">)</span><span class="si">}</span><span class="s2">;</span>
 <span class="s2">const bar = </span><span class="si">{</span><span class="n">_dumps_plotly</span><span class="p">(</span><span class="n">bar_payload</span><span class="p">)</span><span class="si">}</span><span class="s2">;</span>
-<span class="s2">Plotly.newPlot(&quot;lineplot&quot;, line.data, line.layout, line.config);</span>
-<span class="s2">Plotly.newPlot(&quot;barplot&quot;, bar.data, bar.layout, bar.config);</span>
-<span class="s2">window.addEventListener(&quot;resize&quot;, () =&gt; </span><span class="se">{{</span>
-<span class="s2">  Plotly.Plots.resize(&quot;lineplot&quot;);</span>
-<span class="s2">  Plotly.Plots.resize(&quot;barplot&quot;);</span>
+<span class="s2">Plotly.newPlot("lineplot", line.data, line.layout, line.config);</span>
+<span class="s2">Plotly.newPlot("barplot", bar.data, bar.layout, bar.config);</span>
+<span class="s2">window.addEventListener("resize", () =&gt; </span><span class="se">{{</span>
+<span class="s2">  Plotly.Plots.resize("lineplot");</span>
+<span class="s2">  Plotly.Plots.resize("barplot");</span>
 <span class="se">}}</span><span class="s2">);</span>
 <span class="s2">&lt;/script&gt;</span>
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 
 
 <div class="viewcode-block" id="report_html">
 <a class="viewcode-back" href="../../api/report.html#openseries.report_html">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">report_html</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
-    <span class="n">bar_freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">&quot;BYE&quot;</span><span class="p">,</span>
+    <span class="n">bar_freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">"BYE"</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
-    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">"file"</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">"cdn"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">vertical_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a responsive HTML report page with line and bar plots and a table.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Generate a responsive HTML report page with line and bar plots and a table."""</span>
     <span class="n">copied</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
     <span class="n">copied</span><span class="o">.</span><span class="n">trunc_frame</span><span class="p">()</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>
 
@@ -662,7 +662,7 @@
     <span class="n">bar_traces</span> <span class="o">=</span> <span class="n">_create_bar_traces</span><span class="p">(</span><span class="n">copied</span><span class="p">,</span> <span class="n">bar_freq</span><span class="p">)</span>
 
     <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">copied</span><span class="o">.</span><span class="n">all_properties</span><span class="p">(</span>
-        <span class="n">properties</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[LiteralFrameProps]&quot;</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
+        <span class="n">properties</span><span class="o">=</span><span class="n">cast</span><span class="p">(</span><span class="s2">"list[LiteralFrameProps]"</span><span class="p">,</span> <span class="n">properties</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">_add_jensen_alpha</span><span class="p">(</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">copied</span><span class="p">)</span>
     <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">_add_information_ratio</span><span class="p">(</span><span class="n">rpt_df</span><span class="p">,</span> <span class="n">copied</span><span class="p">)</span>
@@ -677,64 +677,64 @@
     <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">labels_final</span><span class="p">)</span>
 
     <span class="n">format_map</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;Return (CAGR)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Return (simple)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Year-to-Date&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Month-to-Date&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Volatility&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Sharpe Ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Sortino Ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Jensen&#39;s Alpha&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Information Ratio&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Tracking Error (weekly)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Index Beta (weekly)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Capture Ratio (monthly)&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Worst Month&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Worst Day&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.2%}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Comparison Start&quot;</span><span class="p">:</span> <span class="s2">&quot;{:%Y-%m-</span><span class="si">%d</span><span class="s2">}&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Comparison End&quot;</span><span class="p">:</span> <span class="s2">&quot;{:%Y-%m-</span><span class="si">%d</span><span class="s2">}&quot;</span><span class="p">,</span>
+        <span class="s2">"Return (CAGR)"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Return (simple)"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Year-to-Date"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Month-to-Date"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Volatility"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Sharpe Ratio"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2f}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Sortino Ratio"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2f}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Jensen's Alpha"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Information Ratio"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2f}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Tracking Error (weekly)"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Index Beta (weekly)"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2f}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Capture Ratio (monthly)"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2f}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Worst Month"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Worst Day"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{:.2%}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"Comparison Start"</span><span class="p">:</span> <span class="s2">"{:%Y-%m-</span><span class="si">%d</span><span class="s2">}"</span><span class="p">,</span>
+        <span class="s2">"Comparison End"</span><span class="p">:</span> <span class="s2">"{:%Y-%m-</span><span class="si">%d</span><span class="s2">}"</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">formats</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels_final</span><span class="p">]</span>
+    <span class="n">formats</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="s2">"</span><span class="si">{:.2f}</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels_final</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">formats</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">rpt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">f</span><span class="p">:</span> <span class="p">(</span>
-                <span class="s2">&quot;&quot;</span>
+                <span class="s2">""</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span>
                     <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-                    <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="s2">&quot;nan%&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                    <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"nan"</span><span class="p">,</span> <span class="s2">"nan%"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
                 <span class="p">)</span>
                 <span class="k">else</span> <span class="p">(</span>
                     <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                     <span class="k">else</span> <span class="p">(</span>
-                        <span class="n">Timestamp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                        <span class="n">Timestamp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
                         <span class="k">else</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+    <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">([</span><span class="sa">f</span><span class="s2">"&lt;b&gt;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&lt;/b&gt;"</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
     <span class="n">rpt_df</span> <span class="o">=</span> <span class="n">rpt_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-    <span class="n">colmns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">]</span>
+    <span class="n">colmns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">""</span><span class="p">,</span> <span class="o">*</span><span class="n">copied</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">]</span>
     <span class="n">rpt_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">colmns</span>
     <span class="n">table_html</span> <span class="o">=</span> <span class="n">_metrics_table_html</span><span class="p">(</span><span class="n">rpt_df</span><span class="p">)</span>
 
     <span class="n">dirpath</span> <span class="o">=</span> <span class="n">_get_output_directory</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="n">directory</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="n">ascii_letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">choice</span><span class="p">(</span><span class="n">ascii_letters</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="s2">".html"</span>
 
     <span class="n">plotfile</span> <span class="o">=</span> <span class="n">dirpath</span> <span class="o">/</span> <span class="n">filename</span>
 
     <span class="n">fig_theme</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>
-    <span class="n">layout_theme</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, Any]&quot;</span><span class="p">,</span> <span class="n">fig_theme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layout&quot;</span><span class="p">,</span> <span class="p">{}))</span>
-    <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, list[str]]&quot;</span><span class="p">,</span> <span class="n">layout_theme</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="s2">&quot;colorway&quot;</span><span class="p">,</span> <span class="p">[]</span>
+    <span class="n">layout_theme</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"dict[str, Any]"</span><span class="p">,</span> <span class="n">fig_theme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"layout"</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">colorway</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"dict[str, list[str]]"</span><span class="p">,</span> <span class="n">layout_theme</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">"colorway"</span><span class="p">,</span> <span class="p">[]</span>
     <span class="p">)</span>
 
     <span class="n">line_layout</span><span class="p">,</span> <span class="n">bar_layout</span> <span class="o">=</span> <span class="n">_get_plotly_layouts</span><span class="p">(</span>
@@ -743,26 +743,26 @@
         <span class="n">item_count</span><span class="o">=</span><span class="n">copied</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">config</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;dict[str, Any]&quot;</span><span class="p">,</span> <span class="n">fig_theme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{}))</span> <span class="ow">or</span> <span class="p">{}</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;responsive&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;displayModeBar&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"dict[str, Any]"</span><span class="p">,</span> <span class="n">fig_theme</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"config"</span><span class="p">,</span> <span class="p">{}))</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="s2">"responsive"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"displayModeBar"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
     <span class="n">plotly_script</span> <span class="o">=</span> <span class="n">_get_plotly_script</span><span class="p">(</span><span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">)</span>
     <span class="n">logo_html</span> <span class="o">=</span> <span class="n">_get_logo_html</span><span class="p">(</span><span class="n">logo</span><span class="o">=</span><span class="n">logo</span><span class="p">,</span> <span class="n">add_logo</span><span class="o">=</span><span class="n">add_logo</span><span class="p">)</span>
     <span class="n">css</span> <span class="o">=</span> <span class="n">_get_css</span><span class="p">()</span>
 
     <span class="n">line_payload</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_plotly_json</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">line_traces</span><span class="p">],</span>
-        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="n">line_layout</span><span class="p">,</span>
-        <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_plotly_json</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">line_traces</span><span class="p">],</span>
+        <span class="s2">"layout"</span><span class="p">:</span> <span class="n">line_layout</span><span class="p">,</span>
+        <span class="s2">"config"</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">bar_payload</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_plotly_json</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">bar_traces</span><span class="p">],</span>
-        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="n">bar_layout</span><span class="p">,</span>
-        <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span>
+        <span class="s2">"data"</span><span class="p">:</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_plotly_json</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">bar_traces</span><span class="p">],</span>
+        <span class="s2">"layout"</span><span class="p">:</span> <span class="n">bar_layout</span><span class="p">,</span>
+        <span class="s2">"config"</span><span class="p">:</span> <span class="n">config</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">vertical_legend</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Horizontal legend layout requested.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Horizontal legend layout requested."</span><span class="p">)</span>
     <span class="n">legend_html</span> <span class="o">=</span> <span class="n">_get_legend_html</span><span class="p">(</span><span class="n">line_traces</span><span class="o">=</span><span class="n">line_traces</span><span class="p">,</span> <span class="n">colorway</span><span class="o">=</span><span class="n">colorway</span><span class="p">)</span>
 
     <span class="n">html</span> <span class="o">=</span> <span class="n">_generate_html</span><span class="p">(</span>
@@ -776,7 +776,7 @@
         <span class="n">legend_html</span><span class="o">=</span><span class="n">legend_html</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">"file"</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">_write_html_file</span><span class="p">(</span><span class="n">plotfile</span><span class="o">=</span><span class="n">plotfile</span><span class="p">,</span> <span class="n">html</span><span class="o">=</span><span class="n">html</span><span class="p">,</span> <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">html</span>

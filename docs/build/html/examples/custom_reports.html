@@ -124,13 +124,13 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="c1"># Load sample data for comparison</span>
-<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAPL&quot;</span><span class="p">,</span> <span class="s2">&quot;MSFT&quot;</span><span class="p">,</span> <span class="s2">&quot;GOOGL&quot;</span><span class="p">,</span> <span class="s2">&quot;SPY&quot;</span><span class="p">]</span>
-<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Apple&quot;</span><span class="p">,</span> <span class="s2">&quot;Microsoft&quot;</span><span class="p">,</span> <span class="s2">&quot;Google&quot;</span><span class="p">,</span> <span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">]</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"AAPL"</span><span class="p">,</span> <span class="s2">"MSFT"</span><span class="p">,</span> <span class="s2">"GOOGL"</span><span class="p">,</span> <span class="s2">"SPY"</span><span class="p">]</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Apple"</span><span class="p">,</span> <span class="s2">"Microsoft"</span><span class="p">,</span> <span class="s2">"Google"</span><span class="p">,</span> <span class="s2">"S&amp;P 500"</span><span class="p">]</span>
 
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
-     <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;3y&quot;</span><span class="p">)</span>
-     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+     <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"3y"</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">])</span>
      <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
      <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
@@ -141,12 +141,12 @@
 <span class="c1"># The last asset in the frame is used as the benchmark</span>
 <span class="n">figure</span><span class="p">,</span> <span class="n">filepath</span> <span class="o">=</span> <span class="n">report_html</span><span class="p">(</span>
      <span class="n">data</span><span class="o">=</span><span class="n">comparison_frame</span><span class="p">,</span>
-     <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span><span class="p">,</span>
-     <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;stock_comparison_report.html&quot;</span>
+     <span class="n">output_type</span><span class="o">=</span><span class="s2">"file"</span><span class="p">,</span>
+     <span class="n">filename</span><span class="o">=</span><span class="s2">"stock_comparison_report.html"</span>
 <span class="p">)</span>
 
 <span class="c1"># filepath contains the path to the saved HTML file</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Report saved to: </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Report saved to: </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># The figure object can be used for further customization if needed</span>
 <span class="c1"># figure.show()  # Display the figure interactively</span>
@@ -159,7 +159,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate HTML div section for embedding</span>
 <span class="n">figure</span><span class="p">,</span> <span class="n">html_div</span> <span class="o">=</span> <span class="n">report_html</span><span class="p">(</span>
      <span class="n">data</span><span class="o">=</span><span class="n">comparison_frame</span><span class="p">,</span>
-     <span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;div&quot;</span>
+     <span class="n">output_type</span><span class="o">=</span><span class="s2">"div"</span>
 <span class="p">)</span>
 
 <span class="c1"># html_div contains the responsive HTML div section</span>
@@ -167,7 +167,7 @@
 <span class="c1"># It includes both desktop and mobile layouts with CSS and JavaScript</span>
 
 <span class="c1"># Example: Save to a custom HTML template</span>
-<span class="n">html_template</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="n">html_template</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">&lt;!DOCTYPE html&gt;</span>
 <span class="s2">&lt;html&gt;</span>
 <span class="s2">&lt;head&gt;</span>
@@ -178,9 +178,9 @@
 <span class="s2">    </span><span class="si">{</span><span class="n">html_div</span><span class="si">}</span>
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;custom_report.html&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"custom_report.html"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_template</span><span class="p">)</span>
 </pre></div>
 </div>

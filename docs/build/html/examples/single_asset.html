@@ -131,34 +131,34 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Download Apple stock data</span>
-<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">&quot;AAPL&quot;</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">)</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">"AAPL"</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"5y"</span><span class="p">)</span>
 
 <span class="c1"># Create OpenTimeSeries</span>
 <span class="n">apple</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-     <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># Set descriptive label</span>
-<span class="n">apple</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;Apple Inc. (AAPL)&quot;</span><span class="p">)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">"Apple Inc. (AAPL)"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date range: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Date range: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="performance-analysis">
 <h2>Performance Analysis<a class="headerlink" href="#performance-analysis" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic performance metrics</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== PERFORMANCE METRICS ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Return: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Return: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Volatility: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"=== PERFORMANCE METRICS ==="</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Return: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Annualized Return: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Annualized Volatility: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sharpe Ratio: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Get all metrics at once</span>
 <span class="n">all_metrics</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== ALL METRICS ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">=== ALL METRICS ==="</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">all_metrics</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -166,13 +166,13 @@
 <section id="risk-analysis">
 <h2>Risk Analysis<a class="headerlink" href="#risk-analysis" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Risk metrics</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== RISK ANALYSIS ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum Drawdown: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max Drawdown Date: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">max_drawdown_date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% VaR (daily): </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% CVaR (daily): </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Worst Single Day: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">worst</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sortino Ratio: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"=== RISK ANALYSIS ==="</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Maximum Drawdown: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Max Drawdown Date: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">max_drawdown_date</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"95% VaR (daily): </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"95% CVaR (daily): </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Worst Single Day: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">worst</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sortino Ratio: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -180,7 +180,7 @@
 <h2>Time Series Transformations<a class="headerlink" href="#time-series-transformations" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert to returns (modifies original)</span>
 <span class="n">apple</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns series length: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Returns series length: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Create drawdown series (modifies original)</span>
 <span class="n">apple</span><span class="o">.</span><span class="n">to_drawdown_series</span><span class="p">()</span>
@@ -189,8 +189,8 @@
 <span class="n">apple</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
 
 <span class="c1"># Resample to monthly (modifies original)</span>
-<span class="n">apple</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly data points: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"BME"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Monthly data points: </span><span class="si">{</span><span class="n">apple</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -198,8 +198,8 @@
 <h2>Rolling Analysis<a class="headerlink" href="#rolling-analysis" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rolling volatility (1-year window)</span>
 <span class="n">rolling_vol</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">rolling_vol</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">252</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current 1Y volatility: </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average 1Y volatility: </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current 1Y volatility: </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Average 1Y volatility: </span><span class="si">{</span><span class="n">rolling_vol</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Rolling returns (30-day)</span>
 <span class="n">rolling_returns</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">rolling_return</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -227,24 +227,24 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Annual returns by calendar year</span>
 <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2019</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="mi">2021</span><span class="p">,</span> <span class="mi">2022</span><span class="p">,</span> <span class="mi">2023</span><span class="p">,</span> <span class="mi">2024</span><span class="p">]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== CALENDAR YEAR RETURNS ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"=== CALENDAR YEAR RETURNS ==="</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
      <span class="c1"># This may fail if no data exists for the year</span>
      <span class="n">year_return</span> <span class="o">=</span> <span class="n">apple</span><span class="o">.</span><span class="n">value_ret_calendar_period</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">year_return</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="export-results">
 <h2>Export Results<a class="headerlink" href="#export-results" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export to Excel</span>
-<span class="n">apple</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">&quot;apple_analysis.xlsx&quot;</span><span class="p">)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="s2">"apple_analysis.xlsx"</span><span class="p">)</span>
 
 <span class="c1"># Export metrics to CSV</span>
-<span class="n">all_metrics</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;apple_metrics.csv&quot;</span><span class="p">)</span>
+<span class="n">all_metrics</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">"apple_metrics.csv"</span><span class="p">)</span>
 
 <span class="c1"># Export to JSON</span>
-<span class="n">apple</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;apple_data.json&quot;</span><span class="p">)</span>
+<span class="n">apple</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">"apple_data.json"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -255,55 +255,55 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span>
 
 <span class="c1"># Example: Analyze Apple stock using openseries methods</span>
-<span class="n">ticker_symbol</span> <span class="o">=</span> <span class="s2">&quot;AAPL&quot;</span>
+<span class="n">ticker_symbol</span> <span class="o">=</span> <span class="s2">"AAPL"</span>
 
 <span class="c1"># Download data using openseries methods</span>
 <span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker_symbol</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;5y&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"5y"</span><span class="p">)</span>
 
 <span class="c1"># Create series using openseries from_df method</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-     <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">],</span>
      <span class="n">name</span><span class="o">=</span><span class="n">ticker_symbol</span>
 <span class="p">)</span>
 
 <span class="c1"># Analysis using openseries properties and methods</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;=== </span><span class="si">{</span><span class="n">ticker_symbol</span><span class="si">}</span><span class="s2"> ANALYSIS ===&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Period: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observations: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"=== </span><span class="si">{</span><span class="n">ticker_symbol</span><span class="si">}</span><span class="s2"> ANALYSIS ==="</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Period: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Observations: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Key metrics using openseries properties</span>
 <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
-     <span class="s1">&#39;Total Return&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;Annual Return&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;Volatility&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;Sharpe Ratio&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;Max Drawdown&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;95% VaR&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;Skewness&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-     <span class="s1">&#39;Kurtosis&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+     <span class="s1">'Total Return'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'Annual Return'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'Volatility'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'Sharpe Ratio'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'Max Drawdown'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'95% VaR'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'Skewness'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+     <span class="s1">'Kurtosis'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span>
 <span class="p">}</span>
 
 <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Export results using openseries to_xlsx method</span>
-<span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ticker_symbol</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_analysis.xlsx&quot;</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ticker_symbol</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_analysis.xlsx"</span>
 <span class="n">series</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Results exported to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Results exported to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Example: Analyze multiple assets</span>
-<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAPL&quot;</span><span class="p">,</span> <span class="s2">&quot;TSLA&quot;</span><span class="p">,</span> <span class="s2">&quot;MSFT&quot;</span><span class="p">]</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"AAPL"</span><span class="p">,</span> <span class="s2">"TSLA"</span><span class="p">,</span> <span class="s2">"MSFT"</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">ticker_symbol</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
      <span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker_symbol</span><span class="p">)</span>
-     <span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
-     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+     <span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"2y"</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">])</span>
      <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">ticker_symbol</span><span class="p">)</span>
 
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">ticker_symbol</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Return: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Volatility: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sharpe: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="n">ticker_symbol</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Return: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Volatility: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Sharpe: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

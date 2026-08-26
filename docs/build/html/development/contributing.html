@@ -182,7 +182,7 @@
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>venv
 <span class="nb">source</span><span class="w"> </span>venv/bin/activate
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev,docs]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev,docs]"</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="5">
@@ -217,7 +217,7 @@ uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </s
 <li><p>Commit your changes:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>add<span class="w"> </span>.
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Add your descriptive commit message&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Add your descriptive commit message"</span>
 </pre></div>
 </div>
 <ol class="arabic simple" start="6">
@@ -247,7 +247,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <h3>Type Hints<a class="headerlink" href="#type-hints" title="Link to this heading"></a></h3>
 <p>All new code should include proper type hints:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_returns</span><span class="p">(</span><span class="n">prices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">     </span><span class="sd">&quot;&quot;&quot;Calculate simple returns from prices.&quot;&quot;&quot;</span>
+<span class="w">     </span><span class="sd">"""Calculate simple returns from prices."""</span>
      <span class="n">returns</span> <span class="o">=</span> <span class="p">[]</span>
      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">)):</span>
           <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">prices</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
@@ -260,7 +260,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <h3>Docstrings<a class="headerlink" href="#docstrings" title="Link to this heading"></a></h3>
 <p>Use Google-style docstrings for all public functions and classes:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_sharpe_ratio</span><span class="p">(</span><span class="n">returns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">risk_free_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">     </span><span class="sd">&quot;&quot;&quot;Calculate the Sharpe ratio.</span>
+<span class="w">     </span><span class="sd">"""Calculate the Sharpe ratio.</span>
 
 <span class="sd">     Args:</span>
 <span class="sd">          returns: List of periodic returns.</span>
@@ -275,10 +275,10 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <span class="sd">     Example:</span>
 <span class="sd">          &gt;&gt;&gt; returns = [0.01, 0.02, -0.01, 0.03]</span>
 <span class="sd">          &gt;&gt;&gt; sharpe = calculate_sharpe_ratio(returns)</span>
-<span class="sd">          &gt;&gt;&gt; print(f&quot;Sharpe ratio: {sharpe:.3f}&quot;)</span>
-<span class="sd">     &quot;&quot;&quot;</span>
+<span class="sd">          &gt;&gt;&gt; print(f"Sharpe ratio: {sharpe:.3f}")</span>
+<span class="sd">     """</span>
      <span class="k">if</span> <span class="ow">not</span> <span class="n">returns</span><span class="p">:</span>
-          <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Returns list cannot be empty&quot;</span><span class="p">)</span>
+          <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Returns list cannot be empty"</span><span class="p">)</span>
 
      <span class="n">mean_return</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
      <span class="n">std_dev</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">((</span><span class="n">r</span> <span class="o">-</span> <span class="n">mean_return</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">returns</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
@@ -314,57 +314,57 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TestOpenTimeSeries</span><span class="p">:</span>
-<span class="w">     </span><span class="sd">&quot;&quot;&quot;Test cases for OpenTimeSeries class.&quot;&quot;&quot;</span>
+<span class="w">     </span><span class="sd">"""Test cases for OpenTimeSeries class."""</span>
 
      <span class="k">def</span><span class="w"> </span><span class="nf">test_from_arrays_basic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">          </span><span class="sd">&quot;&quot;&quot;Test basic creation from arrays.&quot;&quot;&quot;</span>
-          <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">]</span>
+<span class="w">          </span><span class="sd">"""Test basic creation from arrays."""</span>
+          <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'2023-01-01'</span><span class="p">,</span> <span class="s1">'2023-01-02'</span><span class="p">,</span> <span class="s1">'2023-01-03'</span><span class="p">]</span>
           <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">]</span>
 
-          <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
+          <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Test"</span><span class="p">)</span>
 
-          <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;Test&quot;</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected name &#39;Test&#39;, got &#39;</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+          <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="s2">"Test"</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Expected name 'Test', got '</span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">'"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
           <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">length</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected length 3, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Expected length 3, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-          <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">first_idx</span> <span class="o">!=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected first_idx 2023-01-01, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">first_idx</span> <span class="o">!=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">'2023-01-01'</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Expected first_idx 2023-01-01, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-          <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">!=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">&#39;2023-01-03&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected last_idx 2023-01-03, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="k">if</span> <span class="n">series</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">!=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s1">'2023-01-03'</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Expected last_idx 2023-01-03, got </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
      <span class="k">def</span><span class="w"> </span><span class="nf">test_from_arrays_invalid_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">          </span><span class="sd">&quot;&quot;&quot;Test that invalid dates raise appropriate errors.&quot;&quot;&quot;</span>
+<span class="w">          </span><span class="sd">"""Test that invalid dates raise appropriate errors."""</span>
           <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
                 <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
-                     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;invalid-date&#39;</span><span class="p">],</span>
+                     <span class="n">dates</span><span class="o">=</span><span class="p">[</span><span class="s1">'invalid-date'</span><span class="p">],</span>
                      <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mf">100.0</span><span class="p">],</span>
-                     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span>
+                     <span class="n">name</span><span class="o">=</span><span class="s2">"Test"</span>
                 <span class="p">)</span>
 
      <span class="k">def</span><span class="w"> </span><span class="nf">test_calculate_returns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">          </span><span class="sd">&quot;&quot;&quot;Test return calculation.&quot;&quot;&quot;</span>
-          <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-02&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-03&#39;</span><span class="p">]</span>
+<span class="w">          </span><span class="sd">"""Test return calculation."""</span>
+          <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'2023-01-01'</span><span class="p">,</span> <span class="s1">'2023-01-02'</span><span class="p">,</span> <span class="s1">'2023-01-03'</span><span class="p">]</span>
           <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">102.0</span><span class="p">,</span> <span class="mf">99.0</span><span class="p">]</span>
 
-          <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
+          <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Test"</span><span class="p">)</span>
           <span class="n">series</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>  <span class="c1"># Modifies original</span>
 
           <span class="n">expected_returns</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.02</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0294117647</span><span class="p">]</span>  <span class="c1"># Approximate</span>
           <span class="n">actual_returns</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">values</span>
 
           <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Expected 2 returns, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Expected 2 returns, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
           <span class="c1"># Use tolerance-based comparison</span>
           <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">expected_returns</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mf">1e-6</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;First return mismatch: </span><span class="si">{</span><span class="n">actual_returns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">expected_returns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"First return mismatch: </span><span class="si">{</span><span class="n">actual_returns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">expected_returns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
           <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">actual_returns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">expected_returns</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mf">1e-6</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Second return mismatch: </span><span class="si">{</span><span class="n">actual_returns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">expected_returns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Second return mismatch: </span><span class="si">{</span><span class="n">actual_returns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">expected_returns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -511,11 +511,11 @@ make<span class="w"> </span>html
 </ul>
 <p>Recommended settings in <code class="docutils literal notranslate"><span class="pre">.vscode/settings.json</span></code>:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;python.defaultInterpreterPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;.venv/bin/python&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;python.linting.enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;python.linting.ruffEnabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;python.formatting.provider&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ruff&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;python.typeChecking&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;strict&quot;</span>
+<span class="w">    </span><span class="nt">"python.defaultInterpreterPath"</span><span class="p">:</span><span class="w"> </span><span class="s2">".venv/bin/python"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"python.linting.enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"python.linting.ruffEnabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"python.formatting.provider"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ruff"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"python.typeChecking"</span><span class="p">:</span><span class="w"> </span><span class="s2">"strict"</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -528,22 +528,22 @@ make<span class="w"> </span>html
 </div>
 <p>For debugging with VS Code, create <code class="docutils literal notranslate"><span class="pre">.vscode/launch.json</span></code>:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.2.0"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"configurations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Python: Current File&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;program&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${file}&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;console&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integratedTerminal&quot;</span>
+<span class="w">            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Python: Current File"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"python"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"program"</span><span class="p">:</span><span class="w"> </span><span class="s2">"${file}"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"console"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integratedTerminal"</span>
 <span class="w">        </span><span class="p">},</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Python: Pytest&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;module&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pytest&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;${workspaceFolder}/tests&quot;</span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;console&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integratedTerminal&quot;</span>
+<span class="w">            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Python: Pytest"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"python"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"request"</span><span class="p">:</span><span class="w"> </span><span class="s2">"launch"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pytest"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"${workspaceFolder}/tests"</span><span class="p">],</span>
+<span class="w">            </span><span class="nt">"console"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integratedTerminal"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">}</span>

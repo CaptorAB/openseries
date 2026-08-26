@@ -108,7 +108,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for openseries.portfoliotools</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Defining the portfolio tools for the OpenFrame class.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Defining the portfolio tools for the OpenFrame class."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -162,11 +162,11 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">.frame</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenFrame</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;constrain_optimized_portfolios&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;efficient_frontier&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;prepare_plot_data&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sharpeplot&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;simulate_portfolios&quot;</span><span class="p">,</span>
+    <span class="s2">"constrain_optimized_portfolios"</span><span class="p">,</span>
+    <span class="s2">"efficient_frontier"</span><span class="p">,</span>
+    <span class="s2">"prepare_plot_data"</span><span class="p">,</span>
+    <span class="s2">"sharpeplot"</span><span class="p">,</span>
+    <span class="s2">"simulate_portfolios"</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -177,7 +177,7 @@
     <span class="n">num_ports</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate random weights for simulated portfolios.</span>
+<span class="w">    </span><span class="sd">"""Generate random weights for simulated portfolios.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        simframe: Return data for portfolio constituents.</span>
@@ -186,7 +186,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The resulting data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">copi</span> <span class="o">=</span> <span class="n">simframe</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
 
     <span class="n">vtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">copi</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
@@ -196,7 +196,7 @@
     <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
         <span class="n">log_ret</span> <span class="o">=</span> <span class="n">copi</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Mix of series types will give inconsistent results&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Mix of series types will give inconsistent results"</span>
         <span class="k">raise</span> <span class="n">MixedValuetypesError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="n">log_ret</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">log_ret</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -209,15 +209,15 @@
     <span class="n">all_weights</span> <span class="o">=</span> <span class="n">all_weights</span> <span class="o">/</span> <span class="n">all_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">ret_arr</span> <span class="o">=</span> <span class="n">all_weights</span> <span class="o">@</span> <span class="n">mean_returns</span>
-    <span class="n">vol_arr</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ij,jk,ik-&gt;i&quot;</span><span class="p">,</span> <span class="n">all_weights</span><span class="p">,</span> <span class="n">cov_matrix</span><span class="p">,</span> <span class="n">all_weights</span><span class="p">))</span>
+    <span class="n">vol_arr</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">einsum</span><span class="p">(</span><span class="s2">"ij,jk,ik-&gt;i"</span><span class="p">,</span> <span class="n">all_weights</span><span class="p">,</span> <span class="n">cov_matrix</span><span class="p">,</span> <span class="n">all_weights</span><span class="p">))</span>
     <span class="n">sharpe_arr</span> <span class="o">=</span> <span class="n">ret_arr</span> <span class="o">/</span> <span class="n">vol_arr</span>
 
     <span class="n">simdf</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span>
         <span class="p">[</span>
-            <span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;stdev&quot;</span><span class="p">:</span> <span class="n">vol_arr</span><span class="p">,</span> <span class="s2">&quot;ret&quot;</span><span class="p">:</span> <span class="n">ret_arr</span><span class="p">,</span> <span class="s2">&quot;sharpe&quot;</span><span class="p">:</span> <span class="n">sharpe_arr</span><span class="p">}),</span>
+            <span class="n">DataFrame</span><span class="p">({</span><span class="s2">"stdev"</span><span class="p">:</span> <span class="n">vol_arr</span><span class="p">,</span> <span class="s2">"ret"</span><span class="p">:</span> <span class="n">ret_arr</span><span class="p">,</span> <span class="s2">"sharpe"</span><span class="p">:</span> <span class="n">sharpe_arr</span><span class="p">}),</span>
             <span class="n">DataFrame</span><span class="p">(</span><span class="n">all_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">simframe</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">),</span>
         <span class="p">],</span>
-        <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="s2">"columns"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">simdf</span> <span class="o">=</span> <span class="n">simdf</span><span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">inf</span><span class="p">],</span> <span class="n">nan</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">simdf</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span></div>
@@ -225,7 +225,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_returns_for_frontier</span><span class="p">(</span><span class="n">eframe</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">OpenFrame</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare returns DataFrame for frontier calculation.</span>
+<span class="w">    </span><span class="sd">"""Prepare returns DataFrame for frontier calculation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        eframe: Portfolio data.</span>
@@ -235,7 +235,7 @@
 
 <span class="sd">    Raises:</span>
 <span class="sd">        MixedValuetypesError: If series types are mixed.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">eframe</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">eframe</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">eframe</span><span class="o">.</span><span class="n">item_count</span><span class="p">]</span> <span class="o">*</span> <span class="n">eframe</span><span class="o">.</span><span class="n">item_count</span>
 
@@ -248,7 +248,7 @@
     <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">vtypes</span><span class="p">):</span>
         <span class="n">log_ret</span> <span class="o">=</span> <span class="n">copi</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Mix of series types will give inconsistent results&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Mix of series types will give inconsistent results"</span>
         <span class="k">raise</span> <span class="n">MixedValuetypesError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="n">log_ret</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">log_ret</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -260,7 +260,7 @@
     <span class="n">log_ret</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">periods_in_a_year</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate frontier return bounds.</span>
+<span class="w">    </span><span class="sd">"""Calculate frontier return bounds.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        simulated: Simulated portfolios DataFrame.</span>
@@ -269,9 +269,9 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of (min_return, max_return).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">min_stdev_idx</span> <span class="o">=</span> <span class="n">simulated</span><span class="p">[</span><span class="s2">&quot;stdev&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
-    <span class="n">frontier_min</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">simulated</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">min_stdev_idx</span><span class="p">,</span> <span class="s2">&quot;ret&quot;</span><span class="p">])</span>
+<span class="sd">    """</span>
+    <span class="n">min_stdev_idx</span> <span class="o">=</span> <span class="n">simulated</span><span class="p">[</span><span class="s2">"stdev"</span><span class="p">]</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+    <span class="n">frontier_min</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">simulated</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">min_stdev_idx</span><span class="p">,</span> <span class="s2">"ret"</span><span class="p">])</span>
 
     <span class="n">arithmetic_means</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">log_ret</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">periods_in_a_year</span><span class="p">)</span>
     <span class="n">cleaned_arithmetic_means</span> <span class="o">=</span> <span class="n">arithmetic_means</span><span class="p">[</span><span class="o">~</span><span class="n">isnan</span><span class="p">(</span><span class="n">arithmetic_means</span><span class="p">)]</span>
@@ -290,7 +290,7 @@
     <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span>
     <span class="n">minimize_method</span><span class="p">:</span> <span class="n">LiteralMinimizeMethods</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build frontier line points.</span>
+<span class="w">    </span><span class="sd">"""Build frontier line points.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        log_ret: Returns DataFrame.</span>
@@ -304,10 +304,10 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of (frontier_x, frontier_weights).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_sum</span><span class="p">(</span><span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">npsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">npsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_ret_vol_sr</span><span class="p">(</span>
         <span class="n">lg_ret</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
@@ -317,7 +317,7 @@
         <span class="n">ret</span> <span class="o">=</span> <span class="n">npsum</span><span class="p">(</span><span class="n">lg_ret</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">weights</span><span class="p">)</span> <span class="o">*</span> <span class="n">per_in_yr</span>
         <span class="n">volatility</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">lg_ret</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="n">per_in_yr</span> <span class="o">@</span> <span class="n">weights</span><span class="p">))</span>
         <span class="n">sr</span> <span class="o">=</span> <span class="n">ret</span> <span class="o">/</span> <span class="n">volatility</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span> <span class="n">array</span><span class="p">([</span><span class="n">ret</span><span class="p">,</span> <span class="n">volatility</span><span class="p">,</span> <span class="n">sr</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"NDArray[float64]"</span><span class="p">,</span> <span class="n">array</span><span class="p">([</span><span class="n">ret</span><span class="p">,</span> <span class="n">volatility</span><span class="p">,</span> <span class="n">sr</span><span class="p">]))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_diff_return</span><span class="p">(</span>
         <span class="n">lg_ret</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
@@ -326,7 +326,7 @@
         <span class="n">poss_return</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="s2">"float64"</span><span class="p">,</span>
             <span class="n">_get_ret_vol_sr</span><span class="p">(</span><span class="n">lg_ret</span><span class="o">=</span><span class="n">lg_ret</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">per_in_yr</span><span class="o">=</span><span class="n">per_in_yr</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="o">-</span> <span class="n">poss_return</span><span class="p">,</span>
         <span class="p">)</span>
@@ -335,7 +335,7 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="s2">"float64"</span><span class="p">,</span>
             <span class="n">_get_ret_vol_sr</span><span class="p">(</span>
                 <span class="n">lg_ret</span><span class="o">=</span><span class="n">log_ret</span><span class="p">,</span>
                 <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
@@ -349,12 +349,12 @@
 
     <span class="k">for</span> <span class="n">possible_return</span> <span class="ow">in</span> <span class="n">frontier_y</span><span class="p">:</span>
         <span class="n">cons</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;Any&quot;</span><span class="p">,</span>
+            <span class="s2">"Any"</span><span class="p">,</span>
             <span class="p">[</span>
-                <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;eq&quot;</span><span class="p">,</span> <span class="s2">&quot;fun&quot;</span><span class="p">:</span> <span class="n">_check_sum</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"eq"</span><span class="p">,</span> <span class="s2">"fun"</span><span class="p">:</span> <span class="n">_check_sum</span><span class="p">},</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;eq&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;fun&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">poss_return</span><span class="o">=</span><span class="n">possible_return</span><span class="p">:</span> <span class="n">_diff_return</span><span class="p">(</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"eq"</span><span class="p">,</span>
+                    <span class="s2">"fun"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">poss_return</span><span class="o">=</span><span class="n">possible_return</span><span class="p">:</span> <span class="n">_diff_return</span><span class="p">(</span>
                         <span class="n">lg_ret</span><span class="o">=</span><span class="n">log_ret</span><span class="p">,</span>
                         <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">,</span>
                         <span class="n">per_in_yr</span><span class="o">=</span><span class="n">periods_in_a_year</span><span class="p">,</span>
@@ -372,8 +372,8 @@
             <span class="n">constraints</span><span class="o">=</span><span class="n">cons</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">frontier_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;fun&quot;</span><span class="p">])</span>
-        <span class="n">frontier_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+        <span class="n">frontier_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"fun"</span><span class="p">])</span>
+        <span class="n">frontier_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"x"</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">frontier_x</span><span class="p">,</span> <span class="n">frontier_weights</span>
 
@@ -384,7 +384,7 @@
     <span class="n">frontier_weights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">columns_lvl_zero</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build frontier DataFrame.</span>
+<span class="w">    </span><span class="sd">"""Build frontier DataFrame.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        frontier_x: Frontier volatility values.</span>
@@ -394,25 +394,25 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Frontier DataFrame.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">line_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">frontier_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns_lvl_zero</span><span class="p">),</span>
-            <span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;stdev&quot;</span><span class="p">:</span> <span class="n">frontier_x</span><span class="p">,</span> <span class="s2">&quot;ret&quot;</span><span class="p">:</span> <span class="n">frontier_y</span><span class="p">}),</span>
+            <span class="n">DataFrame</span><span class="p">({</span><span class="s2">"stdev"</span><span class="p">:</span> <span class="n">frontier_x</span><span class="p">,</span> <span class="s2">"ret"</span><span class="p">:</span> <span class="n">frontier_y</span><span class="p">}),</span>
         <span class="p">],</span>
-        <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="s2">"columns"</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">line_df</span><span class="p">[</span><span class="s2">&quot;sharpe&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_df</span><span class="o">.</span><span class="n">ret</span> <span class="o">/</span> <span class="n">line_df</span><span class="o">.</span><span class="n">stdev</span>
+    <span class="n">line_df</span><span class="p">[</span><span class="s2">"sharpe"</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_df</span><span class="o">.</span><span class="n">ret</span> <span class="o">/</span> <span class="n">line_df</span><span class="o">.</span><span class="n">stdev</span>
 
     <span class="n">limit_small</span> <span class="o">=</span> <span class="mf">0.0001</span>
     <span class="n">line_df</span> <span class="o">=</span> <span class="n">line_df</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">line_df</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">limit_small</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
     <span class="n">weight_cols</span> <span class="o">=</span> <span class="n">columns_lvl_zero</span>
-    <span class="n">weight_header</span> <span class="o">=</span> <span class="s2">&quot;&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;&quot;</span>
-    <span class="n">line_df</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_df</span><span class="p">[</span><span class="n">weight_cols</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="n">weight_header</span> <span class="o">=</span> <span class="s2">"&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;"</span>
+    <span class="n">line_df</span><span class="p">[</span><span class="s2">"text"</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_df</span><span class="p">[</span><span class="n">weight_cols</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span>
             <span class="n">weight_header</span>
-            <span class="o">+</span> <span class="s2">&quot;&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">weight_cols</span><span class="p">])</span>
+            <span class="o">+</span> <span class="s2">"&lt;br&gt;"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">weight_cols</span><span class="p">])</span>
         <span class="p">),</span>
         <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
@@ -421,18 +421,18 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_apply_tweak</span><span class="p">(</span><span class="n">line_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply tweak to frontier DataFrame.</span>
+<span class="w">    </span><span class="sd">"""Apply tweak to frontier DataFrame.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        line_df: Frontier DataFrame.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tweaked DataFrame.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">limit_tweak</span> <span class="o">=</span> <span class="mf">0.001</span>
-    <span class="n">line_df</span><span class="p">[</span><span class="s2">&quot;stdev_diff&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_df</span><span class="o">.</span><span class="n">stdev</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+    <span class="n">line_df</span><span class="p">[</span><span class="s2">"stdev_diff"</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_df</span><span class="o">.</span><span class="n">stdev</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
     <span class="n">line_df</span> <span class="o">=</span> <span class="n">line_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">line_df</span><span class="o">.</span><span class="n">stdev_diff</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">limit_tweak</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">line_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;stdev_diff&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">line_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">"stdev_diff"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_create_optimization_functions</span><span class="p">(</span>
@@ -443,7 +443,7 @@
     <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">float64</span><span class="p">],</span>
 <span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create optimization helper functions.</span>
+<span class="w">    </span><span class="sd">"""Create optimization helper functions.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        log_ret: Returns DataFrame.</span>
@@ -451,19 +451,19 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of (_check_sum, _get_ret_vol_sr, _neg_sharpe) functions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_check_sum</span><span class="p">(</span><span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">npsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">npsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_ret_vol_sr</span><span class="p">(</span><span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]:</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">npsum</span><span class="p">(</span><span class="n">log_ret</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">weights</span><span class="p">)</span> <span class="o">*</span> <span class="n">periods_in_a_year</span>
         <span class="n">volatility</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="p">(</span><span class="n">log_ret</span><span class="o">.</span><span class="n">cov</span><span class="p">()</span> <span class="o">*</span> <span class="n">periods_in_a_year</span> <span class="o">@</span> <span class="n">weights</span><span class="p">))</span>
         <span class="n">sr</span> <span class="o">=</span> <span class="n">ret</span> <span class="o">/</span> <span class="n">volatility</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span> <span class="n">array</span><span class="p">([</span><span class="n">ret</span><span class="p">,</span> <span class="n">volatility</span><span class="p">,</span> <span class="n">sr</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"NDArray[float64]"</span><span class="p">,</span> <span class="n">array</span><span class="p">([</span><span class="n">ret</span><span class="p">,</span> <span class="n">volatility</span><span class="p">,</span> <span class="n">sr</span><span class="p">]))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_neg_sharpe</span><span class="p">(</span><span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span> <span class="n">_get_ret_vol_sr</span><span class="p">(</span><span class="n">weights</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"float64"</span><span class="p">,</span> <span class="n">_get_ret_vol_sr</span><span class="p">(</span><span class="n">weights</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_check_sum</span><span class="p">,</span> <span class="n">_get_ret_vol_sr</span><span class="p">,</span> <span class="n">_neg_sharpe</span>
 
@@ -476,7 +476,7 @@
     <span class="n">_get_ret_vol_sr</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span>
     <span class="n">_neg_sharpe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]],</span> <span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimize maximum Sharpe ratio portfolio.</span>
+<span class="w">    </span><span class="sd">"""Optimize maximum Sharpe ratio portfolio.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        init_guess: Initial guess for optimization.</span>
@@ -488,8 +488,8 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple of (optimal metrics, optimal weights).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">constraints</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;eq&quot;</span><span class="p">,</span> <span class="s2">&quot;fun&quot;</span><span class="p">:</span> <span class="n">_check_sum</span><span class="p">}])</span>
+<span class="sd">    """</span>
+    <span class="n">constraints</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"Any"</span><span class="p">,</span> <span class="p">[{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"eq"</span><span class="p">,</span> <span class="s2">"fun"</span><span class="p">:</span> <span class="n">_check_sum</span><span class="p">}])</span>
     <span class="n">opt_results</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span>
         <span class="n">fun</span><span class="o">=</span><span class="n">_neg_sharpe</span><span class="p">,</span>
         <span class="n">x0</span><span class="o">=</span><span class="n">init_guess</span><span class="p">,</span>
@@ -511,11 +511,11 @@
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">71</span><span class="p">,</span>
     <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">frontier_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
-    <span class="n">minimize_method</span><span class="p">:</span> <span class="n">LiteralMinimizeMethods</span> <span class="o">=</span> <span class="s2">&quot;SLSQP&quot;</span><span class="p">,</span>
+    <span class="n">minimize_method</span><span class="p">:</span> <span class="n">LiteralMinimizeMethods</span> <span class="o">=</span> <span class="s2">"SLSQP"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">tweak</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identify an efficient frontier.</span>
+<span class="w">    </span><span class="sd">"""Identify an efficient frontier.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        eframe: Portfolio data.</span>
@@ -531,7 +531,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The efficient frontier data, simulation data and optimal portfolio.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">log_ret</span><span class="p">,</span> <span class="n">copi</span> <span class="o">=</span> <span class="n">_prepare_returns_for_frontier</span><span class="p">(</span><span class="n">eframe</span><span class="p">)</span>
 
     <span class="n">simulated</span> <span class="o">=</span> <span class="n">simulate_portfolios</span><span class="p">(</span><span class="n">simframe</span><span class="o">=</span><span class="n">copi</span><span class="p">,</span> <span class="n">num_ports</span><span class="o">=</span><span class="n">num_ports</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
@@ -591,18 +591,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">constrain_optimized_portfolios</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">OpenFrame</span><span class="p">,</span>
     <span class="n">serie</span><span class="p">:</span> <span class="n">OpenTimeSeries</span><span class="p">,</span>
-    <span class="n">portfolioname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Current Portfolio&quot;</span><span class="p">,</span>
+    <span class="n">portfolioname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Current Portfolio"</span><span class="p">,</span>
     <span class="n">simulations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
     <span class="n">curve_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
     <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">minimize_method</span><span class="p">:</span> <span class="n">LiteralMinimizeMethods</span> <span class="o">=</span> <span class="s2">&quot;SLSQP&quot;</span><span class="p">,</span>
+    <span class="n">minimize_method</span><span class="p">:</span> <span class="n">LiteralMinimizeMethods</span> <span class="o">=</span> <span class="s2">"SLSQP"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">OpenFrame</span><span class="p">,</span> <span class="n">OpenTimeSeries</span><span class="p">,</span> <span class="n">OpenFrame</span><span class="p">,</span> <span class="n">OpenTimeSeries</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Constrain optimized portfolios to those that improve on the current one.</span>
+<span class="w">    </span><span class="sd">"""Constrain optimized portfolios to those that improve on the current one.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: Portfolio data.</span>
 <span class="sd">        serie: A timeseries representing the current portfolio.</span>
-<span class="sd">        portfolioname: Name of the portfolio. Defaults to &quot;Current Portfolio&quot;.</span>
+<span class="sd">        portfolioname: Name of the portfolio. Defaults to "Current Portfolio".</span>
 <span class="sd">        simulations: Number of possible portfolios to simulate. Defaults to 10000.</span>
 <span class="sd">        curve_points: Number of optimal portfolios on the efficient frontier.</span>
 <span class="sd">            Defaults to 200.</span>
@@ -613,7 +613,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        The constrained optimal portfolio data.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">lr_frame</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
     <span class="n">mv_frame</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
 
@@ -629,9 +629,9 @@
     <span class="p">)</span>
 
     <span class="n">condition_least_ret</span> <span class="o">=</span> <span class="n">front_frame</span><span class="o">.</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="n">serie</span><span class="o">.</span><span class="n">arithmetic_ret</span>
-    <span class="n">least_ret_frame</span> <span class="o">=</span> <span class="n">front_frame</span><span class="p">[</span><span class="n">condition_least_ret</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;stdev&quot;</span><span class="p">)</span>
+    <span class="n">least_ret_frame</span> <span class="o">=</span> <span class="n">front_frame</span><span class="p">[</span><span class="n">condition_least_ret</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">"stdev"</span><span class="p">)</span>
     <span class="n">least_ret_port</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">least_ret_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">least_ret_port_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Minimize vol &amp; target return of </span><span class="si">{</span><span class="n">portfolioname</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">least_ret_port_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Minimize vol &amp; target return of </span><span class="si">{</span><span class="n">portfolioname</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">least_ret_weights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">least_ret_port</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">lr_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span>
     <span class="p">]</span>
@@ -640,11 +640,11 @@
 
     <span class="n">condition_most_vol</span> <span class="o">=</span> <span class="n">front_frame</span><span class="o">.</span><span class="n">stdev</span> <span class="o">&lt;</span> <span class="n">serie</span><span class="o">.</span><span class="n">vol</span>
     <span class="n">most_vol_frame</span> <span class="o">=</span> <span class="n">front_frame</span><span class="p">[</span><span class="n">condition_most_vol</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
-        <span class="n">by</span><span class="o">=</span><span class="s2">&quot;ret&quot;</span><span class="p">,</span>
+        <span class="n">by</span><span class="o">=</span><span class="s2">"ret"</span><span class="p">,</span>
         <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">most_vol_port</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">most_vol_frame</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">most_vol_port_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Maximize return &amp; target risk of </span><span class="si">{</span><span class="n">portfolioname</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">most_vol_port_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Maximize return &amp; target risk of </span><span class="si">{</span><span class="n">portfolioname</span><span class="si">}</span><span class="s2">"</span>
     <span class="n">most_vol_weights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">most_vol_port</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">mv_frame</span><span class="o">.</span><span class="n">columns_lvl_zero</span>
     <span class="p">]</span>
@@ -662,7 +662,7 @@
     <span class="n">current</span><span class="p">:</span> <span class="n">OpenTimeSeries</span><span class="p">,</span>
     <span class="n">optimized</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare data to be used as point_frame in the sharpeplot function.</span>
+<span class="w">    </span><span class="sd">"""Prepare data to be used as point_frame in the sharpeplot function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        assets: Portfolio data with individual assets and a weighted portfolio.</span>
@@ -671,12 +671,12 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The data prepared with mean returns, volatility and weights.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">txt</span> <span class="o">=</span> <span class="s2">&quot;&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<span class="sd">    """</span>
+    <span class="n">txt</span> <span class="o">=</span> <span class="s2">"&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;"</span> <span class="o">+</span> <span class="s2">"&lt;br&gt;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
         <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wgt</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">nm</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">wgt</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">nm</span><span class="si">}</span><span class="s2">"</span>
             <span class="k">for</span> <span class="n">wgt</span><span class="p">,</span> <span class="n">nm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[float]&quot;</span><span class="p">,</span> <span class="n">assets</span><span class="o">.</span><span class="n">weights</span><span class="p">),</span>
+                <span class="n">cast</span><span class="p">(</span><span class="s2">"list[float]"</span><span class="p">,</span> <span class="n">assets</span><span class="o">.</span><span class="n">weights</span><span class="p">),</span>
                 <span class="n">assets</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">,</span>
                 <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
@@ -684,23 +684,23 @@
     <span class="p">)</span>
 
     <span class="n">opt_text_list</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wgt</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">nm</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">wgt</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">nm</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">for</span> <span class="n">wgt</span><span class="p">,</span> <span class="n">nm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">optimized</span><span class="p">[</span><span class="mi">3</span><span class="p">:],</span> <span class="n">assets</span><span class="o">.</span><span class="n">columns_lvl_zero</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="p">]</span>
-    <span class="n">opt_text</span> <span class="o">=</span> <span class="s2">&quot;&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opt_text_list</span><span class="p">)</span>
+    <span class="n">opt_text</span> <span class="o">=</span> <span class="s2">"&lt;br&gt;&lt;br&gt;Weights:&lt;br&gt;"</span> <span class="o">+</span> <span class="s2">"&lt;br&gt;"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opt_text_list</span><span class="p">)</span>
     <span class="n">plotframe</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="p">[</span>
             <span class="n">assets</span><span class="o">.</span><span class="n">arithmetic_ret</span><span class="p">,</span>
             <span class="n">assets</span><span class="o">.</span><span class="n">vol</span><span class="p">,</span>
             <span class="n">Series</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">assets</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">""</span><span class="p">]</span> <span class="o">*</span> <span class="n">assets</span><span class="o">.</span><span class="n">item_count</span><span class="p">,</span>
                 <span class="n">index</span><span class="o">=</span><span class="n">assets</span><span class="o">.</span><span class="n">vol</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">],</span>
-        <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ret&quot;</span><span class="p">,</span> <span class="s2">&quot;stdev&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">],</span>
+        <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">"ret"</span><span class="p">,</span> <span class="s2">"stdev"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">plotframe</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">plotframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">plotframe</span><span class="p">[</span><span class="s2">&quot;Max Sharpe Portfolio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
+    <span class="n">plotframe</span><span class="p">[</span><span class="s2">"Max Sharpe Portfolio"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">optimized</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">optimized</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">opt_text</span><span class="p">],</span>
         <span class="n">index</span><span class="o">=</span><span class="n">plotframe</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
         <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
@@ -718,18 +718,18 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_determine_output_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">:</span> <span class="n">DirectoryPath</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine output directory for plot file.</span>
+<span class="w">    </span><span class="sd">"""Determine output directory for plot file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        directory: Optional directory path.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Path to output directory.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">directory</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;Documents&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">"Documents"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">"Documents"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">stack</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 
 
@@ -739,30 +739,30 @@
     <span class="n">returns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">risk</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add simulated portfolios trace to figure.</span>
+<span class="w">    </span><span class="sd">"""Add simulated portfolios trace to figure.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        figure: Plotly figure.</span>
 <span class="sd">        sim_frame: Simulated portfolios DataFrame.</span>
 <span class="sd">        returns: List to extend with returns.</span>
 <span class="sd">        risk: List to extend with risk values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">returns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;ret&quot;</span><span class="p">]))</span>
-    <span class="n">risk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;stdev&quot;</span><span class="p">]))</span>
+<span class="sd">    """</span>
+    <span class="n">returns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"ret"</span><span class="p">]))</span>
+    <span class="n">risk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"stdev"</span><span class="p">]))</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;stdev&quot;</span><span class="p">],</span>
-        <span class="n">y</span><span class="o">=</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;ret&quot;</span><span class="p">],</span>
-        <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;skip&quot;</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"stdev"</span><span class="p">],</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"ret"</span><span class="p">],</span>
+        <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">"skip"</span><span class="p">,</span>
         <span class="n">marker</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-            <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
-            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;sharpe&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;colorscale&quot;</span><span class="p">:</span> <span class="s2">&quot;Jet&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;reversescale&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">&quot;colorbar&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;thickness&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Ratio&lt;br&gt;ret / vol&quot;</span><span class="p">},</span>
+            <span class="s2">"size"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">"color"</span><span class="p">:</span> <span class="n">sim_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"sharpe"</span><span class="p">],</span>
+            <span class="s2">"colorscale"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+            <span class="s2">"reversescale"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"colorbar"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"thickness"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Ratio&lt;br&gt;ret / vol"</span><span class="p">},</span>
         <span class="p">},</span>
-        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;simulated portfolios&quot;</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"markers"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"simulated portfolios"</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -772,27 +772,27 @@
     <span class="n">returns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">risk</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add efficient frontier trace to figure.</span>
+<span class="w">    </span><span class="sd">"""Add efficient frontier trace to figure.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        figure: Plotly figure.</span>
 <span class="sd">        line_frame: Efficient frontier DataFrame.</span>
 <span class="sd">        returns: List to extend with returns.</span>
 <span class="sd">        risk: List to extend with risk values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">returns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;ret&quot;</span><span class="p">]))</span>
-    <span class="n">risk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;stdev&quot;</span><span class="p">]))</span>
+<span class="sd">    """</span>
+    <span class="n">returns</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"ret"</span><span class="p">]))</span>
+    <span class="n">risk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"stdev"</span><span class="p">]))</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;stdev&quot;</span><span class="p">],</span>
-        <span class="n">y</span><span class="o">=</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;ret&quot;</span><span class="p">],</span>
-        <span class="n">text</span><span class="o">=</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;text&quot;</span><span class="p">],</span>
-        <span class="n">xhoverformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
-        <span class="n">yhoverformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
-        <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;Return %</span><span class="si">{y}</span><span class="s2">&lt;br&gt;Vol %</span><span class="si">{x}</span><span class="s2">%</span><span class="si">{text}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">hoverlabel_align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
-        <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;dash&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">},</span>
-        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;lines&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Efficient frontier&quot;</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"stdev"</span><span class="p">],</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"ret"</span><span class="p">],</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">line_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">"text"</span><span class="p">],</span>
+        <span class="n">xhoverformat</span><span class="o">=</span><span class="s2">".2%"</span><span class="p">,</span>
+        <span class="n">yhoverformat</span><span class="o">=</span><span class="s2">".2%"</span><span class="p">,</span>
+        <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"Return %</span><span class="si">{y}</span><span class="s2">&lt;br&gt;Vol %</span><span class="si">{x}</span><span class="s2">%</span><span class="si">{text}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">hoverlabel_align</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+        <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s2">"dash"</span><span class="p">:</span> <span class="s2">"solid"</span><span class="p">},</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"lines"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Efficient frontier"</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -804,7 +804,7 @@
     <span class="n">returns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">risk</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add point frame traces to figure.</span>
+<span class="w">    </span><span class="sd">"""Add point frame traces to figure.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        figure: Plotly figure.</span>
@@ -813,12 +813,12 @@
 <span class="sd">        fig: Plotly figure dictionary.</span>
 <span class="sd">        returns: List to extend with returns.</span>
 <span class="sd">        risk: List to extend with risk values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">layout_dict</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-        <span class="s2">&quot;dict[str, str | int | float | bool | list[str]]&quot;</span><span class="p">,</span>
-        <span class="n">fig</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">],</span>
+        <span class="s2">"dict[str, str | int | float | bool | list[str]]"</span><span class="p">,</span>
+        <span class="n">fig</span><span class="p">[</span><span class="s2">"layout"</span><span class="p">],</span>
     <span class="p">)</span>
-    <span class="n">base_colorway</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[str]&quot;</span><span class="p">,</span> <span class="n">layout_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;colorway&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="n">base_colorway</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"list[str]"</span><span class="p">,</span> <span class="n">layout_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"colorway"</span><span class="p">,</span> <span class="p">[]))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_colorway</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">point_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> <span class="n">base_colorway</span><span class="p">:</span>
         <span class="n">repeats</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">point_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_colorway</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span>
             <span class="n">base_colorway</span>
@@ -827,22 +827,22 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">colorway</span> <span class="o">=</span> <span class="n">base_colorway</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">point_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">clr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">point_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">colorway</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">returns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;ret&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">])])</span>
-        <span class="n">risk</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;stdev&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">])])</span>
+        <span class="n">returns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"ret"</span><span class="p">,</span> <span class="n">col</span><span class="p">])])</span>
+        <span class="n">risk</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"stdev"</span><span class="p">,</span> <span class="n">col</span><span class="p">])])</span>
         <span class="n">figure</span><span class="o">.</span><span class="n">add_scatter</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;stdev&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">]],</span>
-            <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;ret&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">]],</span>
-            <span class="n">xhoverformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
-            <span class="n">yhoverformat</span><span class="o">=</span><span class="s2">&quot;.2%&quot;</span><span class="p">,</span>
-            <span class="n">hovertext</span><span class="o">=</span><span class="p">[</span><span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">col</span><span class="p">]],</span>
-            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">&quot;Return %</span><span class="si">{y}</span><span class="s2">&lt;br&gt;Vol %</span><span class="si">{x}</span><span class="s2">%</span><span class="si">{hovertext}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">hoverlabel_align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
-            <span class="n">marker</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">clr</span><span class="p">},</span>
+            <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"stdev"</span><span class="p">,</span> <span class="n">col</span><span class="p">]],</span>
+            <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"ret"</span><span class="p">,</span> <span class="n">col</span><span class="p">]],</span>
+            <span class="n">xhoverformat</span><span class="o">=</span><span class="s2">".2%"</span><span class="p">,</span>
+            <span class="n">yhoverformat</span><span class="o">=</span><span class="s2">".2%"</span><span class="p">,</span>
+            <span class="n">hovertext</span><span class="o">=</span><span class="p">[</span><span class="n">point_frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"text"</span><span class="p">,</span> <span class="n">col</span><span class="p">]],</span>
+            <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"Return %</span><span class="si">{y}</span><span class="s2">&lt;br&gt;Vol %</span><span class="si">{x}</span><span class="s2">%</span><span class="si">{hovertext}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">hoverlabel_align</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="p">{</span><span class="s2">"size"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="n">clr</span><span class="p">},</span>
             <span class="n">mode</span><span class="o">=</span><span class="n">point_frame_mode</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
             <span class="n">text</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
-            <span class="n">textfont</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">},</span>
-            <span class="n">textposition</span><span class="o">=</span><span class="s2">&quot;bottom center&quot;</span><span class="p">,</span>
+            <span class="n">textfont</span><span class="o">=</span><span class="p">{</span><span class="s2">"size"</span><span class="p">:</span> <span class="mi">14</span><span class="p">},</span>
+            <span class="n">textposition</span><span class="o">=</span><span class="s2">"bottom center"</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -854,7 +854,7 @@
     <span class="n">title</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure figure layout.</span>
+<span class="w">    </span><span class="sd">"""Configure figure layout.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        figure: Plotly figure.</span>
@@ -862,22 +862,22 @@
 <span class="sd">        titletext: Optional title text.</span>
 <span class="sd">        add_logo: Whether to add logo.</span>
 <span class="sd">        logo: Logo dictionary.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">xaxis</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tickformat&quot;</span><span class="p">:</span> <span class="s2">&quot;.1%&quot;</span><span class="p">},</span>
-        <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;volatility&quot;</span><span class="p">,</span>
+        <span class="n">xaxis</span><span class="o">=</span><span class="p">{</span><span class="s2">"tickformat"</span><span class="p">:</span> <span class="s2">".1%"</span><span class="p">},</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">"volatility"</span><span class="p">,</span>
         <span class="n">yaxis</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;tickformat&quot;</span><span class="p">:</span> <span class="s2">&quot;.1%&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;scaleanchor&quot;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;scaleratio&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"tickformat"</span><span class="p">:</span> <span class="s2">".1%"</span><span class="p">,</span>
+            <span class="s2">"scaleanchor"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span>
+            <span class="s2">"scaleratio"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;annual return&quot;</span><span class="p">,</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">"annual return"</span><span class="p">,</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">titletext</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">titletext</span> <span class="o">=</span> <span class="s2">&quot;&lt;b&gt;Risk and Return&lt;/b&gt;&lt;br&gt;&quot;</span>
-        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">titletext</span><span class="p">,</span> <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">36</span><span class="p">}})</span>
+            <span class="n">titletext</span> <span class="o">=</span> <span class="s2">"&lt;b&gt;Risk and Return&lt;/b&gt;&lt;br&gt;"</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="n">titletext</span><span class="p">,</span> <span class="s2">"font"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"size"</span><span class="p">:</span> <span class="mi">36</span><span class="p">}})</span>
 
     <span class="k">if</span> <span class="n">add_logo</span><span class="p">:</span>
         <span class="n">figure</span><span class="o">.</span><span class="n">add_layout_image</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span>
@@ -893,7 +893,7 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate output for sharpeplot.</span>
+<span class="w">    </span><span class="sd">"""Generate output for sharpeplot.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        figure: Plotly figure.</span>
@@ -906,26 +906,26 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Output string.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s2">"file"</span><span class="p">:</span>
         <span class="n">plot</span><span class="p">(</span>
             <span class="n">figure_or_data</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
             <span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">),</span>
             <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">,</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">link_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">link_text</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
             <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">"config"</span><span class="p">],</span>
             <span class="n">output_type</span><span class="o">=</span><span class="n">output_type</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">plotfile</span><span class="p">)</span>
 
-    <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-        <span class="s2">&quot;str&quot;</span><span class="p">,</span>
+        <span class="s2">"str"</span><span class="p">,</span>
         <span class="n">to_html</span><span class="p">(</span>
             <span class="n">fig</span><span class="o">=</span><span class="n">figure</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">fig</span><span class="p">[</span><span class="s2">"config"</span><span class="p">],</span>
             <span class="n">auto_play</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">include_plotlyjs</span><span class="o">=</span><span class="n">include_plotlyjs</span><span class="p">,</span>
             <span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -940,18 +940,18 @@
     <span class="n">sim_frame</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">line_frame</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">point_frame</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">point_frame_mode</span><span class="p">:</span> <span class="n">LiteralLinePlotMode</span> <span class="o">=</span> <span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+    <span class="n">point_frame_mode</span><span class="p">:</span> <span class="n">LiteralLinePlotMode</span> <span class="o">=</span> <span class="s2">"markers"</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">directory</span><span class="p">:</span> <span class="n">DirectoryPath</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">titletext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span>
-    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">&quot;cdn&quot;</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="p">:</span> <span class="n">LiteralPlotlyOutput</span> <span class="o">=</span> <span class="s2">"file"</span><span class="p">,</span>
+    <span class="n">include_plotlyjs</span><span class="p">:</span> <span class="n">LiteralPlotlyJSlib</span> <span class="o">=</span> <span class="s2">"cdn"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">add_logo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">auto_open</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create scatter plot coloured by Sharpe Ratio.</span>
+<span class="w">    </span><span class="sd">"""Create scatter plot coloured by Sharpe Ratio.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sim_frame: Data from the simulate_portfolios method.</span>
@@ -961,10 +961,10 @@
 <span class="sd">        filename: Name of the Plotly html file.</span>
 <span class="sd">        directory: Directory where Plotly html file is saved.</span>
 <span class="sd">        titletext: Text for the plot title.</span>
-<span class="sd">        output_type: Determines output type. Defaults to &quot;file&quot;.</span>
+<span class="sd">        output_type: Determines output type. Defaults to "file".</span>
 <span class="sd">        include_plotlyjs: Determines how the plotly.js library is included</span>
 <span class="sd">            in the output.</span>
-<span class="sd">            Defaults to &quot;cdn&quot;.</span>
+<span class="sd">            Defaults to "cdn".</span>
 <span class="sd">        title: Whether to add standard plot title. Defaults to True.</span>
 <span class="sd">        add_logo: Whether to add Captor logo. Defaults to True.</span>
 <span class="sd">        auto_open: Determines whether to open a browser window with the plot.</span>
@@ -972,9 +972,9 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The scatter plot with simulated and optimized results.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">sim_frame</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">line_frame</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">point_frame</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;One of sim_frame, line_frame or point_frame must be provided.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"One of sim_frame, line_frame or point_frame must be provided."</span>
         <span class="k">raise</span> <span class="n">AtLeastOneFrameError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="n">returns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -982,7 +982,7 @@
 
     <span class="n">dirpath</span> <span class="o">=</span> <span class="n">_determine_output_directory</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;sharpeplot.html&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">"sharpeplot.html"</span>
     <span class="n">plotfile</span> <span class="o">=</span> <span class="n">dirpath</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">logo</span> <span class="o">=</span> <span class="n">load_plotly_dict</span><span class="p">()</span>

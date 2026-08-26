@@ -52,7 +52,7 @@ Core Dependencies
 - **pandas** (>=2.1.2,<3.0.0) - Data manipulation and analysis
 - **numpy** (>=1.23.2,!=2.3.0,<3.0.0) - Numerical computing
 - **pydantic** (>=2.5.2,<3.0.0) - Data validation and settings management
-- **plotly** (>=5.18.0,<7.0.0) - Interactive plotting
+- **plotly** (>=5.18.0) - Interactive plotting
 - **scipy** (>=1.11.4,<2.0.0) - Scientific computing
 - **scikit-learn** (>=1.4.0,<2.0.0) - Machine learning utilities
 
