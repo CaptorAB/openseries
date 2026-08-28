@@ -108,7 +108,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for openseries.series</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;The OpenTimeSeries class.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""The OpenTimeSeries class."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -172,15 +172,15 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;OpenTimeSeries&quot;</span><span class="p">,</span> <span class="s2">&quot;timeseries_chain&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"OpenTimeSeries"</span><span class="p">,</span> <span class="s2">"timeseries_chain"</span><span class="p">]</span>
 
-<span class="n">TypeOpenTimeSeries</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TypeOpenTimeSeries&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;OpenTimeSeries&quot;</span><span class="p">)</span>
+<span class="n">TypeOpenTimeSeries</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TypeOpenTimeSeries"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"OpenTimeSeries"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="OpenTimeSeries">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OpenTimeSeries</span><span class="p">(</span><span class="n">_CommonModel</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;OpenTimeSeries objects are at the core of the openseries package.</span>
+<span class="w">    </span><span class="sd">"""OpenTimeSeries objects are at the core of the openseries package.</span>
 
 <span class="sd">    The intended use is to allow analyses of financial timeseries.</span>
 <span class="sd">    It is only intended for daily or less frequent data samples.</span>
@@ -199,15 +199,15 @@
 <span class="sd">        tsdf: Pandas object holding dates and values that can be altered via</span>
 <span class="sd">            methods.</span>
 <span class="sd">        currency: ISO 4217 currency code of the timeseries.</span>
-<span class="sd">        domestic: ISO 4217 currency code of the user&#39;s home currency.</span>
-<span class="sd">            Defaults to &quot;SEK&quot;.</span>
+<span class="sd">        domestic: ISO 4217 currency code of the user's home currency.</span>
+<span class="sd">            Defaults to "SEK".</span>
 <span class="sd">        countries: (List of) country code(s) according to ISO 3166-1 alpha-2.</span>
-<span class="sd">            Defaults to &quot;SE&quot;.</span>
+<span class="sd">            Defaults to "SE".</span>
 <span class="sd">        markets: (List of) markets code(s) supported by exchange_calendars.</span>
 <span class="sd">            Optional.</span>
 <span class="sd">        isin: ISO 6166 identifier code of the associated instrument. Optional.</span>
 <span class="sd">        label: Placeholder for a name of the timeseries. Optional.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">timeseries_id</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">instrument_id</span><span class="p">:</span> <span class="nb">str</span>
@@ -218,70 +218,70 @@
     <span class="n">local_ccy</span><span class="p">:</span> <span class="nb">bool</span>
     <span class="n">tsdf</span><span class="p">:</span> <span class="n">DataFrame</span>
     <span class="n">currency</span><span class="p">:</span> <span class="n">CurrencyStringType</span>
-    <span class="n">domestic</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">&quot;SEK&quot;</span>
-    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">&quot;SE&quot;</span>
+    <span class="n">domestic</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">"SEK"</span>
+    <span class="n">countries</span><span class="p">:</span> <span class="n">CountriesType</span> <span class="o">=</span> <span class="s2">"SE"</span>
     <span class="n">isin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;domestic&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"domestic"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_domestic</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">CurrencyStringType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CurrencyStringType</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure domestic field is validated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Pydantic validator to ensure domestic field is validated."""</span>
         <span class="n">Currency</span><span class="p">(</span><span class="n">ccy</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;countries&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"countries"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_countries</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">CountriesType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CountriesType</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure countries field is validated.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Pydantic validator to ensure countries field is validated."""</span>
         <span class="n">Countries</span><span class="p">(</span><span class="n">countryinput</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;markets&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">"markets"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_markets</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure markets field is validated.</span>
+<span class="w">        </span><span class="sd">"""Pydantic validator to ensure markets field is validated.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MarketsNotStringNorListStrError: If ``markets`` is neither a string</span>
 <span class="sd">                nor a non-empty list of strings.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;&#39;markets&#39; must be a string or list of strings, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="s2">"'markets' must be a string or list of strings, "</span>
+            <span class="sa">f</span><span class="s2">"got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">value</span>
-            <span class="n">item_msg</span> <span class="o">=</span> <span class="s2">&quot;All items in &#39;markets&#39; must be strings.&quot;</span>
+            <span class="n">item_msg</span> <span class="o">=</span> <span class="s2">"All items in 'markets' must be strings."</span>
             <span class="k">raise</span> <span class="n">MarketsNotStringNorListStrError</span><span class="p">(</span><span class="n">item_msg</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">MarketsNotStringNorListStrError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_dates_and_values_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic validator to ensure dates and values are validated.</span>
+<span class="w">        </span><span class="sd">"""Pydantic validator to ensure dates and values are validated.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If dates are not unique or if numbers of dates and values</span>
 <span class="sd">                do not match the shape of ``tsdf``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">values_list_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="n">dates_list_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">)</span>
         <span class="n">dates_set_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">dates_list_length</span> <span class="o">!=</span> <span class="n">dates_set_length</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Dates are not unique&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Dates are not unique"</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">dates_list_length</span> <span class="o">!=</span> <span class="n">values_list_length</span><span class="p">)</span>
             <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
         <span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Number of dates and values passed do not match&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Number of dates and values passed do not match"</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -302,14 +302,14 @@
         <span class="n">dates</span><span class="p">:</span> <span class="n">DateListType</span><span class="p">,</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">ValueListType</span><span class="p">,</span>
         <span class="n">valuetype</span><span class="p">:</span> <span class="n">ValueType</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
-        <span class="n">timeseries_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">instrument_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">timeseries_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+        <span class="n">instrument_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">isin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">&quot;SEK&quot;</span><span class="p">,</span>
+        <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">"SEK"</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">local_ccy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create series from a list of dates and a list of values.</span>
+<span class="w">        </span><span class="sd">"""Create series from a list of dates and a list of values.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: String identifier of the timeseries and/or instrument.</span>
@@ -321,13 +321,13 @@
 <span class="sd">            instrument_id: Database identifier of the instrument associated</span>
 <span class="sd">                with the timeseries. Optional.</span>
 <span class="sd">            isin: ISO 6166 identifier code of the associated instrument. Optional.</span>
-<span class="sd">            baseccy: ISO 4217 currency code of the timeseries. Defaults to &quot;SEK&quot;.</span>
+<span class="sd">            baseccy: ISO 4217 currency code of the timeseries. Defaults to "SEK".</span>
 <span class="sd">            local_ccy: Boolean flag indicating if timeseries is in local currency.</span>
 <span class="sd">                Defaults to True.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
@@ -343,7 +343,7 @@
                 <span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">deyt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">deyt</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dates</span><span class="p">)],</span>
                 <span class="n">columns</span><span class="o">=</span><span class="p">[[</span><span class="n">name</span><span class="p">],</span> <span class="p">[</span><span class="n">valuetype</span><span class="p">]],</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span></div>
 
@@ -356,18 +356,18 @@
         <span class="n">dframe</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="nb">object</span><span class="p">,</span>
         <span class="n">column_nmbr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">valuetype</span><span class="p">:</span> <span class="n">ValueType</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
-        <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">&quot;SEK&quot;</span><span class="p">,</span>
+        <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">"SEK"</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">local_ccy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create series from a Pandas DataFrame or Series.</span>
+<span class="w">        </span><span class="sd">"""Create series from a Pandas DataFrame or Series.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dframe: Pandas DataFrame or Series.</span>
 <span class="sd">            column_nmbr: Using iloc[:, column_nmbr] to pick column. Defaults to 0.</span>
 <span class="sd">            valuetype: Identifies if the series is a series of values or returns.</span>
 <span class="sd">                Defaults to ValueType.PRICE.</span>
-<span class="sd">            baseccy: ISO 4217 currency code of the timeseries. Defaults to &quot;SEK&quot;.</span>
+<span class="sd">            baseccy: ISO 4217 currency code of the timeseries. Defaults to "SEK".</span>
 <span class="sd">            local_ccy: Boolean flag indicating if timeseries is in local currency.</span>
 <span class="sd">                Defaults to True.</span>
 
@@ -377,8 +377,8 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            TypeError: If ``dframe`` is not a ``pandas.Series`` or a</span>
 <span class="sd">                ``pandas.DataFrame``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Argument dframe must be pandas Series or DataFrame.&quot;</span>
+<span class="sd">        """</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Argument dframe must be pandas Series or DataFrame."</span>
         <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
         <span class="n">pandas_obj</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dframe</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
@@ -395,8 +395,8 @@
                 <span class="k">if</span> <span class="n">_check_if_none</span><span class="p">(</span>
                     <span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">column_nmbr</span><span class="p">],</span>
                 <span class="p">):</span>
-                    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Series&quot;</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Label missing. Adding: </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="s2">"Series"</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Label missing. Adding: </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">label</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">column_nmbr</span><span class="p">]</span>
@@ -404,7 +404,7 @@
                     <span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">column_nmbr</span><span class="p">],</span>
                 <span class="p">):</span>
                     <span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span>
-                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;valuetype missing. Adding: </span><span class="si">{</span><span class="n">valuetype</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"valuetype missing. Adding: </span><span class="si">{</span><span class="n">valuetype</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">valuetype</span> <span class="o">=</span> <span class="n">dframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span>
@@ -415,11 +415,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">date_fix</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">pandas_obj</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">date_fix</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">pandas_obj</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">timeseries_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">instrument_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">timeseries_id</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+            <span class="n">instrument_id</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
             <span class="n">currency</span><span class="o">=</span><span class="n">baseccy</span><span class="p">,</span>
             <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
@@ -431,7 +431,7 @@
                 <span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">deyt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">deyt</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dates</span><span class="p">)],</span>
                 <span class="n">columns</span><span class="o">=</span><span class="p">[[</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="n">valuetype</span><span class="p">]],</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span></div>
 
@@ -445,13 +445,13 @@
         <span class="n">d_range</span><span class="p">:</span> <span class="n">DatetimeIndex</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end_dt</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Series&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Series"</span><span class="p">,</span>
         <span class="n">valuetype</span><span class="p">:</span> <span class="n">ValueType</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">,</span>
-        <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">&quot;SEK&quot;</span><span class="p">,</span>
+        <span class="n">baseccy</span><span class="p">:</span> <span class="n">CurrencyStringType</span> <span class="o">=</span> <span class="s2">"SEK"</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">local_ccy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create series from values accruing with a given fixed rate return.</span>
+<span class="w">        </span><span class="sd">"""Create series from values accruing with a given fixed rate return.</span>
 
 <span class="sd">        Providing a date_range of type Pandas DatetimeIndex takes priority over</span>
 <span class="sd">        providing a combination of days and an end date.</span>
@@ -466,7 +466,7 @@
 <span class="sd">            label: Placeholder for a name of the timeseries.</span>
 <span class="sd">            valuetype: Identifies if the series is a series of values or returns.</span>
 <span class="sd">                Defaults to ValueType.PRICE.</span>
-<span class="sd">            baseccy: The currency of the timeseries. Defaults to &quot;SEK&quot;.</span>
+<span class="sd">            baseccy: The currency of the timeseries. Defaults to "SEK".</span>
 <span class="sd">            local_ccy: Boolean flag indicating if timeseries is in local currency.</span>
 <span class="sd">                Defaults to True.</span>
 
@@ -476,22 +476,22 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            IncorrectArgumentComboError: If ``d_range`` is not provided and the</span>
 <span class="sd">                combination of ``days`` and ``end_dt`` is incomplete.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">d_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">days</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">d_range</span> <span class="o">=</span> <span class="n">DatetimeIndex</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date_range</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">days</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">)],</span>
+                    <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date_range</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">days</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end_dt</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"D"</span><span class="p">)],</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;If d_range is not provided both days and end_dt must be.&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"If d_range is not provided both days and end_dt must be."</span>
                 <span class="k">raise</span> <span class="n">IncorrectArgumentComboError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">deltas</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">days</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">d_range</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">d_range</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
         <span class="n">arr</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cumprod</span><span class="p">(</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">deltas</span> <span class="o">*</span> <span class="n">rate</span> <span class="o">/</span> <span class="mi">365</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)))</span>
-        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">d_range</span><span class="p">]</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">d_range</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">timeseries_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">instrument_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">timeseries_id</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
+            <span class="n">instrument_id</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
             <span class="n">currency</span><span class="o">=</span><span class="n">baseccy</span><span class="p">,</span>
             <span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
@@ -503,7 +503,7 @@
                 <span class="n">data</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span>
                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dates</span><span class="p">)],</span>
                 <span class="n">columns</span><span class="o">=</span><span class="p">[[</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="n">valuetype</span><span class="p">]],</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span></div>
 
@@ -511,27 +511,27 @@
 <div class="viewcode-block" id="OpenTimeSeries.from_deepcopy">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.from_deepcopy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create copy of OpenTimeSeries object.</span>
+<span class="w">        </span><span class="sd">"""Create copy of OpenTimeSeries object.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="OpenTimeSeries.pandas_df">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.pandas_df">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pandas_df</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate .tsdf Pandas DataFrame from the .dates and .values lists.</span>
+<span class="w">        </span><span class="sd">"""Populate .tsdf Pandas DataFrame from the .dates and .values lists.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">dframe</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">)],</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]],</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">dframe</span>
 
@@ -544,7 +544,7 @@
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
         <span class="n">properties</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LiteralSeriesProps</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate chosen properties.</span>
+<span class="w">        </span><span class="sd">"""Calculate chosen properties.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            properties: The properties to calculate. Defaults to calculating all</span>
@@ -552,10 +552,10 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Properties of the OpenTimeSeries.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">properties</span><span class="p">:</span>
             <span class="n">properties</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-                <span class="s2">&quot;list[LiteralSeriesProps]&quot;</span><span class="p">,</span>
+                <span class="s2">"list[LiteralSeriesProps]"</span><span class="p">,</span>
                 <span class="n">OpenTimeSeriesPropertiesList</span><span class="o">.</span><span class="n">allowed_strings</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -564,13 +564,13 @@
         <span class="k">def</span><span class="w"> </span><span class="nf">_prop_value</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
             <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">cast</span><span class="p">(</span>
-                <span class="s2">&quot;float | int | dt.date | Series[float]&quot;</span><span class="p">,</span>
+                <span class="s2">"float | int | dt.date | Series[float]"</span><span class="p">,</span>
                 <span class="n">attr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">else</span> <span class="n">attr</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="n">pdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
             <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">_prop_value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">props</span><span class="p">},</span>
-            <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span>
+            <span class="n">orient</span><span class="o">=</span><span class="s2">"index"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">pdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span>
         <span class="k">return</span> <span class="n">pdf</span></div>
@@ -579,15 +579,15 @@
 <div class="viewcode-block" id="OpenTimeSeries.value_to_ret">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.value_to_ret">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">value_to_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values into series of returns.</span>
+<span class="w">        </span><span class="sd">"""Convert series of values into series of returns.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The returns of the values in the series.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">returns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
         <span class="n">returns</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
-        <span class="n">arrays</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Any&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]])</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"Any"</span><span class="p">,</span> <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]])</span>
         <span class="n">returns</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">returns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -596,7 +596,7 @@
 <div class="viewcode-block" id="OpenTimeSeries.value_to_diff">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.value_to_diff">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">value_to_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">periods</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of values to series of their period differences.</span>
+<span class="w">        </span><span class="sd">"""Convert series of values to series of their period differences.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            periods: The number of periods between observations over which difference</span>
@@ -604,7 +604,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">periods</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
@@ -620,11 +620,11 @@
 <div class="viewcode-block" id="OpenTimeSeries.to_cumret">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.to_cumret">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_cumret</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of returns into cumulative series of values.</span>
+<span class="w">        </span><span class="sd">"""Convert series of returns into cumulative series of values.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
 
@@ -648,7 +648,7 @@
         <span class="n">days_in_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">365</span><span class="p">,</span>
         <span class="n">divider</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert series of 1-day rates into series of cumulative values.</span>
+<span class="w">        </span><span class="sd">"""Convert series of 1-day rates into series of cumulative values.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            days_in_year: Calendar days per year used as divisor. Defaults to 365.</span>
@@ -657,12 +657,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">arr</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="n">divider</span>
 
         <span class="n">deltas</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">days</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span>
+            <span class="s2">"NDArray[float64]"</span><span class="p">,</span>
             <span class="n">cumprod</span><span class="p">(</span>
                 <span class="n">a</span><span class="o">=</span><span class="n">insert</span><span class="p">(</span>
                     <span class="n">arr</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">deltas</span> <span class="o">*</span> <span class="n">arr</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">days_in_year</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="mf">1.0</span>
@@ -670,14 +670,14 @@
             <span class="p">),</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">PRICE</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dates</span><span class="p">)],</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]],</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -687,17 +687,17 @@
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.resample">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
-        <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;BME&quot;</span><span class="p">,</span>
+        <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"BME"</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resamples the timeseries frequency.</span>
+<span class="w">        </span><span class="sd">"""Resamples the timeseries frequency.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            freq: The date offset string that sets the resampled frequency.</span>
-<span class="sd">                Defaults to &quot;BME&quot;.</span>
+<span class="sd">                Defaults to "BME".</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -711,10 +711,10 @@
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.resample_to_business_period_ends">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resample_to_business_period_ends</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
-        <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">&quot;BME&quot;</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">LiteralPandasReindexMethod</span> <span class="o">=</span> <span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+        <span class="n">freq</span><span class="p">:</span> <span class="n">LiteralBizDayFreq</span> <span class="o">=</span> <span class="s2">"BME"</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">LiteralPandasReindexMethod</span> <span class="o">=</span> <span class="s2">"nearest"</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resamples timeseries frequency to the business calendar month end dates.</span>
+<span class="w">        </span><span class="sd">"""Resamples timeseries frequency to the business calendar month end dates.</span>
 
 <span class="sd">        Stubs left in place. Stubs will be aligned to the shortest stub.</span>
 
@@ -731,12 +731,12 @@
 <span class="sd">            ResampleDataLossError: If called on a return series (``valuetype`` is</span>
 <span class="sd">                ``ValueType.RTRN``), since summation across sparser frequency would</span>
 <span class="sd">                be required to avoid data loss.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;Do not run resample_to_business_period_ends on return series. &quot;</span>
-                <span class="s2">&quot;The operation will pick the last data point in the sparser series. &quot;</span>
-                <span class="s2">&quot;It will not sum returns and therefore data will be lost.&quot;</span>
+                <span class="s2">"Do not run resample_to_business_period_ends on return series. "</span>
+                <span class="s2">"The operation will pick the last data point in the sparser series. "</span>
+                <span class="s2">"It will not sum returns and therefore data will be lost."</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="n">ResampleDataLossError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -762,7 +762,7 @@
         <span class="n">to_date</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">periods_in_a_year_fixed</span><span class="p">:</span> <span class="n">DaysInYearType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exponentially Weighted Moving Average Model for Volatility.</span>
+<span class="w">        </span><span class="sd">"""Exponentially Weighted Moving Average Model for Volatility.</span>
 
 <span class="sd">        Reference: https://www.investopedia.com/articles/07/ewma.asp.</span>
 
@@ -781,7 +781,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Series EWMA volatility.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_range</span><span class="p">(</span>
             <span class="n">months_offset</span><span class="o">=</span><span class="n">months_from_last</span><span class="p">,</span>
             <span class="n">from_dt</span><span class="o">=</span><span class="n">from_date</span><span class="p">,</span>
@@ -789,7 +789,7 @@
         <span class="p">)</span>
         <span class="n">time_factor</span> <span class="o">=</span> <span class="n">_calculate_time_factor</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-                <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
+                <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
             <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
             <span class="n">earlier</span><span class="o">=</span><span class="n">earlier</span><span class="p">,</span>
             <span class="n">later</span><span class="o">=</span><span class="n">later</span><span class="p">,</span>
@@ -797,7 +797,7 @@
         <span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
         <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">)]</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span>
@@ -823,7 +823,7 @@
             <span class="n">data</span><span class="o">=</span><span class="n">rawdata</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">EWMA_VOL</span><span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -840,7 +840,7 @@
         <span class="n">to_date</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">periods_in_a_year_fixed</span><span class="p">:</span> <span class="n">DaysInYearType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exponentially Weighted Moving Average Model for Value At Risk (VaR).</span>
+<span class="w">        </span><span class="sd">"""Exponentially Weighted Moving Average Model for Value At Risk (VaR).</span>
 
 <span class="sd">        Reference: https://www.investopedia.com/articles/07/ewma.asp.</span>
 
@@ -860,7 +860,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Series EWMA VaR.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">earlier</span><span class="p">,</span> <span class="n">later</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_range</span><span class="p">(</span>
             <span class="n">months_offset</span><span class="o">=</span><span class="n">months_from_last</span><span class="p">,</span>
             <span class="n">from_dt</span><span class="o">=</span><span class="n">from_date</span><span class="p">,</span>
@@ -868,7 +868,7 @@
         <span class="p">)</span>
         <span class="n">time_factor</span> <span class="o">=</span> <span class="n">_calculate_time_factor</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-                <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
+                <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
             <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
             <span class="n">earlier</span><span class="o">=</span><span class="n">earlier</span><span class="p">,</span>
             <span class="n">later</span><span class="o">=</span><span class="n">later</span><span class="p">,</span>
@@ -876,7 +876,7 @@
         <span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-            <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
+            <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">earlier</span><span class="p">)</span> <span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"Timestamp"</span><span class="p">,</span> <span class="n">later</span><span class="p">)</span>
         <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">)]</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span>
@@ -902,7 +902,7 @@
             <span class="n">data</span><span class="o">=</span><span class="n">array</span><span class="p">(</span><span class="n">rawdata</span><span class="p">)</span> <span class="o">*</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">level</span><span class="p">),</span>
             <span class="n">index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">EWMA_VAR</span><span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -913,7 +913,7 @@
         <span class="n">adjustment</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">days_in_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">365</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add or subtract a fee from the timeseries return.</span>
+<span class="w">        </span><span class="sd">"""Add or subtract a fee from the timeseries return.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            adjustment: Fee to add or subtract.</span>
@@ -922,13 +922,13 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">==</span> <span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span><span class="p">:</span>
             <span class="n">ra_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">initial_value</span> <span class="o">=</span> <span class="mf">1.0</span>
             <span class="n">returns_input</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">initial_value</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">initial_value</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
             <span class="n">ra_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
             <span class="n">returns_input</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">ra_df</span> <span class="o">=</span> <span class="n">ra_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
@@ -938,15 +938,15 @@
 
         <span class="n">dates_np</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span>
             <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates_list</span><span class="p">],</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[D]&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"datetime64[D]"</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">date_diffs</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span>
-            <span class="n">diff</span><span class="p">(</span><span class="n">dates_np</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;timedelta64[D]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">),</span>
+            <span class="s2">"NDArray[float64]"</span><span class="p">,</span>
+            <span class="n">diff</span><span class="p">(</span><span class="n">dates_np</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">"timedelta64[D]"</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="n">returns_array</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span>
-            <span class="s2">&quot;NDArray[float64]&quot;</span><span class="p">,</span>
+            <span class="s2">"NDArray[float64]"</span><span class="p">,</span>
             <span class="n">ra_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
         <span class="p">)</span>
 
@@ -980,7 +980,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">delete_lvl_one</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the column labels of the .tsdf Pandas Dataframe.</span>
+<span class="w">        </span><span class="sd">"""Set the column labels of the .tsdf Pandas Dataframe.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lvl_zero: New level zero label. Optional.</span>
@@ -989,7 +989,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            An OpenTimeSeries object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">lvl_zero</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lvl_one</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
                 <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]],</span>
@@ -1002,14 +1002,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">lvl_one</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">([[</span><span class="n">lvl_zero</span><span class="p">],</span> <span class="p">[</span><span class="n">lvl_one</span><span class="p">]])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">lvl_zero</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;ValueType&quot;</span><span class="p">,</span> <span class="n">lvl_one</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span> <span class="o">=</span> <span class="n">lvl_zero</span><span class="p">,</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"ValueType"</span><span class="p">,</span> <span class="n">lvl_one</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">delete_lvl_one</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_returns_series</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return demeaned return series for autocorrelation analysis.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return demeaned return series for autocorrelation analysis."""</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">_demeaned_returns_for_autocorr</span><span class="p">(</span>
             <span class="n">series</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">valuetype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">valuetype</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="n">squared</span>
@@ -1023,7 +1023,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate autocorrelation function for specified lags.</span>
+<span class="w">        </span><span class="sd">"""Calculate autocorrelation function for specified lags.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lags: If int, compute ACF from lag 0 to this value (inclusive).</span>
@@ -1032,7 +1032,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Series of autocorrelations indexed by lag.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">rets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns_series</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lags</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -1047,15 +1047,15 @@
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="n">lag_list</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ACF&quot;</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"ACF"</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="OpenTimeSeries.partial_autocorr">
 <a class="viewcode-back" href="../../api/series.html#openseries.OpenTimeSeries.partial_autocorr">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">partial_autocorr</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">lag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate partial autocorrelation at a given lag.</span>
+<span class="w">        </span><span class="sd">"""Calculate partial autocorrelation at a given lag.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lag: The lag at which to compute partial autocorrelation. Defaults to 1.</span>
@@ -1064,7 +1064,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Partial autocorrelation at the specified lag.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">pacf_series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pacf</span><span class="p">(</span><span class="n">lags</span><span class="o">=</span><span class="n">lag</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">pacf_series</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lag</span><span class="p">])</span></div>
 
@@ -1077,7 +1077,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate partial autocorrelation function for specified lags.</span>
+<span class="w">        </span><span class="sd">"""Calculate partial autocorrelation function for specified lags.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lags: If int, compute PACF from lag 0 to this value (inclusive).</span>
@@ -1086,7 +1086,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Series of partial autocorrelations indexed by lag.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">lag_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lags</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1116,8 +1116,8 @@
         <span class="k">return</span> <span class="n">Series</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="n">lag</span><span class="p">]</span> <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="n">lag_list</span><span class="p">],</span>
             <span class="n">index</span><span class="o">=</span><span class="n">lag_list</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PACF&quot;</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"PACF"</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -1129,7 +1129,7 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">squared</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute Ljung-Box test for autocorrelation.</span>
+<span class="w">        </span><span class="sd">"""Compute Ljung-Box test for autocorrelation.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lags: If int, use lags 1 through this value. If list, use the given</span>
@@ -1141,7 +1141,7 @@
 <span class="sd">            Tuple of (statistic, pvalue, lags) where statistic is the Ljung-Box</span>
 <span class="sd">            Q statistic, pvalue is the chi-squared p-value, and lags is the</span>
 <span class="sd">            list of lags used.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">rets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_returns_series</span><span class="p">(</span><span class="n">squared</span><span class="o">=</span><span class="n">squared</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rets</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -1170,7 +1170,7 @@
     <span class="n">back</span><span class="p">:</span> <span class="n">TypeOpenTimeSeries</span><span class="p">,</span>
     <span class="n">old_fee</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TypeOpenTimeSeries</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chain two timeseries together.</span>
+<span class="w">    </span><span class="sd">"""Chain two timeseries together.</span>
 
 <span class="sd">    The function assumes that the two series have at least one date in common.</span>
 
@@ -1181,7 +1181,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        An OpenTimeSeries object or a subclass thereof.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">old</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
     <span class="n">old</span><span class="o">.</span><span class="n">running_adjustment</span><span class="p">(</span><span class="n">old_fee</span><span class="p">)</span>
     <span class="n">new</span> <span class="o">=</span> <span class="n">back</span><span class="o">.</span><span class="n">from_deepcopy</span><span class="p">()</span>
@@ -1189,17 +1189,17 @@
     <span class="n">first</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">old</span><span class="o">.</span><span class="n">last_idx</span> <span class="o">&lt;</span> <span class="n">first</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Timeseries dates must overlap to allow them to be chained.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Timeseries dates must overlap to allow them to be chained."</span>
         <span class="k">raise</span> <span class="n">DateAlignmentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="n">first</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
         <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">first</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">first</span> <span class="o">&gt;</span> <span class="n">old</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to find a matching date between series&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Failed to find a matching date between series"</span>
             <span class="k">raise</span> <span class="n">DateAlignmentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="n">dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">old</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">first</span><span class="p">]</span>
+    <span class="n">dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">old</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">first</span><span class="p">]</span>
 
     <span class="n">old_values</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">),</span> <span class="mi">0</span><span class="p">])</span>
     <span class="n">old_values</span> <span class="o">=</span> <span class="n">old_values</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span>
@@ -1208,7 +1208,7 @@
     <span class="p">)</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">old_values</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
 
-    <span class="n">dates</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+    <span class="n">dates</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">tsdf</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">back</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
         <span class="n">timeseries_id</span><span class="o">=</span><span class="n">new</span><span class="o">.</span><span class="n">timeseries_id</span><span class="p">,</span>
@@ -1224,26 +1224,26 @@
             <span class="n">data</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">dates</span><span class="p">)],</span>
             <span class="n">columns</span><span class="o">=</span><span class="p">[[</span><span class="n">new</span><span class="o">.</span><span class="n">label</span><span class="p">],</span> <span class="p">[</span><span class="n">new</span><span class="o">.</span><span class="n">valuetype</span><span class="p">]],</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="s2">"float64"</span><span class="p">,</span>
         <span class="p">),</span>
     <span class="p">)</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_check_if_none</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a variable is None or equivalent.</span>
+<span class="w">    </span><span class="sd">"""Check if a variable is None or equivalent.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        item: Variable to be checked.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Answer to whether the variable is None or equivalent.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">isnan</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">item</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"bool"</span><span class="p">,</span> <span class="n">isnan</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">item</span><span class="p">)))</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>

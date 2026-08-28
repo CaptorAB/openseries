@@ -184,7 +184,7 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <li><p><strong>pandas</strong> (&gt;=2.1.2,&lt;3.0.0) - Data manipulation and analysis</p></li>
 <li><p><strong>numpy</strong> (&gt;=1.23.2,!=2.3.0,&lt;3.0.0) - Numerical computing</p></li>
 <li><p><strong>pydantic</strong> (&gt;=2.5.2,&lt;3.0.0) - Data validation and settings management</p></li>
-<li><p><strong>plotly</strong> (&gt;=5.18.0,&lt;7.0.0) - Interactive plotting</p></li>
+<li><p><strong>plotly</strong> (&gt;=5.18.0) - Interactive plotting</p></li>
 <li><p><strong>scipy</strong> (&gt;=1.11.4,&lt;2.0.0) - Scientific computing</p></li>
 <li><p><strong>scikit-learn</strong> (&gt;=1.4.0,&lt;2.0.0) - Machine learning utilities</p></li>
 </ul>
@@ -235,12 +235,12 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 
 <span class="c1"># Create OpenTimeSeries</span>
 <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-     <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test Series&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Test Series"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
      <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
 <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Series length: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annual return: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Series length: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Annual return: </span><span class="si">{</span><span class="n">series</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -256,7 +256,7 @@ pip<span class="w"> </span>install<span class="w"> </span>uv
 <span class="c1"># Create a virtual environment and install dependencies</span>
 uv<span class="w"> </span>venv<span class="w"> </span>venv
 <span class="nb">source</span><span class="w"> </span>venv/bin/activate
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
 </pre></div>
 </div>
 <p>This will install additional development dependencies including:</p>

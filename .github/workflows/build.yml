@@ -48,6 +48,8 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
+          python-version: ${{ matrix.python-version }}
+          cache-suffix: py${{ matrix.python-version }}
 
       - name: Sync dependencies (locked)
         run: uv sync --locked --extra dev
@@ -122,6 +124,8 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
+          python-version: ${{ matrix.python-version }}
+          cache-suffix: py${{ matrix.python-version }}
 
       - name: Sync dependencies (locked)
         run: uv sync --locked --extra dev
@@ -196,6 +200,8 @@ jobs:
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
+          python-version: ${{ matrix.python-version }}
+          cache-suffix: py${{ matrix.python-version }}
 
       - name: Sync dependencies (locked)
         run: uv sync --locked --extra dev

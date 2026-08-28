@@ -148,17 +148,17 @@
 
 <span class="c1"># Convert simulation to OpenTimeSeries</span>
 <span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span>
-     <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
+     <span class="n">dframe</span><span class="o">=</span><span class="n">simulation</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"S&amp;P 500"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2023</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)),</span>
      <span class="n">valuetype</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">RTRN</span>
 <span class="p">)</span><span class="o">.</span><span class="n">to_cumret</span><span class="p">()</span>  <span class="c1"># Convert returns to cumulative prices</span>
 
-<span class="n">sp500</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">"S&amp;P 500"</span><span class="p">)</span>
 
 <span class="c1"># Display basic information</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Series: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start date: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;End date: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of observations: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Series: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Start date: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"End date: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number of observations: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -169,17 +169,17 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">openseries</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenTimeSeries</span>
 
 <span class="c1"># Download S&amp;P 500 data</span>
-<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">&quot;^GSPC&quot;</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s2">"^GSPC"</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"2y"</span><span class="p">)</span>
 
 <span class="c1"># Create OpenTimeSeries from the Close prices</span>
-<span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+<span class="n">sp500</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">])</span>
 
 <span class="c1"># Set a more descriptive label</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;S&amp;P 500 Index&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">"S&amp;P 500 Index"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date range: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> observations"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Date range: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">first_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">last_idx</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -187,21 +187,21 @@
 <h2>Basic Financial Metrics<a class="headerlink" href="#basic-financial-metrics" title="Link to this heading"></a></h2>
 <p>openseries provides a comprehensive set of financial metrics:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Key performance metrics</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Return: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Return (CAGR): </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Volatility: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sharpe Ratio: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Maximum Drawdown: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Return: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">value_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Annualized Return (CAGR): </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Annualized Volatility: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sharpe Ratio: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Maximum Drawdown: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">max_drawdown</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Risk metrics</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% VaR (daily): </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;95% CVaR (daily): </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sortino Ratio: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"95% VaR (daily): </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">var_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"95% CVaR (daily): </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">cvar_down</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sortino Ratio: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">sortino_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Distribution statistics</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skewness: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Kurtosis: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Positive Days: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skewness: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">skew</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Kurtosis: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">kurtosis</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Positive Days: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">positive_share</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="get-all-metrics-at-once">
@@ -242,13 +242,13 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
 
 <span class="c1"># Download data for multiple assets</span>
-<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;^GSPC&quot;</span><span class="p">,</span> <span class="s2">&quot;^IXIC&quot;</span><span class="p">,</span> <span class="s2">&quot;^RUT&quot;</span><span class="p">]</span>  <span class="c1"># S&amp;P 500, NASDAQ, Russell 2000</span>
-<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;S&amp;P 500&quot;</span><span class="p">,</span> <span class="s2">&quot;NASDAQ&quot;</span><span class="p">,</span> <span class="s2">&quot;Russell 2000&quot;</span><span class="p">]</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"^GSPC"</span><span class="p">,</span> <span class="s2">"^IXIC"</span><span class="p">,</span> <span class="s2">"^RUT"</span><span class="p">]</span>  <span class="c1"># S&amp;P 500, NASDAQ, Russell 2000</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"S&amp;P 500"</span><span class="p">,</span> <span class="s2">"NASDAQ"</span><span class="p">,</span> <span class="s2">"Russell 2000"</span><span class="p">]</span>
 
 <span class="n">series_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
-     <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">&quot;2y&quot;</span><span class="p">)</span>
-     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
+     <span class="n">data</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">ticker</span><span class="p">)</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s2">"2y"</span><span class="p">)</span>
+     <span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">])</span>
      <span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
      <span class="n">series_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
 
@@ -262,7 +262,7 @@
 
 <span class="c1"># Calculate correlations</span>
 <span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Correlation Matrix:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Correlation Matrix:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">correlations</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -271,18 +271,18 @@
 <h2>Portfolio Analysis<a class="headerlink" href="#portfolio-analysis" title="Link to this heading"></a></h2>
 <p>Create and analyze portfolios:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Equal-weighted portfolio</span>
-<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Equal Weight"</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">"eq_weights"</span><span class="p">)</span>
 <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Return: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Volatility: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equal Weight Portfolio Sharpe: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Equal Weight Portfolio Return: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">geo_ret</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Equal Weight Portfolio Volatility: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">vol</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Equal Weight Portfolio Sharpe: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Create custom weighted portfolio</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>  <span class="c1"># Custom allocation</span>
-<span class="n">custom_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Portfolio&quot;</span><span class="p">)</span>
+<span class="n">custom_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Custom Portfolio"</span><span class="p">)</span>
 <span class="n">custom_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">custom_df</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Custom Portfolio Sharpe: </span><span class="si">{</span><span class="n">custom_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Custom Portfolio Sharpe: </span><span class="si">{</span><span class="n">custom_portfolio</span><span class="o">.</span><span class="n">ret_vol_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Compare with individual assets</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">portfolio</span><span class="p">)</span>
@@ -297,7 +297,7 @@
 <p>openseries provides various data transformation methods:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert prices to returns (modifies original)</span>
 <span class="n">sp500</span><span class="o">.</span><span class="n">value_to_ret</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Returns series length: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Returns series length: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Convert to log returns (modifies original)</span>
 <span class="n">sp500</span><span class="o">.</span><span class="n">value_to_log</span><span class="p">()</span>
@@ -307,8 +307,8 @@
 <span class="n">rolling_ret</span> <span class="o">=</span> <span class="n">sp500</span><span class="o">.</span><span class="n">rolling_return</span><span class="p">(</span><span class="n">observations</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># 30-day rolling returns</span>
 
 <span class="c1"># Resample to monthly data (modifies original)</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;BME&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly data points: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">resample_to_business_period_ends</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">"BME"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Monthly data points: </span><span class="si">{</span><span class="n">sp500</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -316,10 +316,10 @@
 <h2>Exporting Results<a class="headerlink" href="#exporting-results" title="Link to this heading"></a></h2>
 <p>Save your analysis results:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export to Excel</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;sp500_analysis.xlsx&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">to_xlsx</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">"sp500_analysis.xlsx"</span><span class="p">)</span>
 
 <span class="c1"># Export to JSON</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;sp500_data.json&quot;</span><span class="p">,</span> <span class="n">what_output</span><span class="o">=</span><span class="s2">&quot;tsdf&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">"sp500_data.json"</span><span class="p">,</span> <span class="n">what_output</span><span class="o">=</span><span class="s2">"tsdf"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -327,10 +327,10 @@
 <h2>Working with Business Days<a class="headerlink" href="#working-with-business-days" title="Link to this heading"></a></h2>
 <p>openseries handles business day calendars automatically:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Align to Swedish business days (modifies original)</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">&quot;SE&quot;</span><span class="p">)</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="s2">"SE"</span><span class="p">)</span>
 
 <span class="c1"># Use multiple countries (modifies original)</span>
-<span class="n">sp500</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">])</span>
+<span class="n">sp500</span><span class="o">.</span><span class="n">align_index_to_local_cdays</span><span class="p">(</span><span class="n">countries</span><span class="o">=</span><span class="p">[</span><span class="s2">"US"</span><span class="p">,</span> <span class="s2">"GB"</span><span class="p">])</span>
 
 <span class="c1"># Handle missing values (modifies original)</span>
 <span class="n">sp500</span><span class="o">.</span><span class="n">value_nan_handle</span><span class="p">()</span>  <span class="c1"># Forward fill NaN values</span>
@@ -361,8 +361,8 @@
 <h2>Common Patterns<a class="headerlink" href="#common-patterns" title="Link to this heading"></a></h2>
 <p>Here are some common usage patterns:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pattern 1: Load, analyze, visualize</span>
-<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">])</span>
-<span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">&quot;Asset&quot;</span><span class="p">)</span>
+<span class="n">series</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">'Close'</span><span class="p">])</span>
+<span class="n">series</span><span class="o">.</span><span class="n">set_new_label</span><span class="p">(</span><span class="n">lvl_zero</span><span class="o">=</span><span class="s2">"Asset"</span><span class="p">)</span>
 <span class="n">metrics</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">all_properties</span><span class="p">()</span>
 <span class="n">series</span><span class="o">.</span><span class="n">plot_series</span><span class="p">()</span>
 
@@ -372,14 +372,14 @@
 <span class="n">correlations</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">correl_matrix</span>
 
 <span class="c1"># Pattern 3: Portfolio construction (built-in strategies)</span>
-<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Equal Weight&quot;</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">&quot;eq_weights&quot;</span><span class="p">)</span>
+<span class="n">portfolio_df</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Equal Weight"</span><span class="p">,</span> <span class="n">weight_strat</span><span class="o">=</span><span class="s2">"eq_weights"</span><span class="p">)</span>
 <span class="n">portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">portfolio_df</span><span class="p">)</span>
 <span class="n">frame</span><span class="o">.</span><span class="n">add_timeseries</span><span class="p">(</span><span class="n">portfolio</span><span class="p">)</span>
 
 <span class="c1"># Pattern 3b: Custom portfolio construction (create fresh frame)</span>
 <span class="n">custom_frame</span> <span class="o">=</span> <span class="n">OpenFrame</span><span class="p">(</span><span class="n">constituents</span><span class="o">=</span><span class="p">[</span><span class="n">series1</span><span class="p">,</span> <span class="n">series2</span><span class="p">,</span> <span class="n">series3</span><span class="p">])</span>
 <span class="n">custom_frame</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
-<span class="n">custom_df</span> <span class="o">=</span> <span class="n">custom_frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Custom Portfolio&quot;</span><span class="p">)</span>
+<span class="n">custom_df</span> <span class="o">=</span> <span class="n">custom_frame</span><span class="o">.</span><span class="n">make_portfolio</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Custom Portfolio"</span><span class="p">)</span>
 <span class="n">custom_portfolio</span> <span class="o">=</span> <span class="n">OpenTimeSeries</span><span class="o">.</span><span class="n">from_df</span><span class="p">(</span><span class="n">dframe</span><span class="o">=</span><span class="n">custom_df</span><span class="p">)</span>
 
 <span class="c1"># Pattern 4: Risk analysis</span>
