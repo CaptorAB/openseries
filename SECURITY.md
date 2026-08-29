@@ -58,6 +58,8 @@ YAML alone:
    - Required reviewers before deployment
    - Restrict deployment branches to `master`
    - Do not expose secrets to fork PR workflows
+   - `codecov` is used only by `codecov.yml` on `master` (not PR tests or
+     `deploy.yml`)
 4. **Branch protection on `master`**:
    - Require status checks from `tests.yml`, `supply-chain.yml`, and
      `zizmor.yml` before merge. Do not require the Read the Docs PR check.

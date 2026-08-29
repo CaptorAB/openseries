@@ -33,7 +33,6 @@ jobs:
     name: Build and test
     needs: gate
     runs-on: ubuntu-latest
-    environment: codecov
     permissions:
       contents: read
       issues: write  # Required for actions/github-script to create issues on test failure
@@ -92,24 +91,6 @@ jobs:
               title: `Tests failed on ${new Date().toDateString()}`,
               body: `See the full logs here: ${GH_RUN_URL}`,
             });
-
-      - name: Upload test results to Codecov
-        if: ${{ github.ref_name == 'master' && success() }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          report_type: test_results
-          files: junit.xml
-          verbose: true
-
-      - name: Upload coverage to Codecov
-        if: ${{ github.ref_name == 'master' && success() }}
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: CaptorAB/openseries
-          files: coverage.xml
-          verbose: true
 
   tag_and_release:
     name: Tag and create release

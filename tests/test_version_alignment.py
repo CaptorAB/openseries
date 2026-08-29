@@ -27,6 +27,7 @@ UV_WORKFLOW_FILES = (
     "codeql.yml",
     "zizmor.yml",
     "supply-chain.yml",
+    "codecov.yml",
 )
 
 MYPY_ADDITIONAL_DEPENDENCIES = (
@@ -434,6 +435,36 @@ class TestVersionAlignment:
             raise VersionAlignmentError(msg)
         if uv_pin not in contributing:
             msg = f"{CONTRIBUTING_RST_PATH.name} is missing {uv_pin}"
+            raise VersionAlignmentError(msg)
+
+    def test_codecov_reporting_is_master_only(self: TestVersionAlignment) -> None:
+        """Test Codecov uploads run only from the master coverage workflow."""
+        tests = _read_text(WORKFLOW_DIR / "test.yml")
+        deploy = _read_text(WORKFLOW_DIR / "deploy.yml")
+        codecov = _read_text(WORKFLOW_DIR / "codecov.yml")
+        if "codecov/codecov-action" in tests:
+            msg = "test.yml must not upload to Codecov"
+            raise VersionAlignmentError(msg)
+        if "environment: codecov" in tests:
+            msg = "test.yml must not use the codecov environment"
+            raise VersionAlignmentError(msg)
+        if "codecov/codecov-action" in deploy:
+            msg = "deploy.yml must not upload to Codecov"
+            raise VersionAlignmentError(msg)
+        if "environment: codecov" in deploy:
+            msg = "deploy.yml must not use the codecov environment"
+            raise VersionAlignmentError(msg)
+        if "codecov/codecov-action" not in codecov:
+            msg = "codecov.yml must upload to Codecov"
+            raise VersionAlignmentError(msg)
+        if "environment: codecov" not in codecov:
+            msg = "codecov.yml must use the codecov environment"
+            raise VersionAlignmentError(msg)
+        if "branches:\n      - master" not in codecov:
+            msg = "codecov.yml must run on push to master"
+            raise VersionAlignmentError(msg)
+        if "workflow_dispatch: {}" not in codecov:
+            msg = "codecov.yml must allow workflow_dispatch from master"
             raise VersionAlignmentError(msg)
 
     def test_python_versions_match(self: TestVersionAlignment) -> None:
