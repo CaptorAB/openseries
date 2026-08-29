@@ -3,6 +3,7 @@ name: supply-chain.yml
 permissions:
   contents: read
   actions: read  # Required for setup-uv and other actions to read action metadata
+  pull-requests: read  # Required to list PR files for path filtering
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -16,10 +17,10 @@ concurrency:
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: "15 6 * * 1"
 
 jobs:
   lockfile:
@@ -31,12 +32,27 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Filter paths
+        id: paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci-pr-paths.sh
+          'uv.lock'
+          'pyproject.toml'
+          '.github/workflows/supply-chain.yml'
+          'scripts/ci-pr-paths.sh'
+
       - name: Set up uv
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
 
       - name: Check uv.lock is up to date
+        if: ${{ steps.paths.outputs.run == 'true' }}
         run: uv lock --check
 
   osv-scanner:
@@ -48,7 +64,21 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Filter paths
+        id: paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci-pr-paths.sh
+          'uv.lock'
+          'pyproject.toml'
+          '.github/workflows/supply-chain.yml'
+          'scripts/ci-pr-paths.sh'
+
       - name: Run OSV-Scanner
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
         with:
           scan-args: --lockfile=uv.lock
@@ -63,23 +93,41 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Filter paths
+        id: paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci-pr-paths.sh
+          'uv.lock'
+          'pyproject.toml'
+          '.github/workflows/supply-chain.yml'
+          'scripts/ci-pr-paths.sh'
+
       - name: Set up Python
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version-file: .python-version
 
       - name: Set up uv
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
 
       - name: Sync dependencies (locked)
+        if: ${{ steps.paths.outputs.run == 'true' }}
         run: uv sync --locked --extra dev
 
       - name: Export requirements for pip-audit
+        if: ${{ steps.paths.outputs.run == 'true' }}
         run: uv export --locked --extra dev --no-emit-project -o requirements-audit.txt
 
       - name: Run pip-audit
+        if: ${{ steps.paths.outputs.run == 'true' }}
         env:
           PIP_AUDIT_VERSION: ${{ env.PIP_AUDIT_VERSION }}
         run: uvx pip-audit==${PIP_AUDIT_VERSION} -r requirements-audit.txt

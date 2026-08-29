@@ -3,6 +3,7 @@ name: zizmor.yml
 permissions:
   contents: read
   actions: read  # Required for setup-uv and other actions to read action metadata
+  pull-requests: read  # Required to list PR files for path filtering
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -15,8 +16,6 @@ concurrency:
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
 
@@ -25,6 +24,9 @@ jobs:
     name: Run zizmor audit
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+      actions: read  # Required for setup-uv and other actions to read action metadata
+      pull-requests: read  # Required to list PR files for path filtering
       security-events: write  # Required for github/codeql-action/upload-sarif to upload SARIF results
     steps:
       - name: Checkout repository
@@ -34,26 +36,40 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.sha }}
           persist-credentials: false
 
+      - name: Filter paths
+        id: paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci-pr-paths.sh
+          '.github/*'
+          'scripts/run-zizmor.sh'
+          'scripts/ci-pr-paths.sh'
+
       - name: Set up uv
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
 
       - name: Run zizmor audit
+        if: ${{ steps.paths.outputs.run == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ZIZMOR_VERSION: ${{ env.ZIZMOR_VERSION }}
         run: uvx zizmor==${ZIZMOR_VERSION} --strict-collection --pedantic .
 
       - name: Generate zizmor SARIF report
-        if: always()
+        if: ${{ always() && steps.paths.outputs.run == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ZIZMOR_VERSION: ${{ env.ZIZMOR_VERSION }}
         run: uvx zizmor==${ZIZMOR_VERSION} --strict-collection --pedantic --format=sarif . > results.sarif
 
       - name: Upload SARIF file
-        if: always()
+        if: ${{ always() && steps.paths.outputs.run == 'true' }}
         uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
         with:
           sarif_file: results.sarif

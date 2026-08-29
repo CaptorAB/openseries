@@ -90,7 +90,7 @@ class TestPackage:
             "^(Tools for analyzing financial timeseries.)$",
             "^(Martin Karrin)$",
             "^(>=3.11,<3.15)$",
-            "^(Documentation, https://openseries.readthedocs.io/)$",
+            "^(Documentation, https://captorab.github.io/openseries/)$",
         ]
 
         for name, value in zip(attribute_names, expected_values, strict=True):
@@ -108,7 +108,7 @@ class TestPackage:
                 continue
             if name == "Project-URL":
                 project_urls = package_metadata.get_all("Project-URL") or []
-                expected_url = "Documentation, https://openseries.readthedocs.io/"
+                expected_url = "Documentation, https://captorab.github.io/openseries/"
                 if expected_url not in project_urls:
                     msg = f"Package metadata {name} not as expected: {project_urls}"
                     raise PackageTestError(msg)

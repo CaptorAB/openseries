@@ -19,11 +19,20 @@ vulnerabilities.
 - **CI workflows** use hash-pinned actions, default read-only `contents`, and
   [zizmor](https://github.com/woodruffw/zizmor) audits.
 - **Dependencies** are locked in `uv.lock`; CI runs `uv sync --locked` and
-  supply-chain scans (`supply-chain.yml`).
+  supply-chain scans (`supply-chain.yml`) on pull requests that change lockfiles
+  and on a weekly schedule.
 - **Releases** build from the signed git tag, record `SHA256SUMS` for artifacts,
   and verify checksums before publish.
 - **`pull_request_target` is not used**; PR CI runs on `pull_request` with
   read-only defaults and fork guards on cache restore and issue creation.
+- **Validation workflows** (`tests.yml`, `supply-chain.yml`, `zizmor.yml`,
+  `codeql.yml`) run on pull requests, not again on merge to `master`. Path
+  filters skip heavy steps when the PR does not touch relevant files, while the
+  jobs still report success so required checks are not left pending.
+- **CodeQL** full analysis runs on pull requests that change Python sources and
+  on a weekly schedule; it is not repeated on every push to `master`.
+- **Documentation** is built and deployed to GitHub Pages only
+  (`docs.yml`). Pull requests build without deploying.
 - **Release tagging** is isolated in a reusable workflow (`release-tag.yml`);
   build and PyPI publish run in `deploy.yml` because PyPI Trusted Publishing
   does not support reusable workflows. `deploy.yml` is the only manual entry
@@ -48,9 +57,13 @@ YAML alone:
    - Restrict deployment branches to `master`
    - Do not expose secrets to fork PR workflows
 4. **Branch protection on `master`**:
-   - Require status checks from `tests.yml`, `supply-chain.yml`, `zizmor.yml`,
-     and CodeQL before merge
+   - Require status checks from `tests.yml`, `supply-chain.yml`, and
+     `zizmor.yml` before merge. Do not require Read the Docs. CodeQL may remain
+     required; the `codeql.yml` job no-ops on PRs that do not change Python
+     sources.
    - Require review for changes under `.github/workflows/`
+   - Disconnect the Read the Docs GitHub integration (docs are GitHub Pages
+     only) so PR checks are not duplicated there.
 5. **Dependabot**: keep weekly updates with cooldown enabled (see
    `.github/dependabot.yml`).
 6. **Audit log**: periodically review GitHub audit log for workflow or secret

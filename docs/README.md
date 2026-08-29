@@ -83,13 +83,16 @@ docs/
 └── make.bat                      # Build commands (Windows)
 ```
 
-## ReadTheDocs Integration
+## GitHub Pages
 
-This documentation is configured for [ReadTheDocs](https://readthedocs.org/) hosting:
+Documentation is built with Sphinx and published to
+[GitHub Pages](https://captorab.github.io/openseries/) by `.github/workflows/docs.yml`:
 
-- Configuration: `.readthedocs.yaml` in the project root
-- Dependencies: Managed through `pyproject.toml` optional docs dependencies
-- Build process: Automated on ReadTheDocs
+- Pull requests that touch documentation sources or library code build docs
+  (warnings as errors) without deploying
+- Pushes to `master` and manual `workflow_dispatch` (including after a PyPI
+  release) build and deploy
+- Dependencies come from the `docs` extra in `pyproject.toml` / `uv.lock`
 
 ## Writing Documentation
 
@@ -196,7 +199,6 @@ When contributing to documentation:
 **Missing modules:**
 
 - Install missing dependencies: `uv sync --locked --extra docs`
-- For ReadTheDocs builds, `docs/requirements.txt` must match the `docs` extra in `pyproject.toml`
 
 **Broken links:**
 

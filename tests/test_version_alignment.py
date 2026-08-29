@@ -13,7 +13,6 @@ LOCK_PATH = ROOT / "uv.lock"
 PRE_COMMIT_PATH = ROOT / ".pre-commit-config.yaml"
 MAKEFILE_PATH = ROOT / "Makefile"
 MAKE_PS1_PATH = ROOT / "make.ps1"
-DOCS_REQUIREMENTS_PATH = ROOT / "docs" / "requirements.txt"
 INSTALLATION_RST_PATH = ROOT / "docs" / "source" / "user_guide" / "installation.rst"
 CONTRIBUTING_RST_PATH = ROOT / "docs" / "source" / "development" / "contributing.rst"
 PYTHON_VERSION_PATH = ROOT / ".python-version"
@@ -188,13 +187,6 @@ def _check_default_python_pins(python_version: str) -> None:
             python_version,
             language_match.group(1),
         )
-    rtd_match = _required_search(
-        r'^    python: "([^"]+)"$',
-        _read_text(ROOT / ".readthedocs.yaml"),
-        ".readthedocs.yaml python version",
-    )
-    if rtd_match.group(1) != python_version:
-        _raise_mismatch(".readthedocs.yaml python", python_version, rtd_match.group(1))
 
 
 def _check_python_matrix_and_docs(versions: list[str]) -> None:
@@ -255,25 +247,6 @@ class TestVersionAlignment:
             msg = (
                 "uv.lock package metadata does not match pyproject.toml: "
                 f"{lock_requires} != {expected}"
-            )
-            raise VersionAlignmentError(msg)
-
-    def test_docs_requirements_match_docs_extra(self: TestVersionAlignment) -> None:
-        """Test docs/requirements.txt matches the pyproject docs extra."""
-        pyproject = _load_toml(PYPROJECT_PATH)
-        expected = [
-            item.replace(" ", "")
-            for item in pyproject["project"]["optional-dependencies"]["docs"]
-        ]
-        actual = [
-            line.strip().replace(" ", "")
-            for line in _read_text(DOCS_REQUIREMENTS_PATH).splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        if actual != expected:
-            msg = (
-                "docs/requirements.txt does not match pyproject docs extra: "
-                f"{actual} != {expected}"
             )
             raise VersionAlignmentError(msg)
 

@@ -10,7 +10,7 @@
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
 [![codecov](https://img.shields.io/codecov/c/gh/CaptorAB/openseries?logo=codecov)](https://codecov.io/gh/CaptorAB/openseries/branch/master)
-[![Documentation Status](https://readthedocs.org/projects/openseries/badge/?version=latest)](https://captorab.github.io/openseries/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://captorab.github.io/openseries/)
 [![uv](https://img.shields.io/badge/package%20manager-uv-blueviolet)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![GitHub License](https://img.shields.io/github/license/CaptorAB/openseries)](https://github.com/CaptorAB/openseries/blob/master/LICENSE.md)
