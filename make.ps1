@@ -111,6 +111,9 @@ switch ($task) {
 
     "test" {
         pytest
+        $exitCode = $LASTEXITCODE
+        Remove-Item -Force -ErrorAction SilentlyContinue coverage.xml, junit.xml, .coverage
+        if ($exitCode -ne 0) { exit $exitCode }
     }
 
     "lint" {
