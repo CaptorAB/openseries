@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly ZIZMOR_VERSION=1.25.2
+readonly ZIZMOR_VERSION=1.29.0
 
 if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]]; then
   if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
