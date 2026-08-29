@@ -83,16 +83,22 @@ docs/
 └── make.bat                      # Build commands (Windows)
 ```
 
-## GitHub Pages
+## Hosting
 
-Documentation is built with Sphinx and published to
-[GitHub Pages](https://captorab.github.io/openseries/) by `.github/workflows/docs.yml`:
+Canonical documentation is [https://openseries.readthedocs.io/](https://openseries.readthedocs.io/)
+(the URL published on PyPI and conda-forge). The same Sphinx site is also
+deployed to [GitHub Pages](https://captorab.github.io/openseries/) by
+`.github/workflows/docs.yml` (Homepage in package metadata).
 
 - Pull requests that touch documentation sources or library code build docs
-  (warnings as errors) without deploying
+  in GitHub Actions (warnings as errors) without deploying Pages
 - Pushes to `master` and manual `workflow_dispatch` (including after a PyPI
-  release) build and deploy
-- Dependencies come from the `docs` extra in `pyproject.toml` / `uv.lock`
+  release) build and deploy Pages
+- Read the Docs builds `latest` from `master` using `.readthedocs.yaml`;
+  disable **Build pull requests** in the RTD dashboard so PRs are not also
+  built there
+- Dependencies come from the `docs` extra in `pyproject.toml` / `uv.lock`;
+  `docs/requirements.txt` must stay aligned with that extra for RTD installs
 
 ## Writing Documentation
 
@@ -199,6 +205,7 @@ When contributing to documentation:
 **Missing modules:**
 
 - Install missing dependencies: `uv sync --locked --extra docs`
+- For Read the Docs builds, `docs/requirements.txt` must match the `docs` extra in `pyproject.toml`
 
 **Broken links:**
 

@@ -31,8 +31,10 @@ vulnerabilities.
   jobs still report success so required checks are not left pending.
 - **CodeQL** full analysis runs on pull requests that change Python sources and
   on a weekly schedule; it is not repeated on every push to `master`.
-- **Documentation** is built and deployed to GitHub Pages only
-  (`docs.yml`). Pull requests build without deploying.
+- **Documentation** is published at
+  [openseries.readthedocs.io](https://openseries.readthedocs.io/) (the URL in
+  PyPI and conda-forge metadata) and also deployed to GitHub Pages by
+  `docs.yml`. Pull requests build docs without deploying Pages.
 - **Release tagging** is isolated in a reusable workflow (`release-tag.yml`);
   build and PyPI publish run in `deploy.yml` because PyPI Trusted Publishing
   does not support reusable workflows. `deploy.yml` is the only manual entry
@@ -58,12 +60,12 @@ YAML alone:
    - Do not expose secrets to fork PR workflows
 4. **Branch protection on `master`**:
    - Require status checks from `tests.yml`, `supply-chain.yml`, and
-     `zizmor.yml` before merge. Do not require Read the Docs. CodeQL may remain
-     required; the `codeql.yml` job no-ops on PRs that do not change Python
-     sources.
+     `zizmor.yml` before merge. Do not require the Read the Docs PR check.
+     CodeQL may remain required; the `codeql.yml` job no-ops on PRs that do
+     not change Python sources.
    - Require review for changes under `.github/workflows/`
-   - Disconnect the Read the Docs GitHub integration (docs are GitHub Pages
-     only) so PR checks are not duplicated there.
+   - Keep the Read the Docs GitHub integration so `latest` still builds; turn
+     off **Build pull requests** in the RTD project so PRs are not double-built.
 5. **Dependabot**: keep weekly updates with cooldown enabled (see
    `.github/dependabot.yml`).
 6. **Audit log**: periodically review GitHub audit log for workflow or secret
