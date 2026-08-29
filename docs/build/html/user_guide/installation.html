@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; openseries 2.1.9 documentation</title>
+  <title>Installation &mdash; openseries 2.1.10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a7898dfc"></script>
+      <script src="../_static/documentation_options.js?v=5f0ef145"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -181,27 +181,28 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <section id="core-dependencies">
 <h3>Core Dependencies<a class="headerlink" href="#core-dependencies" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong>pandas</strong> (&gt;=2.1.2,&lt;3.0.0) - Data manipulation and analysis</p></li>
-<li><p><strong>numpy</strong> (&gt;=1.23.2,!=2.3.0,&lt;3.0.0) - Numerical computing</p></li>
-<li><p><strong>pydantic</strong> (&gt;=2.5.2,&lt;3.0.0) - Data validation and settings management</p></li>
+<li><p><strong>pandas</strong> (&gt;=2.1.2) - Data manipulation and analysis</p></li>
+<li><p><strong>numpy</strong> (&gt;=1.23.2) - Numerical computing</p></li>
+<li><p><strong>pydantic</strong> (&gt;=2.5.2) - Data validation and settings management</p></li>
 <li><p><strong>plotly</strong> (&gt;=5.18.0) - Interactive plotting</p></li>
-<li><p><strong>scipy</strong> (&gt;=1.11.4,&lt;2.0.0) - Scientific computing</p></li>
-<li><p><strong>scikit-learn</strong> (&gt;=1.4.0,&lt;2.0.0) - Machine learning utilities</p></li>
+<li><p><strong>scipy</strong> (&gt;=1.14.1) - Scientific computing</p></li>
+<li><p><strong>scikit-learn</strong> (&gt;=1.4.0) - Machine learning utilities</p></li>
 </ul>
 </section>
 <section id="financial-and-date-utilities">
 <h3>Financial and Date Utilities<a class="headerlink" href="#financial-and-date-utilities" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong>exchange-calendars</strong> (&gt;=4.8,&lt;6.0) - Trading calendar support</p></li>
-<li><p><strong>holidays</strong> (&gt;=0.30,&lt;1.0) - Holiday calendar support</p></li>
-<li><p><strong>python-dateutil</strong> (&gt;=2.8.2,&lt;4.0.0) - Date parsing utilities</p></li>
+<li><p><strong>exchange-calendars</strong> (&gt;=4.8) - Trading calendar support</p></li>
+<li><p><strong>holidays</strong> (&gt;=0.30) - Holiday calendar support</p></li>
+<li><p><strong>python-dateutil</strong> (&gt;=2.8.2) - Date parsing utilities</p></li>
+<li><p><strong>tzdata</strong> (&gt;=2025.3) - IANA time zone data</p></li>
 </ul>
 </section>
 <section id="file-and-network-support">
 <h3>File and Network Support<a class="headerlink" href="#file-and-network-support" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong>openpyxl</strong> (&gt;=3.1.2,&lt;5.0.0) - Excel file support</p></li>
-<li><p><strong>requests</strong> (&gt;=2.20.0,&lt;3.0.0) - HTTP library</p></li>
+<li><p><strong>openpyxl</strong> (&gt;=3.1.2) - Excel file support</p></li>
+<li><p><strong>requests</strong> (&gt;=2.20.0) - HTTP library</p></li>
 </ul>
 </section>
 <section id="optional-dependencies">
@@ -246,25 +247,24 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </section>
 <section id="development-installation">
 <h2>Development Installation<a class="headerlink" href="#development-installation" title="Link to this heading"></a></h2>
-<p>If you plan to contribute to openseries or need the development dependencies:</p>
+<p>If you plan to contribute to openseries or need the development dependencies,
+use the same pinned tooling as CI (<code class="docutils literal notranslate"><span class="pre">uv==0.11.21</span></code>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/CaptorAB/openseries.git
 <span class="nb">cd</span><span class="w"> </span>openseries
-
-<span class="c1"># Install uv (if not already installed)</span>
-pip<span class="w"> </span>install<span class="w"> </span>uv
-
-<span class="c1"># Create a virtual environment and install dependencies</span>
-uv<span class="w"> </span>venv<span class="w"> </span>venv
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
+make<span class="w"> </span>install
 </pre></div>
 </div>
-<p>This will install additional development dependencies including:</p>
+<p>On Windows, run <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">make</span></code> instead of <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code>.</p>
+<p>This creates <code class="docutils literal notranslate"><span class="pre">venv</span></code>, installs locked runtime, development, and documentation
+dependencies from <code class="docutils literal notranslate"><span class="pre">uv.lock</span></code>, and installs pre-commit hooks. Development
+dependencies include:</p>
 <ul class="simple">
-<li><p><strong>pytest</strong> - Testing framework</p></li>
-<li><p><strong>mypy</strong> - Static type checking</p></li>
-<li><p><strong>ruff</strong> - Linting and formatting</p></li>
-<li><p><strong>pre-commit</strong> - Git hooks for code quality</p></li>
+<li><p><strong>pytest</strong> (&gt;=9.1.0) - Testing framework</p></li>
+<li><p><strong>pytest-cov</strong> (&gt;=7.1.0) - Coverage plugin</p></li>
+<li><p><strong>pytest-xdist</strong> (&gt;=3.8.0) - Parallel test runner</p></li>
+<li><p><strong>mypy</strong> (==2.1.0) - Static type checking</p></li>
+<li><p><strong>ruff</strong> (==0.15.18) - Linting and formatting</p></li>
+<li><p><strong>pre-commit</strong> (&gt;=4.6.0) - Git hooks for code quality</p></li>
 </ul>
 </section>
 <section id="troubleshooting">

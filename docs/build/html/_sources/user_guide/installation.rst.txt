@@ -49,25 +49,26 @@ openseries automatically installs the following dependencies:
 Core Dependencies
 ~~~~~~~~~~~~~~~~~
 
-- **pandas** (>=2.1.2,<3.0.0) - Data manipulation and analysis
-- **numpy** (>=1.23.2,!=2.3.0,<3.0.0) - Numerical computing
-- **pydantic** (>=2.5.2,<3.0.0) - Data validation and settings management
+- **pandas** (>=2.1.2) - Data manipulation and analysis
+- **numpy** (>=1.23.2) - Numerical computing
+- **pydantic** (>=2.5.2) - Data validation and settings management
 - **plotly** (>=5.18.0) - Interactive plotting
-- **scipy** (>=1.11.4,<2.0.0) - Scientific computing
-- **scikit-learn** (>=1.4.0,<2.0.0) - Machine learning utilities
+- **scipy** (>=1.14.1) - Scientific computing
+- **scikit-learn** (>=1.4.0) - Machine learning utilities
 
 Financial and Date Utilities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **exchange-calendars** (>=4.8,<6.0) - Trading calendar support
-- **holidays** (>=0.30,<1.0) - Holiday calendar support
-- **python-dateutil** (>=2.8.2,<4.0.0) - Date parsing utilities
+- **exchange-calendars** (>=4.8) - Trading calendar support
+- **holidays** (>=0.30) - Holiday calendar support
+- **python-dateutil** (>=2.8.2) - Date parsing utilities
+- **tzdata** (>=2025.3) - IANA time zone data
 
 File and Network Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **openpyxl** (>=3.1.2,<5.0.0) - Excel file support
-- **requests** (>=2.20.0,<3.0.0) - HTTP library
+- **openpyxl** (>=3.1.2) - Excel file support
+- **requests** (>=2.20.0) - HTTP library
 
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
@@ -117,27 +118,27 @@ You can also run a quick test:
 Development Installation
 ------------------------
 
-If you plan to contribute to openseries or need the development dependencies:
+If you plan to contribute to openseries or need the development dependencies,
+use the same pinned tooling as CI (``uv==0.11.21``):
 
 .. code-block:: bash
 
    git clone https://github.com/CaptorAB/openseries.git
    cd openseries
+   make install
 
-   # Install uv (if not already installed)
-   pip install uv
+On Windows, run ``.\make.ps1 make`` instead of ``make install``.
 
-   # Create a virtual environment and install dependencies
-   uv venv venv
-   source venv/bin/activate
-   uv pip install -e ".[dev]"
+This creates ``venv``, installs locked runtime, development, and documentation
+dependencies from ``uv.lock``, and installs pre-commit hooks. Development
+dependencies include:
 
-This will install additional development dependencies including:
-
-- **pytest** - Testing framework
-- **mypy** - Static type checking
-- **ruff** - Linting and formatting
-- **pre-commit** - Git hooks for code quality
+- **pytest** (>=9.1.0) - Testing framework
+- **pytest-cov** (>=7.1.0) - Coverage plugin
+- **pytest-xdist** (>=3.8.0) - Parallel test runner
+- **mypy** (==2.1.0) - Static type checking
+- **ruff** (==0.15.18) - Linting and formatting
+- **pre-commit** (>=4.6.0) - Git hooks for code quality
 
 Troubleshooting
 ---------------
