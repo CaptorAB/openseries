@@ -159,6 +159,8 @@ switch ($task) {
         Write-Host "🧹 Cleaning documentation artifacts..." -ForegroundColor Cyan
         if (Test-Path ".\docs\build") { Remove-Item ".\docs\build" -Recurse -Force }
         if (Test-Path ".\docs\source\api\generated") { Remove-Item ".\docs\source\api\generated" -Recurse -Force }
+        Get-ChildItem -Directory -Filter *.egg-info -ErrorAction SilentlyContinue |
+            Remove-Item -Recurse -Force
 
         . .\venv\Scripts\Activate.ps1
         pre-commit uninstall

@@ -43,6 +43,7 @@ clean:
 	@. venv/bin/activate && \
 	pre-commit uninstall && \
 	rm -rf venv
+	rm -rf *.egg-info
 
 builddocs:
 	@echo "📚 Building documentation..."
