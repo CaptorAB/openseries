@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing to openseries &mdash; openseries 2.1.9 documentation</title>
+  <title>Contributing to openseries &mdash; openseries 2.1.10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=b36c5fd4" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=a7898dfc"></script>
+      <script src="../_static/documentation_options.js?v=5f0ef145"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -172,23 +172,15 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li><p>Install uv (if not already installed):</p></li>
+<li><p>Create the development environment. This installs the pinned uv version
+(<code class="docutils literal notranslate"><span class="pre">uv==0.11.21</span></code>), syncs locked <code class="docutils literal notranslate"><span class="pre">dev</span></code> and <code class="docutils literal notranslate"><span class="pre">docs</span></code> dependencies from
+<code class="docutils literal notranslate"><span class="pre">uv.lock</span></code>, and installs pre-commit hooks:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>uv
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>install
 </pre></div>
 </div>
-<ol class="arabic simple" start="4">
-<li><p>Create a virtual environment and install dependencies:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>venv<span class="w"> </span>venv
-<span class="nb">source</span><span class="w"> </span>venv/bin/activate
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev,docs]"</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="5">
-<li><p>Install pre-commit hooks:</p></li>
-</ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
+<p>On Windows:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">make</span>
 </pre></div>
 </div>
 </section>
@@ -511,7 +503,7 @@ make<span class="w"> </span>html
 </ul>
 <p>Recommended settings in <code class="docutils literal notranslate"><span class="pre">.vscode/settings.json</span></code>:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"python.defaultInterpreterPath"</span><span class="p">:</span><span class="w"> </span><span class="s2">".venv/bin/python"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"python.defaultInterpreterPath"</span><span class="p">:</span><span class="w"> </span><span class="s2">"venv/bin/python"</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">"python.linting.enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">"python.linting.ruffEnabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 <span class="w">    </span><span class="nt">"python.formatting.provider"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ruff"</span><span class="p">,</span>
