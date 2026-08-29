@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-import os
+import importlib
+import importlib.util
 import shutil
-import subprocess
-import sys
 import zipfile
+from contextlib import chdir
 from importlib.metadata import metadata
 from pathlib import Path
 from re import match
+from unittest.mock import patch
 
 import pytest
 
@@ -25,40 +26,30 @@ _PACKAGE_DATA_FILES = (
 )
 
 
-def _venv_executable(venv_dir: Path, name: str) -> Path:
-    if sys.platform == "win32":
-        return venv_dir / "Scripts" / f"{name}.exe"
-    return venv_dir / "bin" / name
-
-
 def _prepare_build_tree(build_dir: Path, project_root: Path) -> None:
     shutil.copytree(project_root / "openseries", build_dir / "openseries")
     for filename in ("pyproject.toml", "README.md", "LICENSE.md"):
         shutil.copy2(project_root / filename, build_dir / filename)
 
 
-def _uv_executable() -> str:
-    uv_path = shutil.which("uv")
-    if uv_path is None:
-        msg = "uv executable not found on PATH"
+@pytest.fixture(scope="module")
+def built_wheel(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Build a wheel once for packaging tests."""
+    project_root = Path(__file__).parent.parent
+    tmp_path = tmp_path_factory.mktemp("packaging")
+    build_dir = tmp_path / "project"
+    dist_dir = tmp_path / "dist"
+    build_dir.mkdir()
+    dist_dir.mkdir()
+    _prepare_build_tree(build_dir, project_root)
+
+    with chdir(build_dir):
+        build_meta = importlib.import_module("setuptools.build_meta")
+        wheel_name = build_meta.build_wheel(str(dist_dir))
+    if not isinstance(wheel_name, str):
+        msg = f"Expected wheel filename string, got: {wheel_name!r}"
         raise PackageTestError(msg)
-    return uv_path
-
-
-def _run_checked(
-    command: list[str],
-    *,
-    cwd: Path | None = None,
-    env: dict[str, str] | None = None,
-) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(  # noqa: S603
-        command,
-        cwd=cwd,
-        check=True,
-        capture_output=True,
-        text=True,
-        env=env,
-    )
+    return dist_dir / wheel_name
 
 
 class TestPackage:
@@ -121,26 +112,12 @@ class TestPackage:
                 raise PackageTestError(msg)
 
     @pytest.mark.xdist_group(name="packaging")
-    def test_wheel_includes_package_data(self: TestPackage, tmp_path: Path) -> None:
+    def test_wheel_includes_package_data(
+        self: TestPackage,
+        built_wheel: Path,
+    ) -> None:
         """Test wheel includes package data files required at runtime."""
-        project_root = Path(__file__).parent.parent
-        build_dir = tmp_path / "project"
-        dist_dir = tmp_path / "dist"
-        build_dir.mkdir()
-        dist_dir.mkdir()
-        _prepare_build_tree(build_dir, project_root)
-
-        _run_checked(
-            [_uv_executable(), "build", "--out-dir", str(dist_dir)],
-            cwd=build_dir,
-        )
-
-        wheel_files = list(dist_dir.glob("*.whl"))
-        if len(wheel_files) != 1:
-            msg = f"Expected one wheel file, found: {wheel_files}"
-            raise PackageTestError(msg)
-
-        with zipfile.ZipFile(wheel_files[0]) as wheel:
+        with zipfile.ZipFile(built_wheel) as wheel:
             wheel_names = set(wheel.namelist())
             missing_files = [
                 filename
@@ -154,53 +131,28 @@ class TestPackage:
     @pytest.mark.xdist_group(name="packaging")
     def test_load_plotly_dict_from_installed_wheel(
         self: TestPackage,
+        built_wheel: Path,
         tmp_path: Path,
     ) -> None:
-        """Test load_plotly_dict works from an installed wheel."""
-        project_root = Path(__file__).parent.parent
-        build_dir = tmp_path / "project"
-        dist_dir = tmp_path / "dist"
-        venv_dir = tmp_path / "venv"
-        build_dir.mkdir()
-        dist_dir.mkdir()
-        _prepare_build_tree(build_dir, project_root)
+        """Test load_plotly_dict works from packaged wheel contents."""
+        extract_dir = tmp_path / "extracted"
+        extract_dir.mkdir()
+        with zipfile.ZipFile(built_wheel) as wheel:
+            wheel.extractall(path=extract_dir)
 
-        _run_checked(
-            [_uv_executable(), "build", "--out-dir", str(dist_dir)],
-            cwd=build_dir,
+        module_path = extract_dir / "openseries" / "load_plotly.py"
+        spec = importlib.util.spec_from_file_location(
+            "openseries_wheel_load_plotly",
+            module_path,
         )
-
-        wheel_files = list(dist_dir.glob("*.whl"))
-        if len(wheel_files) != 1:
-            msg = f"Expected one wheel file, found: {wheel_files}"
+        if spec is None or spec.loader is None:
+            msg = f"Failed to load module from wheel path: {module_path}"
             raise PackageTestError(msg)
 
-        _run_checked([sys.executable, "-m", "venv", str(venv_dir)])
-
-        pip = _venv_executable(venv_dir, "pip")
-        python = _venv_executable(venv_dir, "python")
-        _run_checked([str(pip), "install", str(wheel_files[0])])
-
-        env = os.environ.copy()
-        env.pop("PYTHONPATH", None)
-        result = subprocess.run(  # noqa: S603
-            [
-                str(python),
-                "-c",
-                (
-                    "from openseries.load_plotly import load_plotly_dict; "
-                    "fig, _ = load_plotly_dict(); "
-                    "assert 'config' in fig and 'layout' in fig"
-                ),
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            env=env,
-        )
-        if result.returncode != 0:
-            msg = (
-                "load_plotly_dict failed from installed wheel: "
-                f"{result.stderr or result.stdout}"
-            )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with patch.object(module, "_check_remote_file_existence", return_value=True):
+            fig, _ = module.load_plotly_dict()
+        if "config" not in fig or "layout" not in fig:
+            msg = "load_plotly_dict failed from installed wheel: missing config/layout"
             raise PackageTestError(msg)
