@@ -1,6 +1,6 @@
 .ONESHELL:
 
-UV_VERSION ?= 0.11.21
+UV_VERSION ?= 0.12.7
 PIP_AUDIT_VERSION ?= 2.10.0
 
 .PHONY: all install update test lint audit clean builddocs servedocs cleandocs

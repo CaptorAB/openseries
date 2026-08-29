@@ -18,7 +18,7 @@ Development Setup
    cd openseries
 
 3. Create the development environment. This installs the pinned uv version
-   (``uv==0.11.21``), syncs locked ``dev`` and ``docs`` dependencies from
+   (``uv==0.12.7``), syncs locked ``dev`` and ``docs`` dependencies from
    ``uv.lock``, and installs pre-commit hooks:
 
 .. code-block:: bash

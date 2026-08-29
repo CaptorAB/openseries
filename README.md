@@ -47,11 +47,11 @@ conda install -c conda-forge openseries
 from openseries import OpenTimeSeries
 import yfinance as yf
 
-move=yf.Ticker(ticker="^MOVE")
-history=move.history(period="max")
-series=OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
-_=series.set_new_label(lvl_zero="ICE BofAML MOVE Index")
-_,_=series.plot_series()
+move = yf.Ticker(ticker="^MOVE")
+history = move.history(period="max")
+series = OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
+_ = series.set_new_label(lvl_zero="ICE BofAML MOVE Index")
+_, _ = series.plot_series()
 ```
 
 ### Sample output using the report_html() function
