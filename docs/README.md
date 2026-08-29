@@ -97,8 +97,9 @@ deployed to [GitHub Pages](https://captorab.github.io/openseries/) by
 - Read the Docs builds `latest` from `master` using `.readthedocs.yaml`;
   disable **Build pull requests** in the RTD dashboard so PRs are not also
   built there
-- Dependencies come from the `docs` extra in `pyproject.toml` / `uv.lock`;
-  `docs/requirements.txt` must stay aligned with that extra for RTD installs
+- Dependencies come from the `docs` extra in `pyproject.toml` / `uv.lock`.
+  Read the Docs installs that extra via `.readthedocs.yaml`
+  (`pip install .[docs]`)
 
 ## Writing Documentation
 
@@ -205,7 +206,6 @@ When contributing to documentation:
 **Missing modules:**
 
 - Install missing dependencies: `uv sync --locked --extra docs`
-- For Read the Docs builds, `docs/requirements.txt` must match the `docs` extra in `pyproject.toml`
 
 **Broken links:**
 

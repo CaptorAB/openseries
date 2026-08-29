@@ -13,7 +13,6 @@ LOCK_PATH = ROOT / "uv.lock"
 PRE_COMMIT_PATH = ROOT / ".pre-commit-config.yaml"
 MAKEFILE_PATH = ROOT / "Makefile"
 MAKE_PS1_PATH = ROOT / "make.ps1"
-DOCS_REQUIREMENTS_PATH = ROOT / "docs" / "requirements.txt"
 INSTALLATION_RST_PATH = ROOT / "docs" / "source" / "user_guide" / "installation.rst"
 CONTRIBUTING_RST_PATH = ROOT / "docs" / "source" / "development" / "contributing.rst"
 PYTHON_VERSION_PATH = ROOT / ".python-version"
@@ -258,23 +257,29 @@ class TestVersionAlignment:
             )
             raise VersionAlignmentError(msg)
 
-    def test_docs_requirements_match_docs_extra(self: TestVersionAlignment) -> None:
-        """Test docs/requirements.txt matches the pyproject docs extra."""
-        pyproject = _load_toml(PYPROJECT_PATH)
-        expected = [
-            item.replace(" ", "")
-            for item in pyproject["project"]["optional-dependencies"]["docs"]
+    def test_readthedocs_installs_docs_extra(self: TestVersionAlignment) -> None:
+        """Test Read the Docs installs the pyproject docs extra."""
+        rtd = _read_text(ROOT / ".readthedocs.yaml")
+        extras_match = re.search(
+            r"extra_requirements:\n((?:        - .+\n)+)",
+            rtd,
+        )
+        if extras_match is None:
+            msg = ".readthedocs.yaml is missing extra_requirements"
+            raise VersionAlignmentError(msg)
+        extras = [
+            line.strip()[2:].strip()
+            for line in extras_match.group(1).splitlines()
+            if line.strip().startswith("- ")
         ]
-        actual = [
-            line.strip().replace(" ", "")
-            for line in _read_text(DOCS_REQUIREMENTS_PATH).splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        if actual != expected:
-            msg = (
-                "docs/requirements.txt does not match pyproject docs extra: "
-                f"{actual} != {expected}"
+        if extras != ["docs"]:
+            _raise_mismatch(
+                ".readthedocs.yaml extra_requirements",
+                "docs",
+                ", ".join(extras),
             )
+        if "docs/requirements.txt" in rtd:
+            msg = ".readthedocs.yaml must not install docs/requirements.txt"
             raise VersionAlignmentError(msg)
 
     def test_tool_versions_match(self: TestVersionAlignment) -> None:
