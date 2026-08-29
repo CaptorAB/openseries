@@ -5,7 +5,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  UV_VERSION: "0.11.21"
+  UV_VERSION: "0.12.7"
   UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
@@ -13,32 +13,39 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  # Only run on pushes to master for documentation-related changes
-  # This prevents running on every commit, only when docs actually change
   push:
     branches:
       - master
     paths:
       - 'docs/**'
+      - 'openseries/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
       - '.readthedocs.yaml'
-  # Manual trigger for immediate updates (e.g., after releases)
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - 'openseries/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
+      - '.readthedocs.yaml'
+      - '.github/workflows/docs.yml'
   workflow_dispatch: {}
 
 jobs:
-  build-and-deploy:
-    name: Build and deploy documentation
+  build:
+    name: Build documentation
     defaults:
       run:
         shell: bash
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/master'
     permissions:
       contents: read
-      pages: write  # Required for actions/deploy-pages to deploy to GitHub Pages
-      id-token: write  # Required for OIDC token for GitHub Pages deployment
-    environment:
-      name: github-pages
-
     steps:
       - name: Check out GitHub repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -65,12 +72,36 @@ jobs:
         run: uv run --directory docs make builddocs
 
       - name: Check for documentation warnings
-        run: |
-          uv run --directory docs make strict || {
-            echo "Documentation build failed with warnings/errors:"
-            echo "This indicates potential issues that should be fixed."
-            exit 1
-          }
+        run: uv run --directory docs make strict
+
+      - name: Upload HTML artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: docs-html
+          path: docs/build/html
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    name: Deploy documentation
+    needs: build
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write  # Required for actions/deploy-pages to deploy to GitHub Pages
+      id-token: write  # Required for OIDC token for GitHub Pages deployment
+    environment:
+      name: github-pages
+    steps:
+      - name: Download HTML artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: docs-html
+          path: docs/build/html
 
       - name: Setup Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0

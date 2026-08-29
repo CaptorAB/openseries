@@ -3,20 +3,19 @@ name: codeql.yml
 permissions:
   contents: read
   actions: read  # Required for setup-python and other actions to read action metadata
+  pull-requests: read  # Required to list PR files for path filtering
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  UV_VERSION: "0.11.21"
+  UV_VERSION: "0.12.7"
   UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
-  group: codeql-${{ github.ref }}
+  group: codeql-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
   cancel-in-progress: true
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
   schedule:
@@ -28,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read  # Required for setup-python and other actions to read action metadata
+      pull-requests: read  # Required to list PR files for path filtering
       security-events: write  # Required for github/codeql-action/analyze to upload results
     steps:
       - name: Check out repository
@@ -35,25 +36,45 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Filter paths
+        id: paths
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci-pr-paths.sh
+          'openseries/*'
+          'tests/*'
+          'pyproject.toml'
+          'uv.lock'
+          '.github/workflows/codeql.yml'
+          'scripts/ci-pr-paths.sh'
+
       - name: Initialize CodeQL
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: github/codeql-action/init@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
         with:
           languages: python
 
       - name: Set up Python
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version-file: .python-version
 
       - name: Set up uv
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
 
       - name: Sync dependencies (locked)
+        if: ${{ steps.paths.outputs.run == 'true' }}
         run: uv sync --locked --extra dev
 
       - name: Perform CodeQL analysis
+        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: github/codeql-action/analyze@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
         with:
           category: /language:python

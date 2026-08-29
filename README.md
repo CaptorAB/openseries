@@ -10,7 +10,7 @@
 [![Python version](https://img.shields.io/pypi/pyversions/openseries.svg)](https://www.python.org/)
 [![GitHub Action Test Suite](https://github.com/CaptorAB/openseries/actions/workflows/test.yml/badge.svg)](https://github.com/CaptorAB/openseries/actions/workflows/test.yml)
 [![codecov](https://img.shields.io/codecov/c/gh/CaptorAB/openseries?logo=codecov)](https://codecov.io/gh/CaptorAB/openseries/branch/master)
-[![Documentation Status](https://readthedocs.org/projects/openseries/badge/?version=latest)](https://captorab.github.io/openseries/)
+[![Documentation Status](https://readthedocs.org/projects/openseries/badge/?version=latest)](https://openseries.readthedocs.io/)
 [![uv](https://img.shields.io/badge/package%20manager-uv-blueviolet)](https://github.com/astral-sh/uv)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://beta.ruff.rs/docs/)
 [![GitHub License](https://img.shields.io/github/license/CaptorAB/openseries)](https://github.com/CaptorAB/openseries/blob/master/LICENSE.md)
@@ -20,7 +20,7 @@ Tools for analyzing financial timeseries of a single asset or a group of assets.
 
 ## Documentation
 
-Complete documentation is available at: [https://captorab.github.io/openseries/](https://captorab.github.io/openseries/)
+Complete documentation is available at: [https://openseries.readthedocs.io/](https://openseries.readthedocs.io/)
 
 The documentation includes:
 
@@ -47,11 +47,11 @@ conda install -c conda-forge openseries
 from openseries import OpenTimeSeries
 import yfinance as yf
 
-move=yf.Ticker(ticker="^MOVE")
-history=move.history(period="max")
-series=OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
-_=series.set_new_label(lvl_zero="ICE BofAML MOVE Index")
-_,_=series.plot_series()
+move = yf.Ticker(ticker="^MOVE")
+history = move.history(period="max")
+series = OpenTimeSeries.from_df(dframe=history.loc[:, "Close"])
+_ = series.set_new_label(lvl_zero="ICE BofAML MOVE Index")
+_, _ = series.plot_series()
 ```
 
 ### Sample output using the report_html() function

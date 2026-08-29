@@ -1,9 +1,8 @@
-name: tests.yml
+name: codecov.yml
 
 permissions:
   contents: read
   actions: read  # Required for setup-python and other actions to read action metadata
-  pull-requests: read  # Required to list PR files for path filtering
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -11,29 +10,49 @@ env:
   UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:
-  workflow_dispatch: {}
-  pull_request:
+  push:
     branches:
       - master
+    paths:
+      - 'openseries/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.python-version'
+      - '.github/workflows/codecov.yml'
+      - 'Makefile'
+      - 'make.ps1'
+      - '.pre-commit-config.yaml'
+      - 'scripts/ci-pr-paths.sh'
+  workflow_dispatch: {}
 
 jobs:
-  run_tests:
-    name: Run tests
+  upload_coverage:
+    name: Upload coverage
     runs-on: ubuntu-latest
+    environment: codecov
     defaults:
       run:
         shell: bash
     permissions:
       contents: read
       actions: read  # Required for setup-python and other actions to read action metadata
-      pull-requests: read  # Required to list PR files for path filtering
       issues: write  # Required for actions/github-script to create issues on test failure
 
     steps:
+      - name: Require master branch
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/master" ]; then
+            echo "::error::Codecov reporting is limited to the master branch."
+            exit 1
+          fi
+
       - name: Check out GitHub repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -41,65 +60,20 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.sha }}
           persist-credentials: false
 
-      - name: Filter paths
-        id: paths
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: bash scripts/ci-pr-paths.sh
-          'openseries/*'
-          'tests/*'
-          'pyproject.toml'
-          'uv.lock'
-          '.python-version'
-          '.github/workflows/test.yml'
-          '.github/workflows/codecov.yml'
-          'Makefile'
-          'make.ps1'
-          '.pre-commit-config.yaml'
-          'scripts/ci-pr-paths.sh'
-
       - name: Set up Python
-        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version-file: '.python-version'
 
       - name: Set up uv
-        if: ${{ steps.paths.outputs.run == 'true' }}
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           version: ${{ env.UV_VERSION }}
 
       - name: Sync dependencies (locked)
-        if: ${{ steps.paths.outputs.run == 'true' }}
         run: uv sync --locked --extra dev
 
-      - name: Check and fix with Ruff
-        if: ${{ steps.paths.outputs.run == 'true' }}
-        run: uv run ruff check ./tests/*.py ./openseries/*.py --fix --exit-non-zero-on-fix
-
-      - name: Format with Ruff
-        if: ${{ steps.paths.outputs.run == 'true' }}
-        run: uv run ruff format
-
-      - name: Manage Mypy cache
-        if: ${{ steps.paths.outputs.run == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: mypy-cache
-        with:
-          path: .mypy_cache
-          key: mypy-cache-${{ hashFiles('**/*.py') }}
-          restore-keys: mypy-cache-
-
-      - name: Type check with Mypy
-        if: ${{ steps.paths.outputs.run == 'true' }}
-        run: uv run mypy --cache-dir .mypy_cache .
-
       - name: Tests with Pytest
-        if: ${{ steps.paths.outputs.run == 'true' }}
         id: pytest
         continue-on-error: true
         run: uv run pytest
@@ -107,7 +81,7 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
 
       - name: Create GitHub issue on failure
-        if: ${{ steps.pytest.outcome == 'failure' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ steps.pytest.outcome == 'failure' }}
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           GH_OWNER: ${{ github.repository_owner }}
@@ -129,3 +103,19 @@ jobs:
       - name: Fail job if tests failed
         if: ${{ steps.pytest.outcome == 'failure' }}
         run: exit 1
+
+      - name: Upload test results to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit.xml
+          report_type: test_results
+          verbose: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: CaptorAB/openseries
+          files: coverage.xml
+          verbose: true

@@ -13,7 +13,6 @@ LOCK_PATH = ROOT / "uv.lock"
 PRE_COMMIT_PATH = ROOT / ".pre-commit-config.yaml"
 MAKEFILE_PATH = ROOT / "Makefile"
 MAKE_PS1_PATH = ROOT / "make.ps1"
-DOCS_REQUIREMENTS_PATH = ROOT / "docs" / "requirements.txt"
 INSTALLATION_RST_PATH = ROOT / "docs" / "source" / "user_guide" / "installation.rst"
 CONTRIBUTING_RST_PATH = ROOT / "docs" / "source" / "development" / "contributing.rst"
 PYTHON_VERSION_PATH = ROOT / ".python-version"
@@ -28,6 +27,7 @@ UV_WORKFLOW_FILES = (
     "codeql.yml",
     "zizmor.yml",
     "supply-chain.yml",
+    "codecov.yml",
 )
 
 MYPY_ADDITIONAL_DEPENDENCIES = (
@@ -258,23 +258,29 @@ class TestVersionAlignment:
             )
             raise VersionAlignmentError(msg)
 
-    def test_docs_requirements_match_docs_extra(self: TestVersionAlignment) -> None:
-        """Test docs/requirements.txt matches the pyproject docs extra."""
-        pyproject = _load_toml(PYPROJECT_PATH)
-        expected = [
-            item.replace(" ", "")
-            for item in pyproject["project"]["optional-dependencies"]["docs"]
+    def test_readthedocs_installs_docs_extra(self: TestVersionAlignment) -> None:
+        """Test Read the Docs installs the pyproject docs extra."""
+        rtd = _read_text(ROOT / ".readthedocs.yaml")
+        extras_match = re.search(
+            r"extra_requirements:\n((?:        - .+\n)+)",
+            rtd,
+        )
+        if extras_match is None:
+            msg = ".readthedocs.yaml is missing extra_requirements"
+            raise VersionAlignmentError(msg)
+        extras = [
+            line.strip()[2:].strip()
+            for line in extras_match.group(1).splitlines()
+            if line.strip().startswith("- ")
         ]
-        actual = [
-            line.strip().replace(" ", "")
-            for line in _read_text(DOCS_REQUIREMENTS_PATH).splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        if actual != expected:
-            msg = (
-                "docs/requirements.txt does not match pyproject docs extra: "
-                f"{actual} != {expected}"
+        if extras != ["docs"]:
+            _raise_mismatch(
+                ".readthedocs.yaml extra_requirements",
+                "docs",
+                ", ".join(extras),
             )
+        if "docs/requirements.txt" in rtd:
+            msg = ".readthedocs.yaml must not install docs/requirements.txt"
             raise VersionAlignmentError(msg)
 
     def test_tool_versions_match(self: TestVersionAlignment) -> None:
@@ -429,6 +435,36 @@ class TestVersionAlignment:
             raise VersionAlignmentError(msg)
         if uv_pin not in contributing:
             msg = f"{CONTRIBUTING_RST_PATH.name} is missing {uv_pin}"
+            raise VersionAlignmentError(msg)
+
+    def test_codecov_reporting_is_master_only(self: TestVersionAlignment) -> None:
+        """Test Codecov uploads run only from the master coverage workflow."""
+        tests = _read_text(WORKFLOW_DIR / "test.yml")
+        deploy = _read_text(WORKFLOW_DIR / "deploy.yml")
+        codecov = _read_text(WORKFLOW_DIR / "codecov.yml")
+        if "codecov/codecov-action" in tests:
+            msg = "test.yml must not upload to Codecov"
+            raise VersionAlignmentError(msg)
+        if "environment: codecov" in tests:
+            msg = "test.yml must not use the codecov environment"
+            raise VersionAlignmentError(msg)
+        if "codecov/codecov-action" in deploy:
+            msg = "deploy.yml must not upload to Codecov"
+            raise VersionAlignmentError(msg)
+        if "environment: codecov" in deploy:
+            msg = "deploy.yml must not use the codecov environment"
+            raise VersionAlignmentError(msg)
+        if "codecov/codecov-action" not in codecov:
+            msg = "codecov.yml must upload to Codecov"
+            raise VersionAlignmentError(msg)
+        if "environment: codecov" not in codecov:
+            msg = "codecov.yml must use the codecov environment"
+            raise VersionAlignmentError(msg)
+        if "branches:\n      - master" not in codecov:
+            msg = "codecov.yml must run on push to master"
+            raise VersionAlignmentError(msg)
+        if "workflow_dispatch: {}" not in codecov:
+            msg = "codecov.yml must allow workflow_dispatch from master"
             raise VersionAlignmentError(msg)
 
     def test_python_versions_match(self: TestVersionAlignment) -> None:
