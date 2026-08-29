@@ -25,7 +25,7 @@ update:
 	uv sync --active --locked --extra dev --extra docs
 
 test:
-	pytest
+	pytest; status=$$?; rm -f coverage.xml junit.xml .coverage; exit $$status
 
 lint:
 	ruff check . --fix --exit-non-zero-on-fix
