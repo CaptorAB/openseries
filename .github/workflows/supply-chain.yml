@@ -7,9 +7,9 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  UV_VERSION: "0.12.7"
+  UV_VERSION: "0.12.10"
   UV_PROJECT_ENVIRONMENT: venv
-  PIP_AUDIT_VERSION: "2.10.0"
+  PIP_AUDIT_VERSION: "2.10.1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}

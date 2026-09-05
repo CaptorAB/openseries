@@ -30,8 +30,13 @@ rules:
         - pypa/gh-action-pypi-publish
         - softprops/action-gh-release
         - astral-sh/setup-uv
+        - astral-sh/ruff-pre-commit
+        - astral-sh/uv-pre-commit
         - codecov/codecov-action
         - google/osv-scanner-action/osv-scanner-action
+        - pre-commit/mirrors-mypy
+        - pre-commit/pre-commit-hooks
+        - pre-commit/pygrep-hooks
 
   dependabot-cooldown:
     config:

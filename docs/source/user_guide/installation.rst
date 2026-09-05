@@ -119,7 +119,7 @@ Development Installation
 ------------------------
 
 If you plan to contribute to openseries or need the development dependencies,
-use the same pinned tooling as CI (``uv==0.12.7``):
+use the same pinned tooling as CI (``uv==0.12.10``):
 
 .. code-block:: bash
 
@@ -136,8 +136,8 @@ dependencies include:
 - **pytest** (>=9.1.0) - Testing framework
 - **pytest-cov** (>=7.1.0) - Coverage plugin
 - **pytest-xdist** (>=3.8.0) - Parallel test runner
-- **mypy** (==2.1.0) - Static type checking
-- **ruff** (==0.16.5) - Linting and formatting
+- **mypy** (==2.3.1) - Static type checking
+- **ruff** (==0.16.6) - Linting and formatting
 - **pre-commit** (>=4.6.0) - Git hooks for code quality
 
 Troubleshooting
