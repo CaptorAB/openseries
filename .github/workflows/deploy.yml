@@ -5,7 +5,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  UV_VERSION: "0.12.7"
+  UV_VERSION: "0.12.10"
   UV_PROJECT_ENVIRONMENT: venv
 
 concurrency:
@@ -98,7 +98,7 @@ jobs:
     if: ${{ needs.build_test.result == 'success' }}
     permissions:
       contents: write  # Required for release-tag reusable workflow to push signed tags
-    uses: ./.github/workflows/release-tag.yml
+    uses: $/.github/workflows/release-tag.yml
     secrets:
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 

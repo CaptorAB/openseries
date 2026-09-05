@@ -14,8 +14,8 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-$UV_VERSION = "0.12.7"
-$PIP_AUDIT_VERSION = "2.10.0"
+$UV_VERSION = "0.12.10"
+$PIP_AUDIT_VERSION = "2.10.1"
 
 # Ensure we run from repo root
 Push-Location (Split-Path -Parent $MyInvocation.MyCommand.Definition)
