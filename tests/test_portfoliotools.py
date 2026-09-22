@@ -71,8 +71,9 @@ class TestPortfoliotools:
             raise PortfoliotoolsTestError(msg)
 
         return_least_vol = f"{result_returns.loc[:, 'stdev'].min():.7f}"
+        return_least_vol_idx = cast("int", result_returns["stdev"].idxmin())
         return_where_least_vol = (
-            f"{result_returns.loc[result_returns['stdev'].idxmin()]['ret']:.7f}"
+            f"{result_returns.loc[return_least_vol_idx]['ret']:.7f}"
         )
 
         if (return_least_vol, return_where_least_vol) != ("0.0479017", "0.0564059"):
@@ -94,9 +95,8 @@ class TestPortfoliotools:
             raise PortfoliotoolsTestError(msg)
 
         value_least_vol = f"{result_values.loc[:, 'stdev'].min():.7f}"
-        value_where_least_vol = (
-            f"{result_values.loc[result_values['stdev'].idxmin()]['ret']:.7f}"
-        )
+        value_least_vol_idx = cast("int", result_values["stdev"].idxmin())
+        value_where_least_vol = f"{result_values.loc[value_least_vol_idx]['ret']:.7f}"
 
         if (value_least_vol, value_where_least_vol) != ("0.0479112", "0.0564284"):
             msg = (
@@ -160,7 +160,7 @@ class TestPortfoliotools:
                 Decimal(cast("float", frontier.loc[:, "sharpe"].max())),
                 6,
             )
-            max_sharpe_idx = frontier["sharpe"].idxmax()
+            max_sharpe_idx = cast("int", frontier["sharpe"].idxmax())
             frt_return_where_most_sharpe = round(
                 Decimal(cast("float", frontier.loc[max_sharpe_idx, "ret"])),
                 6,
@@ -180,7 +180,7 @@ class TestPortfoliotools:
                 Decimal(cast("float", result.loc[:, "stdev"].min())),
                 6,
             )
-            min_stdev_idx = result["stdev"].idxmin()
+            min_stdev_idx = cast("int", result["stdev"].idxmin())
             sim_return_where_least_vol = round(
                 Decimal(cast("float", result.loc[min_stdev_idx, "ret"])),
                 6,
