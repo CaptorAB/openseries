@@ -157,7 +157,7 @@ def _calculate_frontier_bounds(
     Returns:
         Tuple of (min_return, max_return).
     """
-    min_stdev_idx = simulated["stdev"].idxmin()
+    min_stdev_idx = cast("int", simulated["stdev"].idxmin())
     frontier_min = cast("float", simulated.loc[min_stdev_idx, "ret"])
 
     arithmetic_means = array(log_ret.mean() * periods_in_a_year)
