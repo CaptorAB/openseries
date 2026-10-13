@@ -173,10 +173,14 @@ def _check_python_classifiers(classifiers: list[str], versions: list[str]) -> No
             raise VersionAlignmentError(msg)
 
 
-def _check_default_python_pins(python_version: str) -> None:
-    actual_default = _read_text(PYTHON_VERSION_PATH).strip()
-    if actual_default != python_version:
-        _raise_mismatch(".python-version", python_version, actual_default)
+def _check_default_python_pins(versions: list[str]) -> None:
+    python_version = _read_text(PYTHON_VERSION_PATH).strip()
+    if python_version not in versions:
+        msg = (
+            ".python-version must be a supported Python version, "
+            f"got {python_version!r}"
+        )
+        raise VersionAlignmentError(msg)
     language_match = _required_search(
         r"^  python: python(.+)$",
         _read_text(PRE_COMMIT_PATH),
@@ -472,8 +476,7 @@ class TestVersionAlignment:
         pyproject = _load_toml(PYPROJECT_PATH)
         requires_python = pyproject["project"]["requires-python"].replace(" ", "")
         versions = _python_minor_versions(requires_python)
-        default_version = versions[-1]
         _check_python_classifiers(pyproject["project"]["classifiers"], versions)
-        _check_default_python_pins(default_version)
+        _check_default_python_pins(versions)
         _check_python_matrix_and_docs(versions)
         _check_type_checker_targets(pyproject, versions)

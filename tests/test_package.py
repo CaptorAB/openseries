@@ -80,7 +80,7 @@ class TestPackage:
             f"^({toml_version})$",
             "^(Tools for analyzing financial timeseries.)$",
             "^(Martin Karrin)$",
-            "^(>=3.11,<3.15)$",
+            "^(>=3.11,<3.16)$",
             "^(Documentation, https://openseries.readthedocs.io/)$",
         ]
 
@@ -89,7 +89,7 @@ class TestPackage:
                 actual_specifiers = {
                     part.strip() for part in package_metadata[name].split(",")
                 }
-                expected_specifiers = {">=3.11", "<3.15"}
+                expected_specifiers = {">=3.11", "<3.16"}
                 if actual_specifiers != expected_specifiers:
                     msg = (
                         f"Package metadata {name} not as "
