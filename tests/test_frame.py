@@ -317,7 +317,7 @@ class TestOpenFrame:
 
     def test_to_xlsx_basic(self: TestOpenFrame) -> None:
         """Test to_xlsx method basic functionality."""
-        filename = "trial.xlsx"
+        filename = "trial_basic.xlsx"
         basefile = self._get_xlsx_basefile(filename)
 
         if Path(basefile).exists():
@@ -342,7 +342,9 @@ class TestOpenFrame:
         """Test to_xlsx method with directory parameter."""
         directory = Path(__file__).parent
         seriesfile = Path(
-            self.randomframe.to_xlsx(filename="trial.xlsx", directory=directory),
+            self.randomframe.to_xlsx(
+                filename="trial_directory.xlsx", directory=directory
+            ),
         ).resolve()
 
         if not Path(seriesfile).exists():
@@ -357,7 +359,7 @@ class TestOpenFrame:
 
     def test_to_xlsx_errors(self: TestOpenFrame) -> None:
         """Test to_xlsx method error cases."""
-        filename = "trial.xlsx"
+        filename = "trial_errors.xlsx"
         basefile = self._get_xlsx_basefile(filename)
 
         with pytest.raises(
@@ -379,7 +381,7 @@ class TestOpenFrame:
 
     def test_to_xlsx_read_back(self: TestOpenFrame) -> None:
         """Test to_xlsx method reading back the file."""
-        filename = "trial.xlsx"
+        filename = "trial_read_back.xlsx"
         localfile = Path(__file__).parent.joinpath(filename)
         with patch("pathlib.Path.exists") as mock_doesnotexist:
             mock_doesnotexist.return_value = False
