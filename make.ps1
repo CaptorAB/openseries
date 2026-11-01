@@ -14,7 +14,7 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-$UV_VERSION = "0.13.0"
+$UV_VERSION = "0.13.6"
 $PIP_AUDIT_VERSION = "2.10.1"
 
 # Ensure we run from repo root

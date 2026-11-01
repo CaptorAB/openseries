@@ -1650,7 +1650,7 @@ class TestOpenFrame:
         fig_last_json = loads(cast("str", fig_last.to_json()))
         rawlast = plotframe.tsdf.iloc[-1, -1]
         figlast = fig_last_json["data"][-1]["y"][0]
-        if f"{figlast:.12f}" != f"{rawlast:.12f}":
+        if f"{figlast:.12f}" != f"{cast('float', rawlast):.12f}":
             msg = "Unaligned data between original and data in Figure."
             raise OpenFrameTestError(msg)
 

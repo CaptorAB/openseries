@@ -732,10 +732,10 @@ class TestOpenTimeSeries:
             for item in data
         )
 
-        if f"{series_one.tsdf.iloc[-1, 0]:.6f}" != intended:
+        if f"{cast('float', series_one.tsdf.iloc[-1, 0]):.6f}" != intended:
             msg = (
                 "test_to_json_and_back did not output as intended: "
-                f"{series_one.tsdf.iloc[-1, 0]:.6f}"
+                f"{cast('float', series_one.tsdf.iloc[-1, 0]):.6f}"
             )
             raise OpenTimeSeriesTestError(msg)
 
@@ -754,10 +754,10 @@ class TestOpenTimeSeries:
             for item in output
         )
 
-        if f"{series_two.tsdf.iloc[-1, 0]:.6f}" != intended:
+        if f"{cast('float', series_two.tsdf.iloc[-1, 0]):.6f}" != intended:
             msg = (
                 "test_to_json_and_back did not output as intended: "
-                f"{series_two.tsdf.iloc[-1, 0]:.6f}"
+                f"{cast('float', series_two.tsdf.iloc[-1, 0]):.6f}"
             )
             raise OpenTimeSeriesTestError(msg)
 
@@ -801,10 +801,10 @@ class TestOpenTimeSeries:
             for item in data
         )
 
-        if f"{series_one.tsdf.iloc[-1, 0]:.6f}" != intended:
+        if f"{cast('float', series_one.tsdf.iloc[-1, 0]):.6f}" != intended:
             msg = (
                 "test_to_json_and_back_tsdf did not output as intended: "
-                f"{series_one.tsdf.iloc[-1, 0]:.6f}"
+                f"{cast('float', series_one.tsdf.iloc[-1, 0]):.6f}"
             )
             raise OpenTimeSeriesTestError(msg)
 
@@ -823,10 +823,10 @@ class TestOpenTimeSeries:
             for item in output
         )
 
-        if f"{series_two.tsdf.iloc[-1, 0]:.6f}" != intended:
+        if f"{cast('float', series_two.tsdf.iloc[-1, 0]):.6f}" != intended:
             msg = (
                 "test_to_json_and_back_tsdf did not output as intended: "
-                f"{series_two.tsdf.iloc[-1, 0]:.6f}"
+                f"{cast('float', series_two.tsdf.iloc[-1, 0]):.6f}"
             )
             raise OpenTimeSeriesTestError(msg)
 
